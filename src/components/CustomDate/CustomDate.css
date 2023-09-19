@@ -1,0 +1,7 @@
+.myDatePicker fieldset.MuiOutlinedInput-notchedOutline {
+  border-color: green !important;
+}
+
+.myDatePicker .Mui-focused fieldset.MuiOutlinedInput-notchedOutline {
+  border-color: red !important;
+}

@@ -1,0 +1,31 @@
+.dropdown {
+  position: relative;
+  user-select: none;
+}
+
+.dropdown .dropdown-btn {
+  padding: 10px 20px;
+  background: #fff;
+  border: 1px solid #cacaca;
+  border-radius: 15px;
+  font-weight: 400;
+  color: #333;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dropdown .dropdown-content {
+  position: absolute;
+  top: 110%;
+  padding: 10px;
+  background-color: #fff;
+  box-shadow: 3px 3px 10px 6px rgba(0, 0, 0, 0.06);
+  width: 100%;
+  border-radius: 25px;
+  z-index: 999;
+}
+
+.dropdown .dropdown-content .dropdown-item {
+  padding: 10px;
+  cursor: pointer;
+}

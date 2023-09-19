@@ -1,0 +1,120 @@
+.logo-img {
+  width: 45px;
+  height: 48px;
+}
+
+.small-logo {
+  width: 30px;
+  width: 36px;
+}
+
+.side-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 17%;
+  background-color: #494949;
+  padding-top: 30px;
+  z-index: 99;
+  overflow-y: auto;
+}
+
+.toggleIconBox {
+  z-index: 999 !important;
+}
+
+.side-navbar::-webkit-scrollbar {
+  display: none;
+}
+
+.small-sidebar {
+  width: 5.3%;
+}
+
+.header-container {
+  position: fixed;
+  /* left: 17%; */
+  background-color: #f9f9f9;
+  top: 0;
+  width: 100%;
+  padding-left: 15%;
+  padding-right: 8%;
+}
+
+.item-text {
+  display: none;
+}
+
+.full-header {
+  position: fixed;
+  left: 5.3%;
+  top: 0;
+  width: 100%;
+}
+
+.content-container {
+  padding-left: 19%;
+  padding-right: 2%;
+}
+
+.small-paddings {
+  position: fixed;
+  background-color: #f9f9f9;
+  top: 0;
+  width: 100%;
+  padding-left: 10%;
+  padding-right: 3%;
+}
+
+.content-container {
+  height: 100%;
+  padding-left: 20%;
+  padding-right: 4%;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+.large-container {
+  padding-left: 10%;
+  padding-right: 4%;
+}
+
+.active {
+  background-color: #faa21b;
+  padding: 15px 0px;
+  /* padding: 15px; */
+}
+
+@media (max-width: 700px) {
+  .side-navbar {
+    z-index: 999;
+  }
+
+  .side-navbar {
+    display: none;
+  }
+  .content-container {
+    padding-left: 4%;
+    padding-right: 4%;
+  }
+
+  .full-header {
+    left: 0%;
+  }
+
+  .header-container {
+    padding-left: 5%;
+  }
+
+  .show-mobile {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 55%;
+    background-color: #494949;
+    padding-top: 30px;
+    z-index: 999;
+  }
+}
