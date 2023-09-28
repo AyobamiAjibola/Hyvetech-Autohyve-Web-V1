@@ -31,6 +31,11 @@ import EditEstimate from "./pages/auth/EditEstimate.jsx";
 import GenerateInvoice from "./pages/auth/GenerateInvoice.jsx";
 import EditInvoice from "./pages/auth/EditInvoice.jsx";
 import Reminder from "./pages/auth/Reminder.jsx";
+import store from "./store";
+import { Provider } from "react-redux";
+import VinDecoder from "./pages/auth/VinDecoder.tsx";
+import Insurance from "./pages/auth/Insurance.tsx";
+import PrivateRoute from "./components/RouteGuard/ProtectedRoute.tsx";
 
 const router = createBrowserRouter([
   {
@@ -62,47 +67,47 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/dashboard",
-        element: <Dashboard />,
+        element: <PrivateRoute><Dashboard /></PrivateRoute>
       },
       {
         path: "/customers",
-        element: <Customers />,
+        element: <PrivateRoute><Customers/></PrivateRoute>,
       },
       {
         path: "/inventory",
-        element: <Inventory />,
+        element: <PrivateRoute><Inventory/></PrivateRoute>,
       },
       {
-        path: "/hyepay",
-        element: <Hyvepay />,
+        path: "/hyvepay",
+        element: <PrivateRoute><Hyvepay/></PrivateRoute>,
       },
       {
         path: "/service-reminder",
-        element: <Reminder />,
+        element: <PrivateRoute><Reminder/></PrivateRoute>,
       },
       {
         path: "/estimates",
-        element: <Estimates />,
+        element: <PrivateRoute><Estimates/></PrivateRoute>,
       },
       {
         path: "/invoice",
-        element: <Invoice />,
+        element: <PrivateRoute><Invoice/></PrivateRoute>,
       },
       {
         path: "/generate-invoice",
-        element: <GenerateInvoice />,
+        element: <PrivateRoute><GenerateInvoice/></PrivateRoute>,
       },
       {
         path: "/edit-invoice",
-        element: <EditInvoice />,
+        element: <PrivateRoute><EditInvoice/></PrivateRoute>,
       },
       {
         path: "/payment",
-        element: <Payment />,
+        element: <PrivateRoute><Payment/></PrivateRoute>,
       },
       {
         path: "/expenses",
-        element: <Expenses />,
+        element: <PrivateRoute><Expenses/></PrivateRoute>,
       },
 
       {
@@ -110,35 +115,43 @@ const router = createBrowserRouter([
       },
       {
         path: "/hyvepay/initiate-transaction",
-        element: <NewTransaction />,
+        element: <PrivateRoute><NewTransaction/></PrivateRoute>,
       },
       {
         path: "/hyvepay/saved-beneficiaries",
-        element: <SavedBeneficiaries />,
+        element: <PrivateRoute><SavedBeneficiaries/></PrivateRoute>,
       },
       {
         path: "/settings",
-        element: <Settings />,
+        element: <PrivateRoute><Settings/></PrivateRoute>,
       },
       {
         path: "/profile",
-        element: <Profile />,
+        element: <PrivateRoute ><Profile/></PrivateRoute>,
       },
       {
         path: "/autoHyveProfile",
-        element: <AutoHyveProfile />,
+        element: <PrivateRoute><AutoHyveProfile/></PrivateRoute>,
       },
       {
         path: "/generate-customer-estimate",
-        element: <GenerateEstimate />,
+        element: <PrivateRoute><GenerateEstimate/></PrivateRoute>,
       },
       {
         path: "/generate-estimate-estimate",
-        element: <GenerateEstimateEstimate />,
+        element: <PrivateRoute><GenerateEstimateEstimate/></PrivateRoute>,
       },
       {
         path: "/edit-estimate",
-        element: <EditEstimate />,
+        element: <PrivateRoute><EditEstimate/></PrivateRoute>,
+      },
+      {
+        path: "/vin-decoder",
+        element: <PrivateRoute><VinDecoder/></PrivateRoute>,
+      },
+      {
+        path: "/insurance",
+        element: <PrivateRoute><Insurance/></PrivateRoute>,
       },
     ],
   },
@@ -146,6 +159,8 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <Provider store={store}>
+      <RouterProvider router={router} />
+    </Provider>
   </React.StrictMode>
 );

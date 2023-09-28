@@ -9,6 +9,9 @@ import hyvelogobar from "../../src/assets/svgs/hyvelogobar.svg";
 // import ItemIcon from '../../assets/svgs/Iconsax/Linear/receiptadd.png'
 import ItemIcon from "../../src/assets/svgs/receiptadd.svg";
 import HyveIcon from "../../src/assets/svgs/hyve-icon.svg";
+import vinIcon from "../../src/assets/svgs/vinIcon.svg";
+import InsuranceIcon from "../../src/assets/svgs/InsuranceIcon.svg"
+
 
 // import LogoutIcon from "../../src/assets/svgs/Icon/Outline/logout.svg";
 
@@ -19,14 +22,52 @@ export const sidebarItems = [
     icon: DashboardIcon,
   },
   {
+    name: "VIN Decoder",
+    path: "/vin-decoder",
+    icon: vinIcon,
+  },
+  {
+    name: "Insurance",
+    path: "/insurance",
+    icon: InsuranceIcon,
+  },
+  // {
+  //   name: "Items & Inventory",
+  //   path: "/inventory",
+  //   icon: ItemIcon,
+  // },
+  // {
+  //   name: "Service Reminder",
+  //   path: "/service-reminder",
+  //   icon: ServiceIcon,
+  // },
+  // {
+  //   name: "Estimates",
+  //   path: "/estimates",
+  //   icon: EstimateIcon,
+  // },
+  // {
+  //   name: "Invoices",
+  //   path: "/invoice",
+  //   icon: InvoiceIcon,
+  // },
+  // {
+  //   name: "Payments",
+  //   path: "/payment",
+  //   icon: PaymentIcon,
+  // },
+  // {
+  //   name: "Expenses",
+  //   path: "/expenses",
+  //   icon: ExpensesIcon,
+  // },
+];
+
+export const subSidebarItems = [
+  {
     name: "Customers",
     path: "/customers",
     icon: CustomerIcon,
-  },
-  {
-    name: "HyvePay",
-    path: "/hyepay",
-    icon: hyvelogobar,
   },
   {
     name: "Items & Inventory",

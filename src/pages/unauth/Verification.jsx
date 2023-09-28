@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import Logo from "../../assets/svgs/hyve_logo.svg";
 import Quote from "../../assets/svgs/blockquote.svg";
 import OtpInput from "react-otp-input";
-import AppBtn from "../../components/AppBtn/AppBtn";
 import { useNavigate } from "react-router-dom";
+import AppBtn from "../../components/AppBtn/AppBtn";
 
 const Verification = () => {
   const [otp, setOtp] = useState("");
@@ -60,16 +60,6 @@ const Verification = () => {
               }
               onClick={() => navigate("/dashboard")}
             />
-
-            {/* <button
-              className={
-                otp.length == 4
-                  ? "btn btn-primary btn-lg w-full mt-20 md:mt-40 md:mb-10"
-                  : "btn btn-primary disabled btn-lg w-full mt-20 md:mt-40 md:mb-10"
-              }
-            >
-              Verify & Create Account
-            </button> */}
           </div>
         </div>
 

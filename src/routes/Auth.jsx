@@ -5,6 +5,7 @@ import Sidebar from "../pages/auth/Layouts/Sidebar";
 import "../assets/css/layout.css";
 import DashboardHeader from "../pages/auth/Layouts/DashboardHeader";
 import MobileHeader from "../pages/auth/Layouts/MobileHeader";
+import PrivateRoute from "../components/RouteGuard/ProtectedRoute";
 
 const Auth = () => {
   const [show, setShow] = useState(false);
@@ -31,6 +32,7 @@ const Auth = () => {
         <MobileHeader />
 
         <Outlet />
+        
       </main>
     </div>
   );

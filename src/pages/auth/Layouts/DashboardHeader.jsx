@@ -3,21 +3,19 @@ import settings from "../../../assets/images/settings.png";
 import MenuIcon from "../../../assets/svgs/menu.svg";
 import ProfileDropDown from "../../../components/ProfileDropDown/ProfileDropDown";
 import { IoIosArrowBack } from "react-icons/io";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
+import hyvelogobarOrange from "../../../assets/svgs/hyvelogobarOrange.svg";
+import hyvelogobarGrey from "../../../assets/svgs/hyvelogobarGrey.svg";
+import useAdmin from "../../../hooks/useAdmin";
+import capitalize from 'capitalize';
 
 const DashboardHeader = ({ show, openNav, setOpenNav, open, setOpen }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const {user} = useAdmin()
 
-  // let name = "David";
   let workshop = "Demo workshop";
   const [path, setPath] = useState("");
-
-  // console.log(location.pathname);
-
-  // useEffect(() => {
-  //   setPath(window.location.pathname);
-  // }, [window.location.pathname]);
 
   return (
     <header
@@ -46,13 +44,15 @@ const DashboardHeader = ({ show, openNav, setOpenNav, open, setOpen }) => {
               Customer’s Profile
             </span>
           )}
-          {location.pathname == "/hyepay" && "HyvePay"}
+          {location.pathname == "/hyvepay" && "HyvePay"}
           {location.pathname == "/inventory" && "Items & Inventory"}
           {location.pathname == "/profile" && "Profile"}
           {location.pathname == "/settings" && "Settings"}
           {location.pathname == "/estimates" && "Estimates"}
           {location.pathname == "/invoice" && "Invoices"}
           {location.pathname == "/payment" && "Payments"}
+          {location.pathname == "/vin-decoder" && "VIN Decoder"}
+          {location.pathname == "/insurance" && "Insurance"}
           {location.pathname == "/expenses" && "Expenses"}
           {location.pathname == "/service-reminder" && "Service Reminders"}
           {location.pathname == "/generate-invoice" && (
@@ -108,10 +108,24 @@ const DashboardHeader = ({ show, openNav, setOpenNav, open, setOpen }) => {
         onClick={() => setOpenNav(!openNav)}
       />
 
-      <div className="">
+      <div className="flex gap-6">
+
+        <Link
+          to='/hyvepay'
+          className={`flex gap-2 p-3 rounded-lg hover:bg-[white] 
+          hover:border-[0.5px] hover:border-[#faa21b] font-[600]`}
+          // onClick={() => localStorage.setItem("active", "")}
+        >
+          <img
+            src={location.pathname == "/hyvepay" ? hyvelogobarGrey : hyvelogobarOrange }
+            alt=""
+            style={{ height: 34, width: 31 }}
+          />
+        </Link>
+        
         <button className="" onClick={() => setOpen(!open)}>
-          <div className="flex  items-center gap-2">
-            <span className="font-montserrat"> {workshop}</span>
+          <div className="flex items-center gap-2">
+            <span className="font-montserrat">{capitalize.words(user?.companyName || user?.firstName || '')}</span>
 
             <img src={settings} alt="" className="w-[30px] h-[30px]" />
           </div>

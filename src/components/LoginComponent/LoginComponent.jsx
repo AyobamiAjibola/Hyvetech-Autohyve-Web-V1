@@ -15,7 +15,7 @@ const LoginComponent = ({ setModal }) => {
             Hello there!
           </h2>
           <h5 className="text-[12px] gray-color">
-            Welcome to HyvePay, what would you like to do?
+            Welcome to HyvePay, what would you like to do
           </h5>
         </div>
 
