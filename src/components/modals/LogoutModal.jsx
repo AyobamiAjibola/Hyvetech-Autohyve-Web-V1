@@ -12,6 +12,12 @@ const LogoutModal = ({ logoutModal, setLogoutModal }) => {
     document.body.classList.remove("active-modal");
   }
 
+  const handleLogout = () => {
+    localStorage.clear()
+    sessionStorage.clear()
+    navigate("/")
+  }
+
   return (
     <>
       {logoutModal && (
@@ -43,7 +49,7 @@ const LogoutModal = ({ logoutModal, setLogoutModal }) => {
                 className="btn-secondary"
                 onClick={() => setLogoutModal(false)}
               />
-              <AppBtn title="LOGOUT" onClick={() => navigate("/")} />
+              <AppBtn title="LOGOUT" onClick={handleLogout} />
             </div>
           </div>
         </div>

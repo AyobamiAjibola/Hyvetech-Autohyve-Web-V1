@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AppBtn from "../../components/AppBtn/AppBtn";
 import cloudIcon from "../../assets/images/cloudIcon.png";
 import { useNavigate } from "react-router-dom";
 import AuthenticationHeader from "../../components/AuthenticationHeader/AuthenticationHeader";
 import SignHyveModal from "../../components/modals/SignHyveModal";
+import settings from "../../config/settings";
 
 const Login = ({ setModal, setShowCurrent }) => {
   const navigate = useNavigate();
   const [openHyveLogin, setOpenHyveLogin] = useState(false);
+
   return (
     <>
       <div className="w-full flex flex-col justify-center mt-10  px-10 md:px-28   items-center h-[100%]">
