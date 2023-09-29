@@ -73,6 +73,16 @@ const SignHyveModal = ({
       navigate('/dashboard');
     }
   }, [authReducer.authToken, authReducer.signingInStatus]);
+
+  useEffect(() => {
+    if(authReducer.signingInStatus === 'failed') {
+      showMessage(
+        "Loggin Error",
+        authReducer.signingInError,
+        "error"
+      );
+    }
+  },[authReducer.signingInStatus])
  
   return (
     <>
