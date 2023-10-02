@@ -1,13 +1,88 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Logo from "../../assets/svgs/hyve_logo.svg";
 import Quote from "../../assets/svgs/blockquote.svg";
 import OtpInput from "react-otp-input";
 import { useNavigate } from "react-router-dom";
 import AppBtn from "../../components/AppBtn/AppBtn";
+import NewPasswordModal from "../../components/modals/NewPasswordModal";
+import useAppDispatch from "../../hooks/useAppDispatch";
+import useAppSelector from "../../hooks/useAppSelector";
+import { veryfyTokenAction } from "../../store/actions/authenicationActions";
+import { showMessage } from "../../helpers/notification";
+import { clearPreSignUpStatus, clearVerifyTokenStatus } from "../../store/reducers/authenticationReducer";
 
 const Verification = () => {
   const [otp, setOtp] = useState("");
   const navigate = useNavigate();
+  const [newPasswordModal, setNewPasswordModal] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const dispatch = useAppDispatch()
+  const authReducer = useAppSelector(state => state.authenticationReducer)
+
+  const handleSubmit = () => {
+    dispatch(veryfyTokenAction({
+      token: otp
+    }))
+  }
+
+  // useEffect(() => {
+  //   if(authReducer.preSignUpStatus === 'completed') {
+  //     showMessage(
+  //       "Sign up",
+  //       authReducer.preSignUpSuccess,
+  //       "success"
+  //     )
+  //   }
+  //   dispatch(clearPreSignUpStatus())
+  // },[authReducer.preSignUpStatus]);
+
+  useEffect(() => {
+    if(authReducer.verifyTokenStatus === 'completed') {
+      showMessage(
+        "Verify token",
+        "Your token is valid",
+        "success"
+      )
+      setNewPasswordModal(true)
+      dispatch(clearVerifyTokenStatus())
+    }else if(authReducer.verifyTokenStatus === 'failed') {
+      showMessage(
+        "Verify token",
+        authReducer.verifyTokenError,
+        "error"
+      )
+      dispatch(clearVerifyTokenStatus())
+    }
+    
+    return () => {
+      dispatch(clearVerifyTokenStatus())
+    } 
+  },[authReducer.verifyTokenStatus])
+  // const handleSubmit = async (values) => {
+  //   setLoading(true)
+  //   try {
+
+  //     const response = await axios.post(`${API_ROOT}/api/v1/garage-sign-up`, {
+  //       token: otp,
+  //     })
+
+  //     if(response.data.code === 200) {
+  //       handleSubmit(true)
+  //     }
+
+  //     setLoading(false)
+      
+
+  //   } catch (error) {
+  //     showMessage(
+  //       "Sign up",
+  //       error.response.data.message,
+  //       "error"
+  //     )
+  //     setLoading(false)
+  //   }
+  // }
+  console.log(authReducer.preSignUpStatus, 'status')
 
   return (
     <>
@@ -58,7 +133,8 @@ const Verification = () => {
                   ? "btn btn-primary w-[80%] mt-10 md:mt-24 md:mb-10"
                   : "btn btn-primary disabled w-[80%] mt-10 md:mt-24 md:mb-10"
               }
-              onClick={() => navigate("/dashboard")}
+              onClick={handleSubmit}
+              spinner={authReducer.verifyTokenStatus === 'loading'}
             />
           </div>
         </div>
@@ -138,6 +214,11 @@ const Verification = () => {
             </div>
           </div>
         </div>
+
+        <NewPasswordModal 
+          newPasswordModal={newPasswordModal}
+          setNewPasswordModal={setNewPasswordModal}
+        />
       </div>
     </>
   );

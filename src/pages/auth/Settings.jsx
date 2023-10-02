@@ -1,12 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
-
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import DownloadIcon from "../../assets/svgs/download-icon.svg";
 import SearchIcon from "../../assets/svgs/vuesax/linear/search-normal.svg";
 import TrashIcon from "../../assets/svgs/vuesax/linear/trash.svg";
 import AppBtn from "../../components/AppBtn/AppBtn";
 import TabBtn from "../../components/TabBtn/TabBtn";
 import AppInput from "../../components/AppInput/AppInput";
-import AccountSettings from "../../components/AccountSettings/AccountSettings";
+import AccountSettings from "../../components/BusinessProfile/BusinessProfile";
 import { HiChevronDown } from "react-icons/hi";
 import SingleSort from "../../components/SingleSort/SingleSort";
 import DeleteModal from "../../components/modals/DeleteModal";
@@ -17,6 +16,14 @@ import EditRoleModal from "../../components/modals/EditRoleModal";
 import AppSwitch from "../../components/AppSwitch/AppSwitch";
 import { GrEdit } from "react-icons/gr";
 import EditUserModal from "../../components/modals/EditUserModal";
+import {getPermissionsActions, getRoleActions, getUsersAction, updateUserStatusAction } from "../../store/actions/userActions";
+import useAppDispatch from "../../hooks/useAppDispatch";
+import useAppSelector from "../../hooks/useAppSelector";
+import AddUserModall from "../../components/modals/AddUserModalOld";
+import UserAppSwitch from "../../components/AppSwitch/UserAppSwitch";
+import { ToggleOff, ToggleOn } from "@mui/icons-material";
+import { IconButton } from "@mui/material";
+import { clearCreateUserStatus } from "../../store/reducers/userReducer";
 
 const Settings = () => {
   const [deletemodal, setDeletemodal] = useState(false);
@@ -26,6 +33,30 @@ const Settings = () => {
   const [editRole, setEditRole] = useState(false);
   const [editUser, setEditUser] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const dispatch = useAppDispatch()
+  const store = useAppSelector(item => item.userReducer);
+  const [permissions, setPermissions] = useState([]);
+  const [roleName, setRoleName] = useState('');
+  const [editMode, setEditMode] = useState(false);
+  const [roleId, setRoleId] = useState(-1);
+  const [showPassword, setShowPassword] = useState(false);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
+  const [userId, setUserId] = useState(-1);
+  const [role, setRole] = useState("");
+  const [delId, setDelId] = useState(-1);
+
+  const getUsers = useCallback(() => {
+    dispatch(getUsersAction());
+    dispatch(getPermissionsActions());
+    dispatch(getRoleActions());
+  }, []);
+  useEffect(() => {
+    getUsers();
+  }, [getUsers]);
 
   const closeDeleteModal = () => setDeletemodal(!deletemodal);
 
@@ -46,6 +77,52 @@ const Settings = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  const handleRoleEdit = (role) => {
+    setRoleName(role.name);
+    setEditMode(true);
+    setRoleId(role.id);
+    setPermissions(role.permissions.map(item => item.name));
+
+    // setShowCreateRole(true);
+  };
+
+  const handleOnEditUser = (user) => {
+    setFirstName(user.firstName);
+    setLastName(user.lastName);
+    setEmail(user.email);
+    setRoleId(user.roles[0]?.id);
+    setRole(user.roles[0].name)
+    setPhone(user.phone);
+    // setShowCreateUser(true);
+    setEditMode(true);
+    setUserId(user.id);
+  };
+
+  const parsePhone = (phone) => {
+    if (!phone) {
+      return "";
+    }
+
+    if (phone.startsWith("234")) return phone.replace("234", "0");
+
+    return phone;
+  };
+
+  const handleDisableUser = (user) => {
+    setEditMode(true);
+    dispatch(updateUserStatusAction({userId: user.id}));
+  };
+
+  useEffect(() => {
+    if(store.createUserStatus === 'completed') {
+      dispatch(getUsersAction())
+    }
+
+    return () => {
+      dispatch(clearCreateUserStatus());
+    }
+  },[store.createUserStatus])
 
   return (
     <>
@@ -74,7 +151,7 @@ const Settings = () => {
             </div>
 
             <span
-              onClick={() => setAddrolemodal(!addrolemodal)}
+              onClick={() => setEditRole(!addrolemodal)}
               className="flex items-center border-[1px] cursor-pointer border-[#CACACA] p-3 rounded-[20px] px-5"
             >
               ADD ROLE
@@ -117,73 +194,37 @@ const Settings = () => {
                 <th className="font-montserrat">Permission</th>
                 <th className="font-montserrat w-10">Action</th>
               </thead>
-              <tbody>
-                <tr>
-                  <td className="font-montserrat text-center">
-                    <input type="checkbox" name="" id="" />
-                  </td>
-                  <td className="font-montserrat">13</td>
-                  <td className="font-montserrat">Default</td>
-                  <td className="font-montserrat">
-                    delete_expense,view_analytics,read_customer
-                  </td>
-                  <td className="flex gap-3">
-                    <GrEdit
-                      size={18}
-                      onClick={() => setEditRole(!editRole)}
-                      className="cursor-pointer"
-                    />
+              {store.roles.map((role, index) => {
+                return (
+                  <tbody key={role.id}>
+                    <tr>
+                      <td className="font-montserrat text-center">
+                        <input type="checkbox" name="" id="" />
+                      </td>
+                      <td className="font-montserrat">{role.id}</td>
+                      <td className="font-montserrat">{role.name}</td>
+                      <td className="font-montserrat max-w-2xl px-4 py-2 whitespace-normal break-words">
+                        {role.permissions.map(item => item.name).join(', ')}
+                      </td>
+                      <td className="flex gap-3">
+                        <GrEdit
+                          size={18}
+                          onClick={() => {
+                            setEditRole(!editRole)
+                            handleRoleEdit(role)
+                          }}
+                          className="cursor-pointer"
+                        />
 
-                    <button onClick={() => setDeletemodal(true)}>
-                      <img src={TrashIcon} alt="" />
-                    </button>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td className="font-montserrat text-center">
-                    <input type="checkbox" name="" id="" />
-                  </td>
-                  <td className="font-montserrat">16</td>
-                  <td className="font-montserrat">Super</td>
-                  <td className="font-montserrat">
-                    delete_expense,view_analytics,read_customer
-                  </td>
-                  <td className="flex gap-3">
-                    <GrEdit
-                      size={18}
-                      onClick={() => setEditRole(!editRole)}
-                      className="cursor-pointer"
-                    />
-
-                    <button onClick={() => setDeletemodal(true)}>
-                      <img src={TrashIcon} alt="" />
-                    </button>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td className="font-montserrat text-center">
-                    <input type="checkbox" name="" id="" />
-                  </td>
-                  <td className="font-montserrat">9</td>
-                  <td className="font-montserrat">Test</td>
-                  <td className="font-montserrat">
-                    delete_expense,view_analytics,read_customer
-                  </td>
-                  <td className="flex gap-3">
-                    <GrEdit
-                      size={18}
-                      onClick={() => setEditRole(!editRole)}
-                      className="cursor-pointer"
-                    />
-
-                    <button onClick={() => setDeletemodal(true)}>
-                      <img src={TrashIcon} alt="" />
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
+                        <button onClick={() => setDeletemodal(true)}>
+                          <img src={TrashIcon} alt="" />
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                )
+              })
+              }
             </table>
 
             <div className="flex justify-between mt-4 ">
@@ -202,15 +243,10 @@ const Settings = () => {
             <h5 className="heading-five block mb-4">User</h5>
 
             <div className="flex justify-center gap-3 items-center">
-              {/* <AppBtn
-                className="btn-secondary"
-                title="READ USER"
-                onClick={() => setReadusermodal(!readusermodal)}
-              /> */}
               <AppBtn
                 className="btn-secondary"
                 title="ADD USER"
-                onClick={() => setAddusermodal(!addusermodal)}
+                onClick={() => {setAddusermodal(!addusermodal), setShowPassword(true)}}
               />
             </div>
           </div>
@@ -257,69 +293,55 @@ const Settings = () => {
                 </th>
               </thead>
               <tbody>
-                <tr>
-                  <td className="font-montserrat text-center">
-                    <input type="checkbox" name="" id="" />
-                  </td>
-                  <td className="font-montserrat">13</td>
-                  <td className="font-montserrat">David James</td>
-                  <td className="font-montserrat">demo@myautohyve.com</td>
-                  <td className="font-montserrat">Garage Admin Role</td>
-                  <td className="font-montserrat">
-                    <span
-                      className="py-2 bg-gray-300 px-4"
-                      style={{ borderRadius: 10 }}
-                    >
-                      Inactive
-                    </span>
-                  </td>
-                  <td className="font-montserrat">08144246273</td>
-                  <td className="flex items-center gap-3">
-                    <GrEdit
-                      size={18}
-                      onClick={() => setEditUser(!editUser)}
-                      className="cursor-pointer"
-                    />
+                {store.users.map((user, index) => {
+                  return (
+                    <tr key={user.id}>
+                      <td className="font-montserrat text-center">
+                        <input type="checkbox" name="" id="" />
+                      </td>
+                      <td className="font-montserrat">{user.id}</td>
+                      <td className="font-montserrat">{user.firstName} {user.lastName}</td>
+                      <td className="font-montserrat">{ user.email }</td>
+                      <td className="font-montserrat">{user.roles[0].name}</td>
+                      <td className="font-montserrat">
+                        <span
+                          className={`py-2 ${!user.active ? 'bg-gray-300' : 'bg-[#FAA21B]'}  px-4`}
+                          style={{ borderRadius: 10 }}
+                        >
+                          {user.active ? 'Active' : 'Inactive'}
+                        </span>
+                      </td>
+                      <td className="font-montserrat">{parsePhone(user.phone)}</td>
+                      <td className="flex items-center gap-2 justify-center">
+                        <GrEdit
+                          size={28}
+                          onClick={() => {
+                            setAddusermodal(!addusermodal)
+                            handleOnEditUser(user)
+                          }}
+                          className="cursor-pointer"
+                        />
+                          <IconButton
+                            onClick={() => handleDisableUser(user)}
+                          >
+                            {user.active 
+                              ? <ToggleOn
+                                  color="success" 
+                                  sx={{fontSize: '28px'}} 
+                                /> 
+                              : <ToggleOff
+                                  color="warning" 
+                                  sx={{fontSize: '28px'}} 
+                                />}
+                          </IconButton>
 
-                    <AppSwitch />
-
-                    <button onClick={() => setDeletemodal(true)}>
-                      <img src={TrashIcon} alt="" className="w-[22px]" />
-                    </button>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td className="font-montserrat text-center">
-                    <input type="checkbox" name="" id="" />
-                  </td>
-                  <td className="font-montserrat">16</td>
-                  <td className="font-montserrat">Mr Ejike Emmanuel</td>
-                  <td className="font-montserrat">demo@myautohyve.com</td>
-                  <td className="font-montserrat">Garage Admin Role</td>
-                  <td className="font-montserrat">
-                    <span
-                      className="py-2 bg-primary px-4"
-                      style={{ borderRadius: 10 }}
-                    >
-                      Active
-                    </span>
-                  </td>
-                  <td className="font-montserrat">08144246273</td>
-                  <td className="flex items-center gap-3">
-                    <GrEdit
-                      size={18}
-                      onClick={() => setEditUser(!editUser)}
-                      className="cursor-pointer"
-                    />
-
-                    <AppSwitch />
-
-                    <button onClick={() => setDeletemodal(true)}>
-                      <img src={TrashIcon} alt="" className="w-[22px]" />
-                    </button>
-                  </td>
-                </tr>
+                        <button onClick={() => {setDeletemodal(true), setDelId(user.id)}}>
+                          <img src={TrashIcon} alt="" className="w-[28px]" />
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
 
@@ -343,36 +365,51 @@ const Settings = () => {
         title={"Are you sure you want to delete this User?"}
         description=""
         closeDeleteModal={closeDeleteModal}
-      />
-
-      <AddRoleModal
-        addrolemodal={addrolemodal}
-        title={"Add Role"}
-        description=""
-        setAddrolemodal={setAddrolemodal}
+        delId={delId}
+        setDelId={setDelId}
+        setDeletemodal={setDeletemodal}
       />
 
       <AddUserModal
         addusermodal={addusermodal}
-        title={"Add User"}
-        description=""
         setAddusermodal={setAddusermodal}
+        firstName={firstName}
+        lastName={lastName}
+        phone={phone}
+        email={email}
+        roleId={roleId}
+        password={password}
+        setPassword={setPassword}
+        store={store}
+        setRole={setRole}
+        roleName={role}
+        setFirstName={setFirstName}
+        setLastName={setLastName}
+        setEmail={setEmail}
+        setPhone={setPhone}
+        editMode={editMode}
+        setEditMode={setEditMode}
+        userId={userId}
+        setUserId={setUserId}
+        showPassword={showPassword}
+        setShowPassword={setShowPassword}
       />
 
-      <ReadUserModal
-        readusermodal={readusermodal}
-        title={"Read Users"}
-        description=""
-        setReadusermodal={setReadusermodal}
+      <EditRoleModal
+        editRole={editRole}
+        setEditRole={setEditRole}
+        permissions={permissions}
+        roleName={roleName}
+        store={store}
+        setRoleName={setRoleName}
+        setPermissions={setPermissions}
+        editMode={editMode}
+        roleId={roleId}
+        setRoleId={setRoleId}
+        setEditMode={setEditMode}
+        setAddrolemodal={setAddrolemodal}
+        addrolemodal={addrolemodal}
       />
-
-      <EditUserModal
-        editUser={editUser}
-        setEditUser={setEditUser}
-        title={"Edit User"}
-      />
-
-      <EditRoleModal editRole={editRole} setEditRole={setEditRole} />
     </>
   );
 };

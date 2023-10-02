@@ -9,6 +9,20 @@ import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import NewPasswordModal from "./NewPasswordModal";
+import { Button, Typography } from "@mui/material";
+
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
 
 export default function OtpModal({
   openOtp,
@@ -53,7 +67,7 @@ export default function OtpModal({
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <div className="modal-header bg-white p-8 py-2 relative">
+          <div className="modal-header bg-white p-8 py-2 relative mt-4">
             <button
               onClick={() => setOpenOtp(false)}
               className="flex justify-end w-full absolute  -top-5 right-1 md:right-3"
@@ -99,7 +113,9 @@ export default function OtpModal({
       <NewPassword
         newPasswordModal={newPasswordModal}
         setNewPasswordModal={setNewPasswordModal}
+        otp={otp}
       />
     </>
   );
 }
+

@@ -13,6 +13,7 @@ const AppInput: FC<any> = ({
   placeholderTop,
   hasPLaceHolder,
   placeholder,
+  value,
   className,
   type = "text",
 }) => {
@@ -36,6 +37,7 @@ const AppInput: FC<any> = ({
             `w-full placeholder-[#A5A5A5] placeholderText h-[55px] font-montserrat
           } ` + className
           }
+          value={value}
           placeholder={placeholder}
         />
         <button onClick={(e) => togglePassword(e, !pwdfield)}>
@@ -201,6 +203,61 @@ export const MyTextInput = ({
 
       {meta.touched && meta.error ? (
         <div className="error-input-field text-[red] text-[13px]">{meta.error}</div>
+      ) : null}
+    </div>
+  );
+};
+
+export const MyChangePassInput = ({
+  label,
+  className,
+  leftImg,
+  hasPLaceHolder,
+  placeholderTop,
+  rightImg,
+  type = "text",
+  disabled = false,
+  ...props
+}: any) => {
+  // useField() returns [formik.getFieldProps(), formik.getFieldMeta()]
+  // which we can spread on <input>. We can use field meta to show an error
+  // message if the field is invalid and it has been touched (i.e. visited)
+  const [pwdfield, setPwdfield] = useState(false);
+  const [field, meta] = useField({...props});
+  const togglePassword = (e: any, _: any) => {
+    e.preventDefault();
+
+    setPwdfield((state) => !state);
+  };
+
+  return (
+    <div className="mb-5">
+      {hasPLaceHolder && <InputHeader text={placeholderTop} />}
+      <div className="prepend w-full mb-0">
+        {/* <img src={leftImg} alt="" /> */}
+        <input
+          className={
+            `w-full placeholder-[#A5A5A5] placeholderText font-montserrat
+          } ` + className
+          }
+          {...field}
+          {...props}
+          type={pwdfield ? "text" : type}
+          disabled={disabled}
+        />
+        {type === "password" && (
+          <button onClick={(e) => togglePassword(e, !pwdfield)}>
+            {pwdfield ? (
+              <BsEyeSlash color="black" size={25} />
+            ) : (
+              <EyeOutlined color="black" size={25} />
+            )}
+          </button>
+        )}
+      </div>
+
+      {meta.touched && meta.error ? (
+        <div className="error-input-field text-[red] text-[13px] mt-3">{meta.error}</div>
       ) : null}
     </div>
   );

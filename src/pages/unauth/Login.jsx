@@ -5,10 +5,42 @@ import { useNavigate } from "react-router-dom";
 import AuthenticationHeader from "../../components/AuthenticationHeader/AuthenticationHeader";
 import SignHyveModal from "../../components/modals/SignHyveModal";
 import settings from "../../config/settings";
+import { clearGarageSignUpStatus, clearResetPasswordWithTokenStatus } from "../../store/reducers/authenticationReducer";
+import useAppDispatch from "../../hooks/useAppDispatch";
+import useAppSelector from "../../hooks/useAppSelector";
+import { showMessage } from "../../helpers/notification";
 
 const Login = ({ setModal, setShowCurrent }) => {
   const navigate = useNavigate();
   const [openHyveLogin, setOpenHyveLogin] = useState(false);
+
+  const state = useAppSelector(state => state.authenticationReducer)
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if(state.resetPasswordWithTokenStatus === 'completed') {
+      showMessage(
+        "Password reset",
+        state.resetPasswordWithTokenSuccess,
+        "success"
+      )
+    }
+    setTimeout(() => {
+      dispatch(clearResetPasswordWithTokenStatus())
+    },1000)
+  },[state.resetPasswordWithTokenStatus]);
+
+  useEffect(() => {
+    if(state.garageSignUpStatus === 'completed') {
+      showMessage(
+        "Sign up",
+        state.garageSignUpSuccess,
+        "success"
+      )
+      localStorage.removeItem('user_data')
+    }
+    dispatch(clearGarageSignUpStatus())
+  },[state.garageSignUpStatus]);
 
   return (
     <>

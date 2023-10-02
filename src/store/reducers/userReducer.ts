@@ -2,12 +2,15 @@ import { IThunkAPIStatus } from '@app-types';
 import { IPermission, IRole, IUser } from '@app-models';
 import { createSlice } from '@reduxjs/toolkit';
 import {
+  createPartnerUserAction,
   createRoleAction,
   createUserAction,
+  deleteUserAction,
   getPermissionsActions,
   getRoleActions,
   getUserAction,
   getUsersAction,
+  updatePartnerUserAction,
   updateRoleAction,
   updateUserAction,
   updateUserStatusAction,
@@ -41,6 +44,18 @@ interface IUserState {
   createRoleStatus: IThunkAPIStatus;
   createRoleSuccess: string;
   createRoleError?: string;
+
+  createPartnerUserStatus: IThunkAPIStatus;
+  createPartnerUserSuccess: string;
+  createPartnerUserError?: string;
+
+  updatePartnerUserStatus: IThunkAPIStatus;
+  updatePartnerUserSuccess: string;
+  updatePartnerUserError?: string;
+
+  deleteUserStatus: IThunkAPIStatus;
+  deleteUserSuccess: string;
+  deleteUserError?: string;
 
   users: IUser[];
   user: IUser | null;
@@ -79,6 +94,18 @@ const initialState: IUserState = {
   getRoleStatus: 'idle',
   getRoleSuccess: '',
 
+  createPartnerUserError: '',
+  createPartnerUserStatus: 'idle',
+  createPartnerUserSuccess: '',
+
+  updatePartnerUserError: '',
+  updatePartnerUserStatus: 'idle',
+  updatePartnerUserSuccess: '',
+
+  deleteUserError: '',
+  deleteUserStatus: 'idle',
+  deleteUserSuccess: '',
+
   user: null,
   users: [],
 
@@ -114,6 +141,24 @@ const userSlice = createSlice({
       state.createUserSuccess = '';
       state.createUserError = '';
     },
+
+    clearCreatePartnerUserStatus(state: IUserState) {
+      state.createPartnerUserStatus = 'idle';
+      state.createPartnerUserSuccess = '';
+      state.createPartnerUserError = '';
+    },
+
+    clearUpdateUserPartnerStatus(state: IUserState) {
+      state.createPartnerUserStatus = 'idle';
+      state.createPartnerUserSuccess = '';
+      state.createPartnerUserError = '';
+    },
+
+    clearDeleteUserStatus(state: IUserState) {
+      state.deleteUserStatus = 'idle';
+      state.deleteUserSuccess = '';
+      state.deleteUserError = '';
+    },
   },
   extraReducers: builder => {
     builder
@@ -131,6 +176,22 @@ const userSlice = createSlice({
         if (action.payload) {
           state.getUsersError = action.payload.message;
         } else state.getUsersError = action.error.message;
+      });
+
+    builder
+      .addCase(deleteUserAction.pending, state => {
+        state.deleteUserStatus = 'loading';
+      })
+      .addCase(deleteUserAction.fulfilled, (state, action) => {
+        state.deleteUserStatus = 'completed';
+        state.deleteUserSuccess = action.payload.message;
+      })
+      .addCase(deleteUserAction.rejected, (state, action) => {
+        state.deleteUserStatus = 'failed';
+
+        if (action.payload) {
+          state.deleteUserError = action.payload.message;
+        } else state.deleteUserError = action.error.message;
       });
 
     builder
@@ -268,9 +329,49 @@ const userSlice = createSlice({
           state.createUserError = action.payload.message;
         } else state.createUserError = action.error.message;
       });
+
+    builder
+      .addCase(createPartnerUserAction.pending, state => {
+        state.createPartnerUserStatus = 'loading';
+      })
+      .addCase(createPartnerUserAction.fulfilled, (state, action) => {
+        state.createPartnerUserStatus = 'completed';
+        state.createPartnerUserSuccess = action.payload.message;
+      })
+      .addCase(createPartnerUserAction.rejected, (state, action) => {
+        state.createPartnerUserStatus = 'failed';
+
+        if (action.payload) {
+          state.createPartnerUserError = action.payload.message;
+        } else state.createPartnerUserError = action.error.message;
+      });
+
+    builder
+      .addCase(updatePartnerUserAction.pending, state => {
+        state.updatePartnerUserStatus = 'loading';
+      })
+      .addCase(updatePartnerUserAction.fulfilled, (state, action) => {
+        state.updatePartnerUserStatus = 'completed';
+        state.updatePartnerUserSuccess = action.payload.message;
+      })
+      .addCase(updatePartnerUserAction.rejected, (state, action) => {
+        state.updatePartnerUserStatus = 'failed';
+
+        if (action.payload) {
+          state.updatePartnerUserError = action.payload.message;
+        } else state.updatePartnerUserError = action.error.message;
+      });
   },
 });
 
-export const { clearGetUsersStatus, clearGetUserStatus, clearCreateRoleStatus, clearCreateUserStatus } =
+export const {
+  clearGetUsersStatus,
+  clearGetUserStatus,
+  clearCreateRoleStatus,
+  clearCreateUserStatus,
+  clearCreatePartnerUserStatus,
+  clearUpdateUserPartnerStatus,
+  clearDeleteUserStatus
+} =
   userSlice.actions;
 export default userSlice.reducer;

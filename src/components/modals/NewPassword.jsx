@@ -1,42 +1,49 @@
 import React, { useEffect, useState } from "react";
 import "./modal.css";
-import AppInput from "../AppInput/AppInput";
+import { MyTextInput } from "../AppInput/AppInput";
 import CloseIcon from "../../assets/svgs/close-circle.svg";
 import AppBtn from "../AppBtn/AppBtn";
 import OtpModal from "./OtpModal";
 import ModalHeaderTitle from "../ModalHeaderTitle/ModalHeaderTitle";
+import { Form, Formik } from "formik";
+import useAppSelector from "../../hooks/useAppSelector";
+import useAppDispatch from "../../hooks/useAppDispatch";
+import { resetPasswordWithTokenAction } from "../../store/actions/authenicationActions";
+import { showMessage } from "../../helpers/notification";
+import * as Yup from "yup";
+import { useNavigate } from "react-router-dom";
+import { clearSendPasswordResetTokenStatus } from "../../store/reducers/authenticationReducer";
 
-export default function NewPassword({ setNewPasswordModal, newPasswordModal }) {
+export default function NewPassword({ setNewPasswordModal, newPasswordModal, otp }) {
+
+  const state = useAppSelector(state => state.authenticationReducer)
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate()
+
   if (newPasswordModal) {
     document.body.classList.add("active-modal");
   } else {
     document.body.classList.remove("active-modal");
   }
 
-  // const toggleModal = (e) => {
-  //   if (e.target.id === "modalWrapperId") {
-  //     setNewPasswordModal(!newPasswordModal);
+  // const handleClickOutside = (e) => {
+  //   if (node.current.contains(e.target)) {
+  //     return;
   //   }
+
+  //   setNewPasswordModal(false);
   // };
 
-  const handleClickOutside = (e) => {
-    if (node.current.contains(e.target)) {
-      return;
-    }
+  // useEffect(() => {
+  //   if (newPasswordModal) {
+  //     document.addEventListener("mousedown", handleClickOutside);
+  //     return;
+  //   }
 
-    setNewPasswordModal(false);
-  };
-
-  useEffect(() => {
-    if (newPasswordModal) {
-      document.addEventListener("mousedown", handleClickOutside);
-      return;
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [newPasswordModal]);
+  //   return () => {
+  //     document.removeEventListener("mousedown", handleClickOutside);
+  //   };
+  // }, [newPasswordModal]);
 
   useEffect(() => {
     if (newPasswordModal) {
@@ -47,6 +54,48 @@ export default function NewPassword({ setNewPasswordModal, newPasswordModal }) {
       document.body.style.overflow = "auto";
     };
   }, [newPasswordModal]);
+
+  const handleSubmit = (values) => {
+    if(otp.length === 4) {
+      dispatch(
+        resetPasswordWithTokenAction({
+          password: values.newPassword,
+          token: otp
+        })
+      );
+    }
+  };
+
+  useEffect(() => {
+    if(state.resetPasswordWithTokenStatus === 'completed') {
+      setNewPasswordModal(false)
+      localStorage.clear()
+      sessionStorage.clear()
+      navigate("/")
+    }
+    // setTimeout(() => {
+    //   setNewPasswordModal(false)
+    //   localStorage.clear()
+    //   sessionStorage.clear()
+    //   navigate("/")
+    // },1000)
+  },[state.resetPasswordWithTokenStatus]);
+
+  useEffect(() => {
+    if(state.resetPasswordWithTokenStatus === 'failed') {
+      showMessage(
+        "Password reset",
+        state.resetPasswordWithTokenError,
+        "error"
+      )
+    }
+  },[state.resetPasswordWithTokenStatus]);
+
+  useEffect(() => {
+    if(state.sendPasswordResetTokenStatus === 'completed') {
+      dispatch(clearSendPasswordResetTokenStatus())
+    }
+  },[state.sendPasswordResetTokenStatus]);
 
   return (
     <>
@@ -60,10 +109,6 @@ export default function NewPassword({ setNewPasswordModal, newPasswordModal }) {
               >
                 <img src={CloseIcon} alt="" />
               </button>
-
-              {/* <div>
-                <h5 className="text-center heading-five">Transfer Fund</h5>
-              </div> */}
             </div>
 
             <div className="flex flex-col">
@@ -75,30 +120,67 @@ export default function NewPassword({ setNewPasswordModal, newPasswordModal }) {
                 </span>
               </div>
 
-              <div className="flex flex-col md:flex-row  justify-between items-center gap-1 md:gap-5">
-                <div className="w-full">
-                  <AppInput
-                    placeholderTop="New Password"
-                    placeholder="Enter new password"
-                    hasPLaceHolder={true}
-                  />
-                </div>
-                <div className="w-full relative">
-                  <AppInput
-                    placeholderTop="Confirm New Password"
-                    placeholder="Re-enter new password"
-                    hasPLaceHolder={true}
-                  />
-                </div>
-              </div>
+              <Formik
+                enableReinitialize
+                initialValues={{
+                  newPassword: "",
+                  confirmPassword: ""
+                }}
+                validationSchema={Yup.object({
+                  newPassword: Yup.string()
+                    .matches(
+                      /^(?=.*\d)(?=.*[a-z])(?=.*\W)(?=.*[A-Z])(?=.*[a-zA-Z]).{8,20}$/,
+                      'Password does not meet requirement.'
+                    )
+                    .required('Password is required')
+                    .label('Password'),
+                  confirmPassword: Yup.string()
+                    .oneOf([Yup.ref('newPassword')], 'Confirm new password and new password do not match ')
+                    .required('Confirm password is required')
+                    .label('Confirm Password'),
+                })}
+                onSubmit={handleSubmit}
+              >
+                {({ setFieldValue, values, handleChange, handleBlur }) => (
+                  <Form>
+                    <div className="flex flex-col md:flex-row  justify-between items-center gap-1 md:gap-5">
+                      <div className="w-full">
+                        <MyTextInput
+                          hasPLaceHolder={true}
+                          placeholderTop="New Password"
+                          placeholder="Enter new password"
+                          name="newPassword"
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          value={values.newPassword}
+                          type="password"
+                        />
+                      </div>
+                      <div className="w-full relative">
+                        <MyTextInput
+                          hasPLaceHolder={true}
+                          placeholderTop="Confirm New Password"
+                          placeholder="Re-enter new password"
+                          name="confirmPassword"
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          value={values.confirmPassword}
+                          type="password"
+                        />
+                      </div>
+                    </div>
 
-              <div className="flex justify-end mt-3 gap-5">
-                <AppBtn
-                  title="SUBMIT"
-                  onClick={() => setNewPasswordModal(!newPasswordModal)}
-                  className="text-[#000]  w-full md:w-[100px]  bg-[#FAA21B] mt-1 font-medium"
-                />
-              </div>
+                    <div className="flex justify-end mt-3 gap-5">
+                      <AppBtn
+                        title="SUBMIT"
+                        spinner={state.resetPasswordWithTokenStatus === 'loading'}
+                        className="text-[#000]  w-full md:w-[100px]  bg-[#FAA21B] mt-1 font-medium"
+                      />
+                    </div>
+                  </Form>
+                )}
+            </Formik>
+              
             </div>
           </div>
         </div>
