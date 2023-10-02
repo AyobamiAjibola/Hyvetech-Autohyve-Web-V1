@@ -9,7 +9,7 @@ import ChangePasswordModal from "../../components/modals/ChangePasswordModal";
 import UploadPictureModal from "../../components/modals/UploadPictureModal";
 import { customStyles } from "../../contsants/customStyles";
 import TabBtn from "../../components/TabBtn/TabBtn";
-import AccountSettings from "../../components/AccountSettings/AccountSettings";
+import BusinessProfile from "../../components/BusinessProfile/BusinessProfile";
 import useAdmin from "../../hooks/useAdmin";
 import * as Yup from "yup";
 import { showMessage } from "../../helpers/notification";
@@ -22,6 +22,9 @@ import { getUserAction, updateUserAction } from "../../store/actions/userActions
 import useAppSelector from "../../hooks/useAppSelector";
 import { clearCreateUserStatus } from "../../store/reducers/userReducer";
 import settings from "../../config/settings";
+import { clearChangePasswordStatus, clearResetPasswordWithTokenStatus, clearSendPasswordResetTokenStatus } from "../../store/reducers/authenticationReducer";
+import ChangeEmailModal from "../../components/modals/ChangeEmailModal";
+import { clearCompanyLogoUploadStatus } from "../../store/reducers/partnerReducer";
 
 const API_ROOT = settings.api.baseURL;
 
@@ -44,9 +47,12 @@ const Profile = () => {
     district: "",
     address: ""
   });
+  const [openChangeEmailModal, setOpenChangeEmailModal] = useState(false);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const userReducer = useAppSelector(state => state.userReducer)
+  const authReducer = useAppSelector(state => state.authenticationReducer)
+  const partnerReducer = useAppSelector(state => state.partnerReducer);
 
   useEffect(() => {
     let stateArray = [];
@@ -134,7 +140,6 @@ const Profile = () => {
   };
 
   const handleSubmit = ({ phone, ...rest }) => {
-    console.log(phone, 'phone')
     const newPhone = `${phone}`.startsWith("234")
                         ? phone
                         : `${phone}`.startsWith("0")
@@ -188,19 +193,49 @@ const Profile = () => {
   useEffect(() => {
     if(userReducer.createUserStatus === 'failed') {
         showMessage(
-        "Profile Update",
-        userReducer.createUserError,
-        "success"
-      );
+          "Profile Update",
+          userReducer.createUserError,
+          "success"
+        );
     }
     dispatch(getUserAction(user && user?.id))
     dispatch(clearCreateUserStatus())
   },[userReducer.createUserStatus]);
+
+  useEffect(() => {
+    if(authReducer.changePasswordStatus === 'completed') {
+      dispatch(clearChangePasswordStatus())
+    }
+  },[authReducer.changePasswordStatus]);
+
+  useEffect(() => {
+    if(authReducer.sendPasswordResetTokenStatus === 'completed') {
+      dispatch(clearSendPasswordResetTokenStatus())
+    }
+  },[authReducer.sendPasswordResetTokenStatus]);
+
+  useEffect(() => {
+    if(partnerReducer.companyLogoUploadStatus === 'completed') {
+      dispatch(getUserAction(user && user?.id))
+      dispatch(clearCompanyLogoUploadStatus())
+    } else if (partnerReducer.companyLogoUploadStatus === 'failed') {
+        showMessage(
+          "Logo",
+          partnerReducer.companyLogoUploadError,
+          "error"
+        );
+        dispatch(clearCompanyLogoUploadStatus())
+    }
+
+    return () => {
+      dispatch(clearCompanyLogoUploadStatus());
+    }
+  },[partnerReducer.companyLogoUploadStatus])
   
   return (
     <>
       <div className="mb-20 mt-24 w-full">
-        {user?.accountType === 'cooperate' && (
+        {user?.accountType === 'cooperate' || user?.accountType === null && (
           <div className="flex justify-between w-[100%] md:w-[47%] items-center mt-10 my-4 setting-tabs">
             <div className="flex items-center flex-col md:flex-row  w-[100%]  mt-3 md:mt-0 gap-4">
               {data.map((item, index) => {
@@ -403,18 +438,28 @@ const Profile = () => {
 
           {view == 1 && (
             <>
-              <AccountSettings />
+              <BusinessProfile
+                user={user}
+              />
             </>
           )}
         </div>
 
       </div>
 
-      <ChangePasswordModal openModal={openModal} setOpenModal={setOpenModal} />
+      <ChangePasswordModal
+        openModal={openModal}
+        setOpenModal={setOpenModal}
+        email={user?.email}
+      />
       <UploadPictureModal
         openProfile={openProfile}
         setOpenProfile={setOpenProfile}
         data={formState}
+      />
+      <ChangeEmailModal
+        openChangeEmailModal={openChangeEmailModal}
+        setOpenChangeEmailModal={setOpenChangeEmailModal}
       />
     </>
   );

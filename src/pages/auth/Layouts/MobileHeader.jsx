@@ -35,7 +35,7 @@ const MobileHeader = ({ show, openNav, setOpenNav, open, setOpen }) => {
         {location.pathname == "/invoice" && "Invoices"}
         {location.pathname == "/payment" && "Payments"}
         {location.pathname == "/expenses" && "Expenses"}
-        {location.pathname == "/vin-decoder" && "VIN Decoder"}
+        {location.pathname == "/vin-decoder" && ""}
         {location.pathname == "/insurance" && "Insurance"}
         {location.pathname == "/service-reminder" && "Service Reminders"}
         {location.pathname == "/generate-invoice" && (

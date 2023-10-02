@@ -43,14 +43,14 @@ function VinDecoder () {
 
     return (
         <React.Fragment>
-            <div className="mb-20 mt-5 md:mt-32 w-full flex justify-center align-center flex-col">
-                <div className={`flex flex-col w-[90%] h-[25rem] justify-center
+            <div className="md:mt-25 w-full flex justify-center align-center flex-col">
+                <div className={`flex flex-col w-full h-screen justify-center mt-[-2rem]
                     items-center mb-5 bg-[#DFDFDF] border radius-[20px]`}
                 >
-                    <span className='font-montserrat md:text-[2.5rem] my-3 font-bold'>VIN Decoder</span>
-                    <span className='font-montserrat md:text-sm xs:text-[6px] mb-1'>Enter your Vehicle Identification Number (VIN)</span>
-                    <span className='font-montserrat text-md mb-4'>to access detailed information about your vehicle.</span>
-                    <div className='flex flex-row md:w-[40%] xs:w[60%] justify-center align-center py-10'>
+                    <span className='font-montserrat md:text-[2.5rem] text-[2rem] md:my-3 font-bold mt-[-10rem] mb-[1rem] md:mb-[10px]'>VIN Decoder</span>
+                    <span className='font-montserrat text-sm mb-1'>Enter your Vehicle Identification Number (VIN)</span>
+                    <span className='font-montserrat text-sm mb-4 text-center'>to access detailed information about your vehicle.</span>
+                    <div className='flex flex-row md:w-[40%] w-[80%] justify-center align-center py-10'>
                         <SearchAppInput
                             placeholder={'Enter 17-character VIN number'}
                             hasPLaceHolder
@@ -69,7 +69,7 @@ function VinDecoder () {
                 </div>
                 {state.vehicleVINDetails.length !== 0 &&
                    ( <div ref={tableRef}>
-                        <table className="table-fixed w-[90%]">
+                        <table className="table-fixed w-full">
                             <thead className="w-[100%]">
                                 <span className='font-montserrat px-4 md:text-[1.5rem] xs:text-[14px] font-bold'>Basic Vehicle Information</span>
                             </thead>

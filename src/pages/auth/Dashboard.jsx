@@ -51,7 +51,7 @@ const Dashboard = () => {
       setOpenStart(false);
       setStart_date(null);
       setEnd_date(null);
-      setSelectedYear(null)
+      setSelectedYear(null);
     }
   },[techDashboardReducerMain.getTechAnalyticsStatus])
 

@@ -42,12 +42,6 @@ const instance = axios.create();
 instance.interceptors.request.use((config) => {
   const token = sessionStorage.getItem(settings.auth.admin);
   config.headers.Authorization = `Bearer ${token}`;
-  console.log(config.headers['Content-Type'], 'content')
-  // if (config.headers['Content-Type'] === 'multipart/form-data') {
-  //   delete config.headers['Content-Type'];
-  // } else {
-  //   config.headers['Content-Type'] = 'application/json';
-  // }
 
   return config;
 });

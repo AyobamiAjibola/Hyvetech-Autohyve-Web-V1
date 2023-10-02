@@ -13,6 +13,9 @@ const CREATE_USER = 'user:CREATE_USER';
 const UPDATE_ROLE = 'user:UPDATE_ROLE';
 const UPDATE_USER = 'user:UPDATE_USER';
 const UPDATE_USER_STATUS = 'user:UPDATE_USER_STATUS';
+const CREATE_USER_PARTNER = 'user:CREATE_USER_PARTNER';
+const UPDATE_USER_PARTNER = 'user:UPDATE_USER_PARTNER';
+const DELETE_USER = 'user:DELETE_USER';
 
 const API_ROOT = settings.api.rest;
 
@@ -21,6 +24,15 @@ export const getUserAction = asyncThunkWrapper<ApiResponseSuccess<IUser>, number
 
   return response.data;
 });
+
+export const deleteUserAction = asyncThunkWrapper<ApiResponseSuccess<any>, number>(
+  DELETE_USER,
+  async id => {
+    const response = await axiosClient.delete(`${API_ROOT}/delete-user/${id}`);
+
+    return response.data;
+  },
+);
 
 export const getUsersAction = asyncThunkWrapper<ApiResponseSuccess<IUser>, void>(GET_USERS, async () => {
   const response = await axiosClient.get(`${API_ROOT}/users`);
@@ -73,6 +85,39 @@ export const createUserAction = asyncThunkWrapper<
   }
 >(CREATE_USER, async data => {
   const response = await axiosClient.post(`${API_ROOT}/user`, data);
+
+  return response.data;
+});
+
+export const createPartnerUserAction = asyncThunkWrapper<
+  ApiResponseSuccess<IUser>,
+  {
+    firstName: string;
+    lastName: string;
+    phone: string;
+    email: string;
+    password: string;
+    role: string;
+  }
+>(UPDATE_USER_PARTNER, async data => {
+  const response = await axiosClient.post(`${API_ROOT}/create-user-by-partner`, data);
+
+  return response.data;
+});
+
+export const updatePartnerUserAction = asyncThunkWrapper<
+  ApiResponseSuccess<IUser>,
+  {
+    firstName: string;
+    lastName: string;
+    phone: string;
+    email: string;
+    password?: string;
+    role: string;
+    userId: number
+  }
+>(CREATE_USER_PARTNER, async data => {
+  const response = await axiosClient.put(`${API_ROOT}/update-user-by-partner`, data);
 
   return response.data;
 });

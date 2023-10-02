@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import jwt_decode from "jwt-decode";
 
 import { IThunkAPIStatus } from '@app-types';
-import { garageSignUpAction, signInAction, signOutAction } from '../actions/authenicationActions';
+import { changePasswordAction, garageSignUpAction, preSignUpAction, resetPasswordWithTokenAction, sendPasswordResetTokenAction, signInAction, signOutAction, veryfyTokenAction } from '../actions/authenicationActions';
 import { IPermission } from '@app-models';
 import { LOCAL_STORAGE } from '../../config/constants';
 import { CustomJwtPayload } from '@app-interfaces';
@@ -21,6 +21,26 @@ interface IAuthenticationState {
   signOutSuccess: string;
   signOutError?: string;
 
+  changePasswordStatus: IThunkAPIStatus;
+  changePasswordSuccess: string;
+  changePasswordError?: string;
+
+  sendPasswordResetTokenStatus: IThunkAPIStatus;
+  sendPasswordResetTokenSuccess: string;
+  sendPasswordResetTokenError?: string;
+
+  resetPasswordWithTokenStatus: IThunkAPIStatus;
+  resetPasswordWithTokenSuccess: string;
+  resetPasswordWithTokenError?: string;
+
+  preSignUpStatus: IThunkAPIStatus;
+  preSignUpSuccess: string;
+  preSignUpError?: string;
+
+  verifyTokenStatus: IThunkAPIStatus;
+  verifyTokenSuccess: string;
+  verifyTokenError?: string;
+
   authToken: string;
   permissions: IPermission[];
 }
@@ -34,9 +54,29 @@ const initialState: IAuthenticationState = {
   signingInSuccess: '',
   signingInStatus: 'idle',
 
+  changePasswordError: '',
+  changePasswordSuccess: '',
+  changePasswordStatus: 'idle',
+
+  sendPasswordResetTokenError: '',
+  sendPasswordResetTokenSuccess: '',
+  sendPasswordResetTokenStatus: 'idle',
+
+  resetPasswordWithTokenError: '',
+  resetPasswordWithTokenSuccess: '',
+  resetPasswordWithTokenStatus: 'idle',
+
   garageSignUpStatus: 'idle',
   garageSignUpSuccess: '',
   garageSignUpError: '',
+
+  preSignUpStatus: 'idle',
+  preSignUpSuccess: '',
+  preSignUpError: '',
+
+  verifyTokenStatus: 'idle',
+  verifyTokenSuccess: '',
+  verifyTokenError: '',
 
   permissions: [],
 };
@@ -59,6 +99,32 @@ const authenticationSlice = createSlice({
       state.signOutStatus = 'idle';
       state.signOutSuccess = '';
       state.signOutError = '';
+    },
+    clearChangePasswordStatus(state: IAuthenticationState) {
+      state.changePasswordStatus = 'idle';
+      state.changePasswordSuccess = '';
+      state.changePasswordError = '';
+    },
+    clearSendPasswordResetTokenStatus(state: IAuthenticationState) {
+      state.sendPasswordResetTokenStatus = 'idle';
+      state.sendPasswordResetTokenSuccess = '';
+      state.sendPasswordResetTokenError = '';
+    },
+    clearResetPasswordWithTokenStatus(state: IAuthenticationState) {
+      state.resetPasswordWithTokenStatus = 'idle';
+      state.resetPasswordWithTokenSuccess = '';
+      state.resetPasswordWithTokenError = '';
+    },
+    clearPreSignUpStatus(state: IAuthenticationState) {
+      state.preSignUpStatus = 'idle';
+      state.preSignUpSuccess = '';
+      state.preSignUpError = '';
+    },
+
+    clearVerifyTokenStatus(state: IAuthenticationState) {
+      state.verifyTokenStatus = 'idle';
+      state.verifyTokenSuccess = '';
+      state.verifyTokenError = '';
     },
   },
   extraReducers: builder => {
@@ -122,9 +188,98 @@ const authenticationSlice = createSlice({
           state.garageSignUpError = action.payload.message;
         } else state.garageSignUpError = action.error.message as string;
       });
+
+    builder
+      .addCase(changePasswordAction.pending, state => {
+        state.changePasswordStatus = 'loading';
+      })
+      .addCase(changePasswordAction.fulfilled, (state, action) => {
+        state.changePasswordStatus = 'completed';
+        state.changePasswordSuccess = action.payload.message;
+      })
+      .addCase(changePasswordAction.rejected, (state, action) => {
+        state.changePasswordStatus = 'failed';
+
+        if (action.payload) {
+          state.changePasswordError = action.payload.message;
+        } else state.changePasswordError = action.error.message as string;
+      });
+
+    builder
+      .addCase(sendPasswordResetTokenAction.pending, state => {
+        state.sendPasswordResetTokenStatus = 'loading';
+      })
+      .addCase(sendPasswordResetTokenAction.fulfilled, (state, action) => {
+        state.sendPasswordResetTokenStatus = 'completed';
+        state.sendPasswordResetTokenSuccess = action.payload.message;
+      })
+      .addCase(sendPasswordResetTokenAction.rejected, (state, action) => {
+        state.sendPasswordResetTokenStatus = 'failed';
+
+        if (action.payload) {
+          state.sendPasswordResetTokenError = action.payload.message;
+        } else state.sendPasswordResetTokenError = action.error.message as string;
+      });
+
+    builder
+      .addCase(resetPasswordWithTokenAction.pending, state => {
+        state.resetPasswordWithTokenStatus = 'loading';
+      })
+      .addCase(resetPasswordWithTokenAction.fulfilled, (state, action) => {
+        state.resetPasswordWithTokenStatus = 'completed';
+        state.resetPasswordWithTokenSuccess = action.payload.message;
+      })
+      .addCase(resetPasswordWithTokenAction.rejected, (state, action) => {
+        state.resetPasswordWithTokenStatus = 'failed';
+
+        if (action.payload) {
+          state.resetPasswordWithTokenError = action.payload.message;
+        } else state.resetPasswordWithTokenError = action.error.message as string;
+      });
+
+    builder
+      .addCase(preSignUpAction.pending, state => {
+        state.preSignUpStatus = 'loading';
+      })
+      .addCase(preSignUpAction.fulfilled, (state, action) => {
+        state.preSignUpStatus = 'completed';
+        state.preSignUpSuccess = action.payload.message;
+      })
+      .addCase(preSignUpAction.rejected, (state, action) => {
+        state.preSignUpStatus = 'failed';
+
+        if (action.payload) {
+          state.preSignUpError = action.payload.message;
+        } else state.preSignUpError = action.error.message as string;
+      });
+
+    builder
+      .addCase(veryfyTokenAction.pending, state => {
+        state.verifyTokenStatus = 'loading';
+      })
+      .addCase(veryfyTokenAction.fulfilled, (state, action) => {
+        state.verifyTokenStatus = 'completed';
+        state.verifyTokenSuccess = action.payload.message;
+      })
+      .addCase(veryfyTokenAction.rejected, (state, action) => {
+        state.verifyTokenStatus = 'failed';
+
+        if (action.payload) {
+          state.verifyTokenError = action.payload.message;
+        } else state.verifyTokenError = action.error.message as string;
+      });
   },
 });
 
-export const { clearLoginStatus, clearLogoutStatus, clearGarageSignUpStatus } = authenticationSlice.actions;
+export const {
+  clearLoginStatus,
+  clearLogoutStatus,
+  clearGarageSignUpStatus,
+  clearChangePasswordStatus,
+  clearResetPasswordWithTokenStatus,
+  clearSendPasswordResetTokenStatus,
+  clearPreSignUpStatus,
+  clearVerifyTokenStatus
+} = authenticationSlice.actions;
 
 export default authenticationSlice.reducer;

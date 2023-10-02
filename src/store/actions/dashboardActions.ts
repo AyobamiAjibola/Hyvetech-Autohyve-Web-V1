@@ -23,7 +23,6 @@ export const getAnalyticsAction = createAsyncThunk<any, void>(
 export const getTechAnalyticsAction = createAsyncThunk<any, void>(
   GET_TECH_ANALYTICS,
   asyncThunkErrorWrapper(async (args: any) => {
-    console.log(args.start_date, args.end_date, 'date')
     let response;
     if(args.start_date === undefined || args.end_date === undefined ) {
       

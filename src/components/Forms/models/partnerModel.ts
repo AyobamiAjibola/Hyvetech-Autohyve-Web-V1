@@ -13,9 +13,13 @@ export interface IKycValues {
   name: string;
   workshopAddress: string;
   cac: string;
-  vatNumber: string;
+  vatNumber?: string;
   nameOfDirector: string;
   nameOfManager: string;
+  businessCategory?: string;
+  businessRegStatus?: string;
+  state?: string;
+  district?: string;
 }
 
 export interface IBrands {
@@ -280,8 +284,9 @@ const schema = [
     brands: Yup.array()
       .of(
         Yup.object().shape({
-          name: Yup.string().nullable(),
-          description: Yup.string().nullable(),
+          model: Yup.string().nullable(),
+          from: Yup.string().nullable(),
+          to: Yup.string().nullable(),
         }),
       )
       .nullable(),

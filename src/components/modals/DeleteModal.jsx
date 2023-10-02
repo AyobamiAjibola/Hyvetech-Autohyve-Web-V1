@@ -4,6 +4,11 @@ import SuccessfulPaymentModal from "../Dashboard/SuccessfulPaymentModal";
 import AppBtn from "../AppBtn/AppBtn";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
+import useAppDispatch from "../../hooks/useAppDispatch";
+import useAppSelector from "../../hooks/useAppSelector";
+import { deleteUserAction, getUsersAction } from "../../store/actions/userActions";
+import { showMessage } from "../../helpers/notification";
+import { clearDeleteUserStatus } from "../../store/reducers/userReducer";
 
 const style = {
   position: "absolute",
@@ -24,20 +29,49 @@ const style = {
 
 const DeleteModal = ({
   deletemodal,
-  setDeletemodal,
   closeDeleteModal,
-  title,
+  title, setDeletemodal,
   description,
+  delId, setDelId
 }) => {
   const [successModal, setSuccessModal] = useState(false);
   const closeSuccessModal = () => setSuccessModal(!successModal);
-  const handleClose = () => setDeletemodal(false);
+  const handleModalClose = () => setDeletemodal(false);
+  const dispatch = useAppDispatch();
+  const userReducer = useAppSelector(state => state.userReducer);
+
+  const handleDeleteUser = () => {
+    dispatch(deleteUserAction(delId))
+  }
+
+useEffect(() => {
+  if(userReducer.deleteUserStatus === 'completed'){
+    showMessage(
+      "Delete user",
+      userReducer.deleteUserSuccess,
+      "success"
+    )
+    dispatch(getUsersAction())
+    dispatch(clearDeleteUserStatus())
+    setDeletemodal(false)
+    setDelId(-1)
+  } else if (userReducer.deleteUserStatus === 'failed') {
+    showMessage(
+      "Delete user",
+      userReducer.deleteUserError,
+      "error"
+    )
+    dispatch(clearDeleteUserStatus())
+    setDeletemodal(false)
+    setDelId(-1)
+  }
+}, [userReducer.deleteUserStatus]);
 
   return (
     <>
       <Modal
         open={deletemodal}
-        onClose={handleClose}
+        onClose={handleModalClose}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
@@ -49,7 +83,7 @@ const DeleteModal = ({
             />
 
             <div className="flex justify-end w-full">
-              <button onClick={() => setDeletemodal(false)}>
+              <button onClick={() => {setDelId(-1), setDeletemodal(false)}}>
                 <img src={CloseIcon} alt="" />
               </button>
             </div>
@@ -77,7 +111,8 @@ const DeleteModal = ({
                 <AppBtn
                   title="Delete"
                   className=" uppercase"
-                  onClick={() => closeDeleteModal()}
+                  spinner={userReducer.deleteUserStatus === 'loading'}
+                  onClick={handleDeleteUser}
                 />
               </div>
             </div>

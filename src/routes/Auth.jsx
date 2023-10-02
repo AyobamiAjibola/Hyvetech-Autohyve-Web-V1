@@ -11,7 +11,7 @@ const Auth = () => {
   const [show, setShow] = useState(false);
   const [openNav, setOpenNav] = useState(false);
   const [open, setOpen] = useState(false);
-
+  
   return (
     <div>
       <Sidebar
