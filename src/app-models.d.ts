@@ -6,7 +6,7 @@ declare module '@app-models' {
     action: string;
     subjection: string;
   }
-
+IUser
   interface IPreference {
     termsAndCondition: string;
   }
@@ -56,6 +56,17 @@ declare module '@app-models' {
     createdAt: Date;
     updatedAt: Date;
     active: boolean;
+    accountType: string | null;
+  }
+
+  interface UploadResult {
+    file: {
+      url: string;
+      name: string;
+    };
+    uploadStartTime: Date | null;
+    busboyFinishTime: Date | null;
+    s3UploadFinishTime: Date | null;
   }
 
   interface IContact {
@@ -657,7 +668,7 @@ declare module '@app-models' {
 
   interface IBeneficiary {
     name: string;
-    id: number;
+    id?: number;
     accountNumber: string;
     accountName: string;
     bankName: string;
@@ -896,6 +907,19 @@ declare module '@app-models' {
     transferCharge: number;
     sessionID: string;
   }
+
+  interface IBulkTransfer {
+    accountNumber: string;
+    bank: {
+      label: string;
+      value: string;
+    };
+    accountName: string;
+    amount: string;
+    narration: string;
+    saveAsBeneficiary?: boolean;
+    pin?: string;
+  } 
   
   interface UploadResult {
     file: {
@@ -920,7 +944,7 @@ declare module '@app-models' {
     beneficiaryBankCode: string;
     beneficiaryName: string;
     senderName?: string;
-    nameEnquiryId: string;
+    NameEnquirySessionID: string;
     clientFeeCharge?: number;
     saveAsBeneficiary?: boolean;
     bankName?: string;
@@ -953,5 +977,54 @@ declare module '@app-models' {
     trackingReference: string;
     creationDate: Date;
     isDeleted: boolean;
+  }
+
+  interface IBeneficiary {
+    name: string;
+    id?: number;
+    accountNumber: string;
+    accountName: string;
+    bankName: string;
+    bankCode?: string;
+  }
+
+  export interface BulkNameEnquiryResponseDTO  {
+    narration: string;
+    totalAmount: number;
+    expectedFee: number;
+    paidFee: number;
+    accountNumber: string;
+    accountName: string;
+    transactionStatus: string;
+    beneficiaries: BulkNameEnquiryBeneficiary[]
+  }
+
+  interface BulkNameEnquiry {
+    AccountNumber: string;
+    BankCode: string;
+  }
+  
+  export interface BulkNameEnquiryDTO {
+    Data: BulkNameEnquiry[]
+  }
+
+  export interface BulkAccountTransferDTO {
+    ClientAccountNumber?: string;
+    TrackingReference?: string;
+    TotalAmount?: string;
+    NotificationEmail?: string;
+    narration: string;
+    BeneficiaryPaymentData: BeneficiaryPaymentData[];
+    pin: string;
+  }
+
+  export interface BulkAccountResponseDTO {
+    requestReference: string,
+    transactionReference: string,
+    instrumentNumber: string,
+    responseCode: string,
+    status: boolean,
+    message: string,
+    data: any
   }
 }

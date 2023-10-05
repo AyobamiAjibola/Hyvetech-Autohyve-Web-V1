@@ -1,10 +1,48 @@
-import React from "react";
+import React, { useState } from "react";
 import SuccessIcon from "../../assets/svgs/success-icon.svg";
 import CloseIcon from "../../assets/svgs/close-circle.svg";
-import HyveIcon2 from "../../assets/svgs/hyve-icon2.svg";
 import hyvePay from "../../assets/images/hyvePay.png";
+import { jsPDF } from "jspdf";
+import html2canvas from "html2canvas";
+import useAppSelector from "../../hooks/useAppSelector";
+import moment from "moment";
+import { Util } from "../../helpers/Util";
+import { Link } from "react-router-dom";
+import messenger from "../../assets/images/messenger.png"
+import gmail from "../../assets/images/gmail.png"
+import whatsapp from "../../assets/images/whatsapp.png"
+import useAdmin from "../../hooks/useAdmin";
 
-const SuccessfulPaymentModal = ({ successModal, closeSuccessModal }) => {
+const { VITE_TRANSFER_FEE } = import.meta.env
+
+
+const TransactionReceiptModal = ({
+  successModal,
+  closeSuccessModal,
+  rowData,
+}: any) => {
+
+  const state = useAppSelector((state) => state.autoHyveReducer);
+  // const { user } = useUser();
+  const { user } = useAdmin()
+
+
+  const handlePDFDownload = () => {
+    const pdfview = document.querySelector("#pdfView") as HTMLElement;
+    const pdf = new jsPDF() as any;
+    html2canvas(pdfview).then((canvas) => {
+      const imgData = canvas.toDataURL("image/png");
+      pdf.addImage(imgData, "JPEG", 12, 12, 180, 180);
+      pdf.save("receipt.pdf");
+    });
+  };
+
+  const [showShareMenu, setShowShareMenu] = useState(false);
+  const toggleShareMenu = () => {
+    setShowShareMenu(!showShareMenu);
+  };
+
+
   return (
     <>
       {successModal && (
@@ -14,7 +52,7 @@ const SuccessfulPaymentModal = ({ successModal, closeSuccessModal }) => {
         >
           <div
             className="modal bg-white py-8 px-3"
-            style={{ maxHeight: "90%", overflowY: "scroll" }}
+            style={{ maxHeight: "70%", overflowY: "scroll" }}
           >
             <div className="modal-header pt-0 bg-white px-8">
               <div className="flex justify-end w-full">
@@ -28,20 +66,18 @@ const SuccessfulPaymentModal = ({ successModal, closeSuccessModal }) => {
                   <img src={SuccessIcon} style={{ maxWidth: 70 }} alt="" />
                 </div>
                 <h5 className="text-center mt-3 text-[#494949] text-[14px] font-semibold">
-                  Payment Successful
+                  Transaction Receipt
                 </h5>
-                <h5 className="text-center md:text-sm text-[9px] max-w-[95%]  text-[#494949] font-montserrat">
-                  Yay! Congratulations... ₦50,000 was successfully sent <br />
-                  to (Beneficiary 1 GTBank 0357935792)
-                </h5>
-                {/* </div> */}
               </div>
             </div>
             <div className="body">
               {/* view */}
 
               <div className=" flex flex-col mt-4 justify-center items-center px-4 md:px-10">
-                <div className="w-full receipt-preview mt-4 p-3 md:p-8 mb-1 md:mb-3">
+                <div
+                  id="pdfView"
+                  className="w-full receipt-preview mt-4 p-3 md:p-8 mb-1 md:mb-3"
+                >
                   <div className="flex justify-between items-center">
                     <h5 className="text-[#494949] text-[14px] font-semibold">
                       Transaction Receipt
@@ -52,41 +88,48 @@ const SuccessfulPaymentModal = ({ successModal, closeSuccessModal }) => {
                   <div className="my-8">
                     <div className="flex justify-between mb-2 items-center">
                       <p className="text-[10px] font-montserrat">
-                        {" "}
                         Transaction Date:
                       </p>
-                      <p className="text-[10px] font-montserrat">12-06-2023</p>
+                      <p className="text-[10px] font-montserrat">
+                        {moment().format("DD-MM-YYYY")}
+                      </p>
                     </div>
                     <div className="flex justify-between mb-2 items-center">
                       <p className="text-[10px] font-montserrat">
-                        {" "}
                         Reference Number:
                       </p>
                       <p className="text-[10px] font-montserrat">
-                        REF897/386753434354
+                        {rowData.referenceNumber}
                       </p>
                     </div>
                     <div className="flex justify-between mb-2 items-center">
                       <p className="text-[10px] font-montserrat"> Amount:</p>
-                      <p className="text-[10px] font-montserrat">₦50,000.00</p>
+                      <p className="text-[10px] font-montserrat">
+                        {/* {Util.CurrencyDisplay(Number(rowData.amount))} */}
+                        {Util.formAmount(rowData.amount, true)}
+                      </p>
                     </div>
                     <div className="flex justify-between mb-2 items-center">
                       <p className="text-[10px] font-montserrat"> Sender:</p>
                       <p className="text-[10px] font-montserrat">
-                        DEMO WORKSHOP
+                        {user?.companyName}
                       </p>
                     </div>
                     <div className="flex justify-between mb-2 items-center">
                       <p className="text-[10px] font-montserrat"> Recipient:</p>
-                      <p className="text-[10px] font-montserrat">DAVID JAMES</p>
+                      <p className="text-[10px] font-montserrat">
+                        {rowData.beneficiaryName}
+                      </p>
                     </div>
                     <div className="flex justify-between mb-2 items-center">
                       <p className="text-[10px] font-montserrat">
-                        {" "}
                         Recipient Bank Name:
                       </p>
-                      <p className="text-[10px] font-montserrat w-[105px]">
-                        Guaranty Trust Bank (GTBank)
+                      <p
+                        style={{ textAlign: "right" }}
+                        className="text-[10px] font-montserrat w-[105px]"
+                      >
+                        {rowData.merchant}
                       </p>
                     </div>
                     <div className="flex justify-between mb-2 items-center">
@@ -94,52 +137,71 @@ const SuccessfulPaymentModal = ({ successModal, closeSuccessModal }) => {
                         {" "}
                         Account Number:
                       </p>
-                      <p className="text-[11px] font-montserrat">0564784545</p>
+                      <p className="text-[11px] font-montserrat">
+                        {rowData.beneficiaryReference}
+                      </p>
                     </div>
                     <div className="flex justify-between mb-2 items-center">
                       <p className="text-[10px] font-montserrat"> Narration:</p>
                       <p className="text-[10px] font-montserrat w-[150px] text-right">
-                        Refund from your excess payment for engine
+                        {rowData.narration}
                       </p>
                     </div>
                     <div className="flex justify-between mb-2 items-center">
                       <p className="text-[10px] font-montserrat">
-                        {" "}
                         Transfer Fees:
                       </p>
-                      <p className="text-[10px] font-montserrat">₦0.00</p>
+                      <p className="text-[10px] font-montserrat">
+
+                        {Util.CurrencyDisplay(VITE_TRANSFER_FEE)}
+
+
+                      </p>
                     </div>
                     <div className="flex justify-between mb-2 items-center">
                       <p className="text-[10px] font-montserrat"> Status:</p>
-                      <p className="text-[10px] font-montserrat">Successful</p>
+                      <p className="text-[10px] font-montserrat">
+                        {state.accountTranferResponse?.status}
+                      </p>
                     </div>
                   </div>
 
                   <hr className="mb-4" />
-
-                  <p className="md:text-xs text-[5px]  text-gray-500  font-montserrat">
-                    {" "}
-                    <b>Disclaimer:</b> Enjoy customized banking experienced with
-                    HyvePay. HyvePay financial serves are backed by Kuda
-                    Microfinance Bank, regulated by CBN and insured by NDIC. And
-                    all transactions are subject to the CBN regulations.
-                  </p>
                 </div>
 
                 <div className="flex gap-4 justify-around mt-5">
-                  <button className="btn btn-secondary">Download PDF</button>
+                  <button
+                    onClick={handlePDFDownload}
+                    className="btn btn-secondary"
+                  >
+                    Download PDF
+                  </button>
 
-                  <div>
-                    <button className="btn btn-secondary">Share PDF</button>
+
+
+                  <div className="share-button-container">
+                    <button className="btn btn-secondary" onClick={toggleShareMenu}>
+                      {!showShareMenu && (<span>Share PDF</span>)}
+                      {showShareMenu && (
+                        <div className={`space-x-4 flex`}>
+
+                          <button><Link to="#WA" title="whatsapp icons"><img src={whatsapp} width="20" height="20" /></Link></button>
+                          <button><Link to="#IG" className="social-icon"><img src={gmail} width="20" height="20" /></Link></button>
+                          <button><Link to="#LI" className="social-icon"><img src={messenger} width="20" height="20" /></Link></button>
+
+
+                        </div>
+                      )}
+                    </button>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </div >
       )}
     </>
   );
 };
 
-export default SuccessfulPaymentModal;
+export default TransactionReceiptModal;
