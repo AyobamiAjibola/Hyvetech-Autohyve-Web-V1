@@ -39,8 +39,8 @@ import Hyvepay from "./pages/auth/Hyvepay.tsx";
 import jwt_decode from "jwt-decode";
 import settings from "./config/settings";
 
-const token =sessionStorage.getItem(settings.auth.admin);
-const { accountType } = token && (jwt_decode(token));
+const token = sessionStorage.getItem(settings.auth.admin);
+const decoded = token && (jwt_decode(token));
 
 const router = createBrowserRouter([
   {
@@ -73,7 +73,7 @@ const router = createBrowserRouter([
       {
         path: "/dashboard",
         element: <PrivateRoute>
-          {accountType === "cooperate" || accountType === null 
+          {decoded.accountType === "cooperate" || accountType === null 
             ? <Dashboard />
             : <Navigate to="/vin-decoder" replace />
           }
