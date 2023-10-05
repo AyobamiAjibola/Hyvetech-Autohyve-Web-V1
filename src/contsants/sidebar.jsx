@@ -38,11 +38,6 @@ export const sidebarItemsIndividual = [
     name: "VIN Decoder",
     path: "/vin-decoder",
     icon: vinIcon,
-  },
-  {
-    name: "Insurance",
-    path: "/insurance",
-    icon: InsuranceIcon,
   }
 ];
 

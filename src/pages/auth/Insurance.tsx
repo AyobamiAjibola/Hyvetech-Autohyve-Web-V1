@@ -1,12 +1,13 @@
 import React from 'react';
+import DashboardWrapper from '../../components/DashboardWrapper/DashboardWrapper';
 
 function Insurance () {
     return (
-        <React.Fragment>
-            <div className="mb-20 mt-10 md:mt-32 w-full">
+        <DashboardWrapper>
+            <div>
                 Insurance
             </div>
-        </React.Fragment>
+        </DashboardWrapper>
     )
 }
 

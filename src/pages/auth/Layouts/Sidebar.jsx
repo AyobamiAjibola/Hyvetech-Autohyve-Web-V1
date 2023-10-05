@@ -35,11 +35,11 @@ const Sidebar = ({ show, setShow, openNav, setOpenNav }) => {
     }
   }, []);
 
-  useEffect(() => {
-    if(location.pathname === '/vin-decoder') {
-      localStorage.setItem("active", "VIN Decoder");
-    }
-  }, []);
+  // useEffect(() => {
+  //   if(location.pathname === '/vin-decoder') {
+  //     localStorage.setItem("active", "VIN Decoder");
+  //   }
+  // }, []);
 
   const toggleDropdown = () => {
     setShowDropdown(!showDropdown);
@@ -48,11 +48,10 @@ const Sidebar = ({ show, setShow, openNav, setOpenNav }) => {
   useEffect(() => {
     if(token) {
       const payload = jwt_decode(token);
-      console.log(payload, 'payload')
       setAccountType(payload.accountType)
     }
   },[token]);
-
+  console.log(active, location.pathname, 'active')
   return (
     <>
       <div
@@ -165,7 +164,7 @@ const Sidebar = ({ show, setShow, openNav, setOpenNav }) => {
             }
 
 
-            <div>
+            {accountType === "cooperate" || accountType === null ? (<div>
               <div
                 className={`flex items-center font-montserrat text-white cursor-pointer ${showDropdown && 'mb-4'}`}
                 onClick={toggleDropdown}
@@ -185,44 +184,44 @@ const Sidebar = ({ show, setShow, openNav, setOpenNav }) => {
               </div>
 
               <div className={`${showDropdown && 'bg-[#5B5B5B]'} py-4`}>
-              {showDropdown && (
-                subSidebarItems.map((item, index) => {
-                  return (
-                    <NavLink
-                      to={item.path}
-                      key={index}
-                      className={`flex items-center mb-5 font-montserrat text-white  cursor-pointer ${
-                        index === active ? "active" : null
-                      }`}
-                      onClick={() => {
-                        setActive(item.name);
-                        setOpenNav(false);
-                      }}
-                    >
-                      <img
-                        src={item.icon}
-                        alt=""
-                        style={{ height: 23, width: 20 }}
-                        className="ml-7"
-                      />
-                      <span
-                        className={` ml-2 font-montserrat text-[12px] text-white ${
-                          show ? "item-text" : null
-                        } `}
+                {showDropdown && (
+                  subSidebarItems.map((item, index) => {
+                    return (
+                      <NavLink
+                        to={item.path}
+                        key={index}
+                        className={`flex items-center mb-5 font-montserrat text-white  cursor-pointer ${
+                          index === active ? "active" : null
+                        }`}
+                        onClick={() => {
+                          setActive(item.name);
+                          setOpenNav(false);
+                        }}
                       >
-                        {item.name}
-                      </span>
-                    </NavLink>
-                  );
-                })
-              )}
+                        <img
+                          src={item.icon}
+                          alt=""
+                          style={{ height: 23, width: 20 }}
+                          className="ml-7"
+                        />
+                        <span
+                          className={` ml-2 font-montserrat text-[12px] text-white ${
+                            show ? "item-text" : null
+                          } `}
+                        >
+                          {item.name}
+                        </span>
+                      </NavLink>
+                    );
+                  })
+                )}
               </div>
-            </div>
+            </div>) : <div></div>}
 
             <hr />
             <div
               onClick={() => setLogoutModal(!logoutModal)}
-              className="flex items-center font-montserrat  mb-10 text-white pl-[10px] cursor-pointer"
+              className="flex items-center font-montserrat mb-10 text-white pl-[10px] cursor-pointer"
             >
               <img
                 src={logoutLogo}

@@ -109,7 +109,7 @@ const Dashboard = () => {
       color: "#F1F3FF"
     }
   ]
-
+  
   return (
     <DashboardWrapper>
       <>

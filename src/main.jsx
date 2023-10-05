@@ -36,11 +36,6 @@ import VinDecoder from "./pages/auth/VinDecoder.tsx";
 import Insurance from "./pages/auth/Insurance.tsx";
 import PrivateRoute from "./components/RouteGuard/ProtectedRoute.tsx";
 import Hyvepay from "./pages/auth/Hyvepay.tsx";
-import jwt_decode from "jwt-decode";
-import settings from "./config/settings";
-
-const token = sessionStorage.getItem(settings.auth.admin);
-const decoded = token && (jwt_decode(token));
 
 const router = createBrowserRouter([
   {
@@ -72,12 +67,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/dashboard",
-        element: <PrivateRoute>
-          {decoded && (decoded.accountType === "cooperate" || decoded.accountType === null )
-            ? <Dashboard />
-            : <Navigate to="/vin-decoder" replace />
-          }
-        </PrivateRoute>
+        element: <PrivateRoute><Dashboard/></PrivateRoute>,
       },
       {
         path: "/customers",
