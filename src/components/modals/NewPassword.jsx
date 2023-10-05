@@ -73,12 +73,6 @@ export default function NewPassword({ setNewPasswordModal, newPasswordModal, otp
       sessionStorage.clear()
       navigate("/")
     }
-    // setTimeout(() => {
-    //   setNewPasswordModal(false)
-    //   localStorage.clear()
-    //   sessionStorage.clear()
-    //   navigate("/")
-    // },1000)
   },[state.resetPasswordWithTokenStatus]);
 
   useEffect(() => {

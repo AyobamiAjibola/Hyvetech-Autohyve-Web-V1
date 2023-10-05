@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import OptionIcon from "../../assets/svgs/option.svg";
-import DeleteModal from "../modals/DeleteModal.jsx";
 import AddNewBeneficiaryModal from "../modals/AddNewBeneficiaryModal";
+import DeleteModal from "../modals/DeleteModal";
 
 const TransactCard = ({ name, accountnum, bankName, phone }) => {
   const [option, setOption] = useState(false);

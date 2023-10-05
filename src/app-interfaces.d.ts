@@ -38,6 +38,7 @@ declare module '@app-interfaces' {
     permissions: IPermission[];
     userId: number;
     partnerId?: number;
+    accountType: string | null;
     [p: string]: any;
   };
 

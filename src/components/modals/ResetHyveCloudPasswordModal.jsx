@@ -7,6 +7,11 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import AppInput from "../AppInput/AppInput";
 import AppBtn from "../AppBtn/AppBtn";
 import OtpModal from "./OtpModal";
+import useAppSelector from "../../hooks/useAppSelector";
+import useAppDispatch from "../../hooks/useAppDispatch";
+import { clearSendPasswordResetTokenStatus } from "../../store/reducers/authenticationReducer";
+import { showMessage } from "../../helpers/notification";
+import { sendPasswordResetTokenAction } from "../../store/actions/authenicationActions";
 
 const ResetHyveCloudPasswordModal = ({
   openResetPassword,
@@ -18,6 +23,9 @@ const ResetHyveCloudPasswordModal = ({
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.up("sm"));
   const [openOtp, setOpenOtp] = useState(false);
+  const state = useAppSelector(state => state.authenticationReducer)
+  const dispatch = useAppDispatch();
+  const [email, setEmail] = useState("");
 
   const style = {
     position: "absolute",
@@ -33,6 +41,35 @@ const ResetHyveCloudPasswordModal = ({
     boxShadow: 24,
     padding: isSmallScreen ? "20px" : "40px",
   };
+
+  const handleResetPassword = () => {
+    dispatch(sendPasswordResetTokenAction({
+      email
+    }))
+  };
+
+  useEffect(() => {
+    if(state.sendPasswordResetTokenStatus === "completed") {
+      setOpenOtp(true);
+      setOpenResetPassword(false);
+      setOpenHyveLogin(false);
+      showMessage(
+        "Reset password",
+        state.sendPasswordResetTokenSuccess,
+        "success"
+      )
+    } else if(state.sendPasswordResetTokenStatus === "failed") {
+      showMessage(
+        "Reset password",
+        state.sendPasswordResetTokenError,
+        "error"
+      )
+    }
+
+    return () => {
+      dispatch(clearSendPasswordResetTokenStatus())
+    }
+  },[state.sendPasswordResetTokenStatus]);
 
   return (
     <>
@@ -66,6 +103,9 @@ const ResetHyveCloudPasswordModal = ({
                 className="h-14"
                 hasPLaceHolder={true}
                 title="Email"
+                onChange={(e) => {
+                  setEmail(e.target.value)
+                }}
               />
             </div>
 
@@ -73,11 +113,8 @@ const ResetHyveCloudPasswordModal = ({
               title="GET RESET OTP"
               className="text-[#000] w-full bg-[#FAA21B]  mt-10"
               titleClassName="font-semibold"
-              onClick={() => {
-                setOpenOtp(true);
-                setOpenResetPassword(false);
-                setOpenHyveLogin(false);
-              }}
+              onClick={handleResetPassword}
+              spinner={state.sendPasswordResetTokenStatus === 'loading'}
             />
           </div>
         </Box>

@@ -2,7 +2,15 @@ import { createSlice } from '@reduxjs/toolkit';
 import jwt_decode from "jwt-decode";
 
 import { IThunkAPIStatus } from '@app-types';
-import { changePasswordAction, garageSignUpAction, preSignUpAction, resetPasswordWithTokenAction, sendPasswordResetTokenAction, signInAction, signOutAction, veryfyTokenAction } from '../actions/authenicationActions';
+import { 
+  changePasswordAction, 
+  garageSignUpAction, 
+  preSignUpAction, 
+  resetPasswordWithTokenAction, 
+  sendPasswordResetTokenAction, 
+  signInAction, signOutAction, 
+  veryfyTokenAction 
+} from '../actions/authenicationActions';
 import { IPermission } from '@app-models';
 import { LOCAL_STORAGE } from '../../config/constants';
 import { CustomJwtPayload } from '@app-interfaces';

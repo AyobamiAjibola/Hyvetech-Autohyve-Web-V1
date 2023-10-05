@@ -4,6 +4,7 @@ import dashboardReducer from "./dashboardReducer";
 import userReducer from "./userReducer";
 import vehicleReducer from "./vehicleReducer";
 import partnerReducer from "./partnerReducer";
+import autoHyveReducer from "./autoHyveReducer";
 
 const rootReducer = combineReducers({
     authenticationReducer,
@@ -11,6 +12,7 @@ const rootReducer = combineReducers({
     userReducer,
     vehicleReducer,
     partnerReducer,
+    autoHyveReducer
 });
 
 export default rootReducer;

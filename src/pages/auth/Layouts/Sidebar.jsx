@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { VscChromeClose } from "react-icons/vsc";
 import "../../../assets/css/layout.css";
 import hyvePay from "../../../assets/images/Hypelogo.png";
@@ -8,9 +8,11 @@ import ArrowCircleLeft from "../../../assets/svgs/arrowcircleleft.svg";
 import { Link, NavLink, useLocation, useMatch, useNavigate } from "react-router-dom";
 import { BiChevronLeft } from "react-icons/bi";
 import LogoutModal from "../../../components/modals/LogoutModal";
-import { sidebarItems, subSidebarItems } from "../../../contsants/sidebar";
+import { sidebarItemsCooperate, sidebarItemsIndividual, subSidebarItems } from "../../../contsants/sidebar";
 import workshopIcon from "../../../assets/svgs/workshopIcon.svg";
 import { KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
+import jwt_decode from "jwt-decode";
+import settings from "../../../config/settings";
 
 const Sidebar = ({ show, setShow, openNav, setOpenNav }) => {
   const navigation = useNavigate();
@@ -18,6 +20,8 @@ const Sidebar = ({ show, setShow, openNav, setOpenNav }) => {
   const [active, setActive] = useState(localStorage?.getItem("active"));
   const [showDropdown, setShowDropdown] = useState(false);
   const location = useLocation();
+  const token = useMemo(() => sessionStorage.getItem(settings.auth.admin), []);
+  const [accountType, setAccountType] = useState(null);
 
   useEffect(() => {
     if (active != 0) {
@@ -31,9 +35,23 @@ const Sidebar = ({ show, setShow, openNav, setOpenNav }) => {
     }
   }, []);
 
+  useEffect(() => {
+    if(location.pathname === '/vin-decoder') {
+      localStorage.setItem("active", "VIN Decoder");
+    }
+  }, []);
+
   const toggleDropdown = () => {
     setShowDropdown(!showDropdown);
   };
+
+  useEffect(() => {
+    if(token) {
+      const payload = jwt_decode(token);
+      console.log(payload, 'payload')
+      setAccountType(payload.accountType)
+    }
+  },[token]);
 
   return (
     <>
@@ -81,35 +99,71 @@ const Sidebar = ({ show, setShow, openNav, setOpenNav }) => {
           />
 
           <div className="mt-14 flex flex-col gap-5">
-            {sidebarItems.map((item, index) => {
-              return (
-                <NavLink
-                  to={item.path}
-                  key={index}
-                  className={`flex items-center mb-2 font-montserrat text-white  cursor-pointer ${
-                    item.name === active ? "active" : null
-                  }`}
-                  onClick={() => {
-                    setActive(item.name);
-                    setOpenNav(false);
-                  }}
-                >
-                  <img
-                    src={item.icon}
-                    alt=""
-                    style={{ height: 27, width: 24 }}
-                    className="ml-5"
-                  />
-                  <span
-                    className={` ml-4 font-montserrat text-sm text-white ${
-                      show ? "item-text" : null
-                    } `}
-                  >
-                    {item.name}
-                  </span>
-                </NavLink>
-              );
-            })}
+            {accountType === "cooperate" || accountType === null 
+              ? (
+                sidebarItemsCooperate.map((item, index) => {
+                  return (
+                    <NavLink
+                      to={item.path}
+                      key={index}
+                      className={`flex items-center mb-2 font-montserrat text-white cursor-pointer ${
+                        item.name === active ? "active" : null
+                      }`}
+                      onClick={() => {
+                        setActive(item.name);
+                        setOpenNav(false);
+                      }}
+                    >
+                      <img
+                        src={item.icon}
+                        alt=""
+                        style={{ height: 27, width: 24 }}
+                        className="ml-5"
+                      />
+                      <span
+                        className={`ml-4 font-montserrat text-sm text-white ${
+                          show ? "item-text" : null
+                        } `}
+                      >
+                        {item.name}
+                      </span>
+                    </NavLink>
+                  );
+                })
+              ) 
+              : (
+                sidebarItemsIndividual.map((item, index) => {
+                  return (
+                    <NavLink
+                      to={item.path}
+                      key={index}
+                      className={`flex items-center mb-2 font-montserrat text-white cursor-pointer ${
+                        item.name === active ? "active" : null
+                      }`}
+                      onClick={() => {
+                        setActive(item.name);
+                        setOpenNav(false);
+                      }}
+                    >
+                      <img
+                        src={item.icon}
+                        alt=""
+                        style={{ height: 27, width: 24 }}
+                        className="ml-5"
+                      />
+                      <span
+                        className={`ml-4 font-montserrat text-sm text-white ${
+                          show ? "item-text" : null
+                        } `}
+                      >
+                        {item.name}
+                      </span>
+                    </NavLink>
+                  );
+                })
+              )
+            }
+
 
             <div>
               <div

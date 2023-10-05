@@ -14,6 +14,7 @@ const AppInput: FC<any> = ({
   hasPLaceHolder,
   placeholder,
   value,
+  onChange,
   className,
   type = "text",
 }) => {
@@ -37,6 +38,7 @@ const AppInput: FC<any> = ({
             `w-full placeholder-[#A5A5A5] placeholderText h-[55px] font-montserrat
           } ` + className
           }
+          onChange={onChange}
           value={value}
           placeholder={placeholder}
         />

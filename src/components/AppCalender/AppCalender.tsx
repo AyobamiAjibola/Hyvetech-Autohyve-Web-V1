@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DateRange } from "react-date-range";
 import "react-date-range/dist/styles.css"; // main style file
 import "react-date-range/dist/theme/default.css"; // theme css file
 
-const AppCalender = ({ range, setRange }) => {
-  const [orientation, checkOrientation] = useState();
+const AppCalender = ({ range, setRange }: any) => {
+  const [orientation, checkOrientation] = useState<any>();
 
   useEffect(() => {
     checkOrientation(
@@ -17,7 +17,7 @@ const AppCalender = ({ range, setRange }) => {
   return (
     <div className="bg-black">
       <DateRange
-        onChange={(item) => setRange([item.selection])}
+        onChange={(item: any) => setRange([item.selection])}
         editableDateInputs={true}
         moveRangeOnFirstSelection={false}
         ranges={range}

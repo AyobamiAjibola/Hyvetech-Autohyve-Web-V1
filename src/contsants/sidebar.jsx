@@ -15,7 +15,7 @@ import InsuranceIcon from "../../src/assets/svgs/InsuranceIcon.svg"
 
 // import LogoutIcon from "../../src/assets/svgs/Icon/Outline/logout.svg";
 
-export const sidebarItems = [
+export const sidebarItemsCooperate = [
   {
     name: "Dashboard",
     path: "/dashboard",
@@ -30,37 +30,20 @@ export const sidebarItems = [
     name: "Insurance",
     path: "/insurance",
     icon: InsuranceIcon,
+  }
+];
+
+export const sidebarItemsIndividual = [
+  {
+    name: "VIN Decoder",
+    path: "/vin-decoder",
+    icon: vinIcon,
   },
-  // {
-  //   name: "Items & Inventory",
-  //   path: "/inventory",
-  //   icon: ItemIcon,
-  // },
-  // {
-  //   name: "Service Reminder",
-  //   path: "/service-reminder",
-  //   icon: ServiceIcon,
-  // },
-  // {
-  //   name: "Estimates",
-  //   path: "/estimates",
-  //   icon: EstimateIcon,
-  // },
-  // {
-  //   name: "Invoices",
-  //   path: "/invoice",
-  //   icon: InvoiceIcon,
-  // },
-  // {
-  //   name: "Payments",
-  //   path: "/payment",
-  //   icon: PaymentIcon,
-  // },
-  // {
-  //   name: "Expenses",
-  //   path: "/expenses",
-  //   icon: ExpensesIcon,
-  // },
+  {
+    name: "Insurance",
+    path: "/insurance",
+    icon: InsuranceIcon,
+  }
 ];
 
 export const subSidebarItems = [

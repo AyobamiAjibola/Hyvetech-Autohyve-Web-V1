@@ -20,6 +20,7 @@ import { clearLoginStatus } from "../../store/reducers/authenticationReducer";
 import useAppSelector from "../../hooks/useAppSelector";
 import { showMessage } from "../../helpers/notification";
 import settings from "../../config/settings";
+import jwt_decode from "jwt-decode";
 
 const SignHyveModal = ({
   openHyveLogin,
@@ -65,12 +66,20 @@ const SignHyveModal = ({
 
     if (!isLoggedIn) {
       navigate('/');
-    } else navigate('/dashboard');
+    } else if(isLoggedIn) {
+      const { accountType } = jwt_decode(isLoggedIn);
+      accountType === "cooperate" || accountType === null 
+        ? navigate('/dashboard')
+        : navigate('/vin-decoder')
+    };
   }, [navigate]);
 
   useEffect(() => {
     if (authReducer.signingInStatus === 'completed') {
-      navigate('/dashboard');
+      const { accountType } = jwt_decode(authReducer.authToken);
+      accountType === "cooperate" || accountType === null 
+        ? navigate('/dashboard')
+        : navigate('/vin-decoder')
     }
   }, [authReducer.authToken, authReducer.signingInStatus]);
 

@@ -26,7 +26,7 @@
 
 import React from "react";
 
-const AppTabBtn = ({ onClick, title, className, icon, titelClassNam }) => {
+const AppTabBtn = ({ onClick, title, className, icon }: any) => {
   return (
     <button
       className={
