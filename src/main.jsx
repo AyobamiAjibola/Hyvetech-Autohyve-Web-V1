@@ -73,7 +73,7 @@ const router = createBrowserRouter([
       {
         path: "/dashboard",
         element: <PrivateRoute>
-          {decoded.accountType === "cooperate" || decoded.accountType === null 
+          {decoded && (decoded.accountType === "cooperate" || decoded.accountType === null )
             ? <Dashboard />
             : <Navigate to="/vin-decoder" replace />
           }
