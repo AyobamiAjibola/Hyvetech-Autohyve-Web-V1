@@ -36,25 +36,6 @@ const GenerateEstimateEstimate = () => {
               <CustomDate />
             </div>
 
-            {/* <div className="mt-10 w-[30%]">
-              <InputHeader text="Date" />
-              <div
-                className="bg-[#F5F5F5] flex p-3 relative py-4 rounded-xl items-center justify-between"
-                onClick={() => setOpenStart(!openStart)}
-              >
-                <span className="text-sm text-[#A5A5A5]">{calender}</span>
-                <FaCalendarAlt color="#A5A5A5" />
-              </div>
-
-              {openStart && (
-                <SingleAppCalender
-                  setCalender={setCalender}
-                  setOpenStart={setOpenStart}
-                  openStart={openStart}
-                />
-              )}
-            </div> */}
-
             <div className=" w-[100%] border-[1px] rounded-3xl  flex mt-8  px-3 md:px-5 flex-col py-5  border-[#CACACA]">
               <h5 className="font-semibold font-montserrat">
                 Customer Informationsss

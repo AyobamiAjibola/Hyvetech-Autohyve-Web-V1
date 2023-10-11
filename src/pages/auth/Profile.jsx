@@ -230,12 +230,12 @@ const Profile = () => {
     return () => {
       dispatch(clearCompanyLogoUploadStatus());
     }
-  },[partnerReducer.companyLogoUploadStatus])
-  
+  },[partnerReducer.companyLogoUploadStatus]);
+
   return (
     <>
       <div className="mb-20 mt-24 w-full">
-        {user?.accountType === 'cooperate' || user?.accountType === null && (
+        {user?.accountType !== "individual" && (
           <div className="flex justify-between w-[100%] md:w-[47%] items-center mt-10 my-4 setting-tabs">
             <div className="flex items-center flex-col md:flex-row  w-[100%]  mt-3 md:mt-0 gap-4">
               {data.map((item, index) => {
@@ -255,7 +255,7 @@ const Profile = () => {
             </div>
           </div>)}
             
-        <div className={`${user?.accountType === 'cooperate' ? 'mt-20' : 'mt-52'}`}>
+        <div className={`${user?.accountType !== 'individual' ? 'mt-40' : 'mt-52'}`}>
           {view == 0 && (
             <Formik
               enableReinitialize

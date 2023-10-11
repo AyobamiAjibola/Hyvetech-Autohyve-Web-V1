@@ -83,8 +83,8 @@ const initialValues: IItemValues = {
   name: '',
   description: '',
   unit: '',
-  buyingPrice: 0,
-  sellingPrice: 0,
+  buyingPrice: 1,
+  sellingPrice: 1,
   quantity: 0,
   type: '',
   partNumber: ''

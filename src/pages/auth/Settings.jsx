@@ -314,7 +314,7 @@ const Settings = () => {
                       <td className="font-montserrat">{parsePhone(user.phone)}</td>
                       <td className="flex items-center gap-2 justify-center">
                         <GrEdit
-                          size={28}
+                          size={20}
                           onClick={() => {
                             setAddusermodal(!addusermodal)
                             handleOnEditUser(user)
@@ -327,16 +327,16 @@ const Settings = () => {
                             {user.active 
                               ? <ToggleOn
                                   color="success" 
-                                  sx={{fontSize: '28px'}} 
+                                  sx={{fontSize: '26px', color: "#FAA21B"}} 
                                 /> 
                               : <ToggleOff
                                   color="warning" 
-                                  sx={{fontSize: '28px'}} 
+                                  sx={{fontSize: '26px', color: "#424242"}} 
                                 />}
                           </IconButton>
 
                         <button onClick={() => {setDeletemodal(true), setDelId(user.id)}}>
-                          <img src={TrashIcon} alt="" className="w-[28px]" />
+                          <img src={TrashIcon} alt="" className="w-[20px]" />
                         </button>
                       </td>
                     </tr>

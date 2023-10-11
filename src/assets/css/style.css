@@ -409,6 +409,19 @@ select.none {
   box-shadow: var(--shadow);
 }
 
+.custome-input-props {
+  height: 55px;
+  border-radius: 15px !important;
+}
+
+.custome-input-root {
+  height: 55px;
+  border-radius: 20px !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
 .form-group {
   display: flex;
   gap: 24px;

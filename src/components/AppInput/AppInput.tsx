@@ -7,7 +7,22 @@ import "react-phone-input-2/lib/style.css";
 import Select from "react-select";
 import { EyeOutlined } from "@ant-design/icons";
 
-const AppInput: FC<any> = ({
+interface IAppInputProps {
+  rightImg?: any;
+  leftImg?: any;
+  placeholderTop: string;
+  hasPLaceHolder: boolean;
+  placeholder: string;
+  value: any;
+  onChange?: any;
+  className?: any;
+  type?: string;
+  disabled?: boolean
+  name?: any
+  onBlur?: any
+}
+
+const AppInput = ({
   rightImg,
   leftImg,
   placeholderTop,
@@ -17,7 +32,9 @@ const AppInput: FC<any> = ({
   onChange,
   className,
   type = "text",
-}) => {
+  disabled = false,
+  name, onBlur
+}: IAppInputProps) => {
   const [pwdfield, setPwdfield] = React.useState(false);
 
   const togglePassword = (e: any, val: any) => {
@@ -33,6 +50,9 @@ const AppInput: FC<any> = ({
       <div className="prepend w-full">
         <img src={leftImg} alt="" className="pr-10  inline-block" />
         <input
+          onBlur={onBlur}
+          name={name}
+          disabled={disabled}
           type={pwdfield ? "password" : type}
           className={
             `w-full placeholder-[#A5A5A5] placeholderText h-[55px] font-montserrat
@@ -164,6 +184,7 @@ export const MyTextInput = ({
   rightImg,
   type = "text",
   disabled = false,
+  min,
   ...props
 }: any) => {
   // useField() returns [formik.getFieldProps(), formik.getFieldMeta()]
@@ -191,6 +212,7 @@ export const MyTextInput = ({
           {...props}
           type={pwdfield ? "text" : type}
           disabled={disabled}
+          min={min}
         />
         {type === "password" && (
           <button onClick={(e) => togglePassword(e, !pwdfield)}>

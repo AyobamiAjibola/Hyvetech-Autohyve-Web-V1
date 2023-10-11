@@ -233,9 +233,8 @@ const BusinessProfile = ({user}) => {
       setBrands({ brands: brands });
     }
   },[user])
-  console.log(brands.length, 'brands')
+
   const handleSubmitForm = (values) => {
-    console.log(values, 'values')
     dispatch(createPartnerSettingsAction({
       partnerId: user?.partner.id,
       data: {
@@ -244,7 +243,6 @@ const BusinessProfile = ({user}) => {
       }
     }))
   }
-  console.log(user?.partner.brands, 'brands')
 
   return (
     <>

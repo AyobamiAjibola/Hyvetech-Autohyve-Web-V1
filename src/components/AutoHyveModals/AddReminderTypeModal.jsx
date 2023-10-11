@@ -5,7 +5,20 @@ import AppInput from "../AppInput/AppInput";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import ModalHeaderTitle from "../ModalHeaderTitle/ModalHeaderTitle";
+import useReminder from "../../hooks/useReminder";
+import useAppDispatch from "../../hooks/useAppDispatch";
+import useAppSelector from "../../hooks/useAppSelector";
+import { getReminderTypesAction } from "../../store/actions/serviceReminderActions";
+import { showMessage } from "../../helpers/notification";
+import { clearCreateReminderTypeStatus } from "../../store/reducers/serviceReminderReducer";
+
 const AddReminderTypeModal = ({ openReminderType, setOpenReminderType }) => {
+
+  const [type, setType] = useState("");
+  const { handleCreateReminderType } = useReminder();
+  const dispatch = useAppDispatch();
+  const reminderReducer = useAppSelector(state => state.serviceReminderReducer);
+
   const style = {
     position: "absolute",
     top: "50%",
@@ -24,6 +37,16 @@ const AddReminderTypeModal = ({ openReminderType, setOpenReminderType }) => {
   };
 
   const handleClose = () => setOpenReminderType(false);
+
+  useEffect(() => {
+    if(reminderReducer.createReminderTypeStatus === 'completed') {
+      setOpenReminderType(false)
+    }
+
+    return () => {
+      dispatch(clearCreateReminderTypeStatus())
+    }
+  },[reminderReducer.createReminderTypeStatus])
 
   return (
     <>
@@ -44,10 +67,16 @@ const AddReminderTypeModal = ({ openReminderType, setOpenReminderType }) => {
           <AppInput
             placeholder="Enter Reminder Type"
             className="bg-[#F5F5F5] border-[#F5F5F5] h-14 mt-10"
+            onChange={(e) => setType(e.target.value)}
+            value={type}
           />
 
           <div className="flex justify-end mt-10 gap-5">
-            <AppBtn title="SAVE" className="font-semibold" />
+            <AppBtn
+              title="SAVE" 
+              className="font-semibold" 
+              onClick={() => handleCreateReminderType({name: type})}
+            />
           </div>
         </Box>
       </Modal>

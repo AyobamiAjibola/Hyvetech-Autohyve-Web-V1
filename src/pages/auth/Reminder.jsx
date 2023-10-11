@@ -21,6 +21,16 @@ import ReminderSummaryModal from "../../components/AutoHyveModals/ReminderSummar
 import CustomDate from "../../components/CustomDate/CustomDate";
 import TableActionButton from "../../components/TableActionButton/TableActionButton";
 import TableCountTitile from "../../components/TableCountTitile/TableCountTitile";
+import useReminder from "../../hooks/useReminder";
+import moment from "moment";
+import { IconButton } from "@mui/material";
+import Pagination from "../../components/Pagination/Pagination";
+import { ToggleOff, ToggleOn } from "@mui/icons-material";
+import { getReminderAction, toggleReminderStatusAction } from "../../store/actions/serviceReminderActions";
+import useAppDispatch from "../../hooks/useAppDispatch";
+import useAppSelector from "../../hooks/useAppSelector";
+import { showMessage } from "../../helpers/notification";
+import { clearToggleReminderStatus } from "../../store/reducers/serviceReminderReducer";
 
 const Reminder = () => {
   const [openNewReminder, setOpenNewReminder] = useState(false);
@@ -38,6 +48,13 @@ const Reminder = () => {
       setOpenImport(false);
     }
   };
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
+  const { reminders } = useReminder();
+  const [editMode, setEditMode] = useState(false);
+  const [reminderId, setReminderId] = useState(-1);
+  const dispatch = useAppDispatch();
+  const reminderReducer = useAppSelector(state => state.serviceReminderReducer)
 
   useEffect(() => {
     document.addEventListener("click", hideOnClickOutside, true);
@@ -61,9 +78,10 @@ const Reminder = () => {
     }
   };
 
-  const openReminderSummaryFunction = (e) => {
-    event.stopPropagation();
+  const openReminderSummaryFunction = (e, id) => {
+    e.stopPropagation();
     setOpenReminderSummary(!openNewReminder);
+    setReminderId(id)
   };
 
   const closeDeleteModal = (event) => {
@@ -73,7 +91,6 @@ const Reminder = () => {
 
   const openEditReminderFunction = (event) => {
     event.stopPropagation();
-
     setOpenEditReminder(!openEditReminder);
   };
 
@@ -83,6 +100,88 @@ const Reminder = () => {
     "Date (Ascending)",
     "Date (Descending)",
   ];
+
+  // Function to handle changes in the search input
+  const handleSearchChange = (e) => {
+    const inputValue = e.target.value;
+    const cleanedInput = inputValue.replace(/[^a-zA-Z0-9 ]/g, '');
+
+    setSearchQuery(cleanedInput);
+    setCurrentPage(1); // Reset to the first page when the search query changes
+  };
+
+  // Function to filter data based on the search query
+  const filteredData = reminders.filter((item) =>
+    item.reminderType.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const itemsPerPage = filteredData.length === reminders.length ? 10 : filteredData.length;
+
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentData = filteredData.slice(startIndex, endIndex);
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
+  const handleDisableReminder = (reminder) => {
+    dispatch(toggleReminderStatusAction({ reminderId: reminder.id }));
+  };
+
+  useEffect(() => {
+    if(reminderReducer.toggleReminderStatus === 'completed') {
+      dispatch(getReminderAction())
+    } else if(reminderReducer.toggleReminderStatus === 'failed') {
+      showMessage(
+        "Reminder",
+        reminderReducer.toggleReminderError,
+        "error"
+      )
+    }
+
+    return () => {
+      dispatch(clearToggleReminderStatus())
+    }
+  },[reminderReducer.toggleReminderStatus]);
+  // const data = {
+  //   open_modal: undefined,
+  //   id: undefined
+  // }
+
+  // useEffect(() => {
+  //   if(removeSessionStorage){
+  //     Object.keys(data).forEach(key => {
+  //       sessionStorage.removeItem(key);
+  //     });
+  //   }
+  // }, [removeSessionStorage])
+
+  // useEffect(() => {
+  //   if(sessionStorage.getItem('open_modal') === 'true'){
+  //     reminder.setShowCreate(true)
+  //   }
+  // },[]);
+
+  // // remove open modal and id from session storage on page reload
+  // useEffect(() => {
+  //   const handleBeforeUnload = () => {
+  //     sessionStorage.removeItem('open_modal');
+  //     sessionStorage.removeItem('id');
+  //   };
+
+  //   window.addEventListener('beforeunload', handleBeforeUnload);
+
+  //   return () => {
+  //     window.removeEventListener('beforeunload', handleBeforeUnload);
+  //   };
+  // }, []);
+
+  const overDue = reminders.filter(reminder => reminder.reminderStatus.startsWith("Overdue"));
+  const dueWeek = reminders.filter(reminder => reminder.reminderStatus === "Due in [1] week(s)");
+  const dueMonth = reminders.filter(reminder => reminder.reminderStatus === "Due in [1] month(s)");
 
   return (
     <DashboardWrapper>
@@ -109,13 +208,19 @@ const Reminder = () => {
               icon={<AiOutlinePlus />}
               title="New Reminder"
               className="w-[200px] text-[#000] btn-secondary hidden md:flex"
-              onClick={() => setOpenNewReminder(true)}
+              onClick={() => {
+                setEditMode(false)
+                setOpenEditReminder(true)
+              }}
             />
           </div>
         </div>
         <div className="flex justify-between md:flex-row flex-col items-start md:items-center mt-0 md:mt-16">
           <div className="w-[100%] md:w-[50%]">
-            <SearchInput />
+            <SearchInput
+              handleSearchChange={handleSearchChange}
+              searchQuery={searchQuery}
+            />
           </div>
 
           <div className="flex w-full md:w-[50%] items-start md:items-center font-montserrat md:flex-row flex-col  text-[11px] gap-4 text-gray-500">
@@ -126,7 +231,7 @@ const Reminder = () => {
                 className="mr-2 text-[25px]"
               />
               <span className="text-[#3E3E3E] text-xs md:text-[7px]  md:font-semibold font-normal">
-                3 services overdue, 7 services due this week, 12 services due
+                {overDue.length} services overdue, {dueWeek.length} services due this week, {dueMonth.length} services due
                 this month
               </span>
             </div>
@@ -154,59 +259,106 @@ const Reminder = () => {
               <th className="font-montserrat  text-xs text-left">Action</th>
             </thead>
 
-            {tableData.map((item, index) => {
-              return (
-                <tbody>
-                  <tr
-                    onClick={openReminderSummaryFunction}
-                    className="cursor-pointer table-hover"
-                  >
-                    <td
-                      className="font-montserrat text-xs cursor-pointer"
-                      onClick={() => toggleCarts(index)}
+            {filteredData.length === 0 ? (
+              <tbody>
+                <tr>
+                  <td className="font-montserrat font-bold">No data found</td>
+                </tr>
+              </tbody>
+              ) : (
+              currentData.map((item, index) => {
+                return (
+                  <tbody>
+                    <tr
+                      onClick={(e) => {
+                        if (!e.target.closest(".toggle")) {
+                          openReminderSummaryFunction(e, item.id)
+                        }
+                      }}
+                      className="cursor-pointer table-hover"
+                      key={index}
                     >
-                      {[
-                        checkBoxValue.includes(index) ? (
-                          <div className="w-[20px] h-[18px] flex items-center justify-center border-[#FAA21B] border-[1px] rounded-[5px]">
-                            <div className="w-[15px] h-[15px] rounded-[6px] bg-[#FAA21B] border-[1px]"></div>
-                          </div>
-                        ) : (
-                          <div className="w-[20px] h-[18px] border-[#000] border-[1px] rounded-[5px]"></div>
-                        ),
-                      ]}
-                    </td>
-                    <td className="font-montserrat flex items-center gap-2 text-xs">
-                      {index + 1}
-                    </td>
-                    <td className="font-montserrat text-xs">Brake Service</td>
-                    <td className="font-montserrat text-xs">Demo Customer</td>
-                    <td className="font-montserrat text-xs">
-                      1983 Mercedes-Benz 240
-                    </td>
-                    <td className="font-montserrat text-xs"> 26/01/2023</td>
-                    <td className="font-montserrat text-xs">
-                      Overdue by [1] week(s)
-                    </td>
-
-                    <td className="font-montserrat text-xs">
-                      <span
-                        className={`py-2 flex justify-center  w-20 items-center  ${
-                          index == 1 ? "bg-primary" : "bg-gray-300"
-                        } px-4`}
-                        style={{ borderRadius: 10 }}
+                      <td
+                        className="font-montserrat text-xs cursor-pointer"
+                        onClick={() => toggleCarts(index)}
                       >
-                        {index == 1 ? "Active" : "Inactive"}
-                      </span>
-                    </td>
+                        {[
+                          checkBoxValue.includes(index) ? (
+                            <div className="w-[20px] h-[18px] flex items-center justify-center border-[#FAA21B] border-[1px] rounded-[5px]">
+                              <div className="w-[15px] h-[15px] rounded-[6px] bg-[#FAA21B] border-[1px]"></div>
+                            </div>
+                          ) : (
+                            <div className="w-[20px] h-[18px] border-[#000] border-[1px] rounded-[5px]"></div>
+                          ),
+                        ]}
+                      </td>
+                      <td className="font-montserrat flex items-center gap-2 text-xs">
+                        {index + 1}
+                      </td>
+                      <td className="font-montserrat text-xs">{item.reminderType}</td>
+                      <td className="font-montserrat text-xs">{item.customer.firstName} {item.customer.lastName}</td>
+                      <td className="font-montserrat text-xs">
+                        {item.vehicle.modelYear} {item.vehicle.make} {item.vehicle.model} 
+                      </td>
+                      <td className="font-montserrat text-xs">{moment(item.lastServiceDate).format('DD/MM/YYYY')}</td>
+                      <td className="font-montserrat text-xs">
+                        {
+                          item.reminderStatus.split(" ")[0] === 'Overdue' || item.reminderStatus === 'Due today'
+                            ? <span className="font-montserrat text-xs text-[red]">
+                                {item.reminderStatus}
+                              </span>
+                            : item.reminderStatus === "Not Available"
+                              ? item.reminderStatus
+                              : <span className="font-montserrat text-xs text-[green]">
+                                  {item.reminderStatus}
+                                </span>
+                        }
+                      </td>
 
-                    <td className="flex gap-3 items-center justify-center ">
-                      <GrEdit size={13} onClick={openEditReminderFunction} />
-                      <AppSwitch />
-                    </td>
-                  </tr>
-                </tbody>
-              );
-            })}
+                      <td className="font-montserrat text-xs">
+                        <span
+                          className={`py-2 flex justify-center  w-20 items-center  ${
+                            item.status == true ? "bg-primary" : "bg-gray-300"
+                          } px-4`}
+                          style={{ borderRadius: 10 }}
+                        >
+                          {item.status == true ? "Active" : "Inactive"}
+                        </span>
+                      </td>
+
+                      <td className="flex gap-3 items-center justify-center ">
+                        <IconButton
+                          onMouseDown={(e) => {
+                            openEditReminderFunction(e)
+                            setEditMode(true)
+                            setReminderId(item.id)
+                          }} 
+                        >
+                          <GrEdit 
+                            size={13}
+                          />
+                        </IconButton>
+                        <IconButton
+                          onMouseDown={(e) => {
+                            e.stopPropagation();
+                            handleDisableReminder(item)
+                          }}
+                          className="toggle"
+                        >
+                          {item.status 
+                            ? <ToggleOn
+                                sx={{fontSize: '28px', color: "#FAA21B"}} 
+                              /> 
+                            : <ToggleOff
+                                sx={{fontSize: '28px', color: "#424242"}} 
+                              />}
+                        </IconButton>
+                      </td>
+                    </tr>
+                  </tbody>
+                );
+              }))
+            }
           </table>
         </div>
 
@@ -218,15 +370,11 @@ const Reminder = () => {
           />
 
           <div className="flex items-center gap-3">
-            <div className="border-[1px] rounded-[5px] p-3 border-[#D9D9D9] cursor-pointer">
-              <HiChevronLeft color="#D9D9D9" />
-            </div>
-            <div className="border-[1px] rounded-[5px] px-5 py-2 border-[#D9D9D9]">
-              1
-            </div>
-            <div className="border-[1px] rounded-[5px] p-3 border-[#D9D9D9] cursor-pointer">
-              <HiChevronRight color="#D9D9D9" />
-            </div>
+            {filteredData.length !== 0 && (<Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />)}
           </div>
         </div>
 
@@ -239,19 +387,19 @@ const Reminder = () => {
         />
 
         <AddNewReminderModal
-          openNewReminder={openNewReminder}
-          setOpenNewReminder={setOpenNewReminder}
-          title=" New Reminders"
-        />
-        <AddNewReminderModal
-          title="Edit Reminder"
           openNewReminder={openEditReminder}
           setOpenNewReminder={setOpenEditReminder}
+          reminderId={reminderId}
+          setReminderId={setReminderId}
+          editMode={editMode}
+          setEditMode={setEditMode}
         />
 
         <ReminderSummaryModal
           openReminderSummary={openReminderSummary}
           setOpenReminderSummary={setOpenReminderSummary}
+          reminderId={reminderId}
+          setReminderId={setReminderId}
         />
       </>
     </DashboardWrapper>

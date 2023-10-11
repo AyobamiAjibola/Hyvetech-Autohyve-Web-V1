@@ -17,6 +17,15 @@ import { Link, useNavigate } from "react-router-dom";
 import { GrEdit } from "react-icons/gr";
 import EstimateDetailsModal from "../../components/AutoHyveModals/EstimateDetailsModal";
 import TableCountTitile from "../../components/TableCountTitile/TableCountTitile";
+import useEstimate from "../../hooks/useEstimate";
+import Pagination from "../../components/Pagination/Pagination";
+import moment from "moment";
+import settings from "../../config/settings";
+import { Util } from "../../helpers/Util";
+import { ESTIMATE_STATUS } from "../../config/constants";
+import { IconButton } from "@mui/material";
+
+const API_ROOT = settings.api.baseURL;
 
 const Estimates = () => {
   const [openCreatCustomer, setOpenCreatCustomer] = useState(false);
@@ -28,6 +37,9 @@ const Estimates = () => {
   const navigate = useNavigate();
   const refOne = useRef(null);
   const tableData = Array(3).fill("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
+  const { estimates } = useEstimate();
   const hideOnClickOutside = (e) => {
     if (refOne.current && !refOne.current.contains(e.target)) {
       setOpenImport(false);
@@ -72,6 +84,33 @@ const Estimates = () => {
     event.stopPropagation();
     setOpenEstimateDetails(!openEstimateDetails);
   };
+
+    // Function to handle changes in the search input
+    const handleSearchChange = (e) => {
+      const inputValue = e.target.value;
+      const cleanedInput = inputValue.replace(/[^a-zA-Z0-9 ]/g, '');
+  
+      setSearchQuery(cleanedInput);
+      setCurrentPage(1); // Reset to the first page when the search query changes
+    };
+  
+    // Function to filter data based on the search query
+    const filteredData = estimates.filter((item) =>
+      item.customer.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.customer.lastName.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  
+    const itemsPerPage = filteredData.length === estimates.length ? 10 : filteredData.length;
+  
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentData = filteredData.slice(startIndex, endIndex);
+  
+    const handlePageChange = (newPage) => {
+      setCurrentPage(newPage);
+    };
 
   return (
     <DashboardWrapper>
@@ -157,7 +196,10 @@ const Estimates = () => {
         </div>
         <div className="flex justify-between md:flex-row flex-col items-start md:items-center mt-5 md:mt-16">
           <div className="w-[100%] md:w-[50%]">
-            <SearchInput />
+            <SearchInput
+              handleSearchChange={handleSearchChange}
+              searchQuery={searchQuery}
+            />
           </div>
 
           <TableCountTitile />
@@ -186,7 +228,7 @@ const Estimates = () => {
               <th className="font-montserrat  text-xs text-left">Action</th>
             </thead>
 
-            {tableData.map((item, index) => {
+            {currentData.map((item, index) => {
               return (
                 <tbody>
                   <tr
@@ -208,36 +250,58 @@ const Estimates = () => {
                       ]}
                     </td>
 
-                    <td className="font-montserrat text-xs">26/04/2023</td>
-                    <td className="font-montserrat text-xs">EST-53019</td>
+                    <td className="font-montserrat text-xs">{moment(item.createdAt).format('DD/MM/YYYY')}</td>
+                    <td className="font-montserrat text-xs">{item.code.split('_')[0]}</td>
                     <td className="font-montserrat flex items-center gap-2 text-xs">
-                      <img
-                        src={profilePicx}
-                        alt=""
-                        className="w-[20px] h-[20px]"
-                      />
-                      <span>Mr Olusola Segun</span>
+                        <img
+                          src={ item.profileImageUrl ? `${API_ROOT}/${item.profileImageUrl}` : profilePicx }
+                          alt=""
+                          className="w-[20px] h-[20px]"
+                        />
+                      <span>{item.customer.title || ''} {item.customer.firstName || ''} {item.customer.lastName || ''}</span>
                     </td>
                     <td className="font-montserrat text-xs">
-                      2009 MAZDA CX-954
+                      {item.vehicle 
+                        ? `${item.vehicle.modelYear} 
+                            ${item.vehicle.make}
+                            ${item.vehicle.model}
+                          ` 
+                        : ''}
                     </td>
-                    <td className="font-montserrat text-xs">₦140,184.00</td>
+                    <td className="font-montserrat text-xs">{Util.formAmount(item.grandTotal)}</td>
                     <td className="font-montserrat text-xs">
                       <span
                         className={`py-2 flex justify-center  w-20 items-center  ${
-                          index == 1 ? "bg-primary" : "bg-gray-300"
+                          item.status === ESTIMATE_STATUS.sent
+                            ? "bg-primary" 
+                            : item.status === ESTIMATE_STATUS.draft 
+                              ? "bg-gray-300"
+                              : "bg-[green]"
                         } px-4`}
                         style={{ borderRadius: 10 }}
                       >
-                        {index == 1 ? "Sent" : "Draft"}
+                        {item.status === ESTIMATE_STATUS.sent 
+                          ? "Sent" 
+                          : item.status === ESTIMATE_STATUS.draft
+                            ? "Draft"
+                            : "Invoiced"
+                        }
                       </span>
                     </td>
 
                     <td className="flex gap-3 items-center justify-center ">
-                      <GrEdit
-                        size={13}
-                        onClick={() => navigate("/edit-estimate")}
-                      />
+                      <IconButton
+                        onClick={() => {
+                          navigate("/edit-estimate", { state: { item } })
+                          sessionStorage.setItem('editMode', true)
+                          sessionStorage.setItem('id', item.id)
+                        }}
+                        disabled
+                      >
+                        <GrEdit
+                          size={13}
+                        />
+                      </IconButton>
                       <img
                         src={TrashIcon}
                         alt=""
@@ -253,33 +317,19 @@ const Estimates = () => {
         </div>
 
         <div className="md:flex hidden  mb-10 justify-end w-full mt-4">
-          <div className="flex items-center gap-3">
-            <div className="border-[1px] rounded-[5px] p-3 border-[#D9D9D9] cursor-pointer">
-              <HiChevronLeft color="#D9D9D9" />
-            </div>
-            <div className="border-[1px] rounded-[5px] px-5 py-2 border-[#D9D9D9]">
-              1
-            </div>
-            <div className="border-[1px] rounded-[5px] p-3 border-[#D9D9D9] cursor-pointer">
-              <HiChevronRight color="#D9D9D9" />
-            </div>
-          </div>
+          {filteredData.length !== 0 && (<Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />)}
         </div>
 
         <div className="md:hidden gap-3 flex flex-col">
-          <div className="flex justify-start mb-10 md:justify-end w-full mt-4">
-            <div className="flex items-center gap-3">
-              <div className="border-[1px] rounded-[5px] p-3 border-[#D9D9D9] cursor-pointer">
-                <HiChevronLeft color="#D9D9D9" />
-              </div>
-              <div className="border-[1px] rounded-[5px] px-5 py-2 border-[#D9D9D9]">
-                1
-              </div>
-              <div className="border-[1px] rounded-[5px] p-3 border-[#D9D9D9] cursor-pointer">
-                <HiChevronRight color="#D9D9D9" />
-              </div>
-            </div>
-          </div>
+          {filteredData.length !== 0 && (<Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />)}
         </div>
 
         <CreateAutoHyveCustomerModal

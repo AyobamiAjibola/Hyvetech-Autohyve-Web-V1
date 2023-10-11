@@ -331,7 +331,7 @@ export const stateLga = {
     "Udi",
     "Uzo Uwani",
   ],
-  FCT: [
+  Abuja: [
     "Abaji",
     "Bwari",
     "Gwagwalada",

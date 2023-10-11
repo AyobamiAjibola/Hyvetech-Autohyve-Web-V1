@@ -18,10 +18,12 @@ import React, { FC } from "react";
 interface IProps {
   text: string;
   className?: string;
+  onClick?: any
 }
-const InputHeader: FC<IProps> = ({ text, className }) => {
+const InputHeader: FC<IProps> = ({ text, className, onClick }) => {
   return (
     <span
+      onClick={onClick}
       className={
         `text-sm inline-block font-montserrat
   ` + className

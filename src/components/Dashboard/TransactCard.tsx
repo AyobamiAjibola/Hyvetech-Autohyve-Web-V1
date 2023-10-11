@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import OptionIcon from "../../assets/svgs/option.svg";
+import DeleteModal from "../modals/DeleteModal.js";
 import AddNewBeneficiaryModal from "../modals/AddNewBeneficiaryModal";
-import DeleteModal from "../modals/DeleteModal";
 
-const TransactCard = ({ name, accountnum, bankName, phone }) => {
+const TransactCard = ({ name, accountNumber, bankName, phone }: any) => {
   const [option, setOption] = useState(false);
   const [dModal, setdModal] = useState(false);
   const [beneficiary, setBeneficiary] = useState(false);
@@ -34,7 +34,7 @@ const TransactCard = ({ name, accountnum, bankName, phone }) => {
 
             {option && (
               <ul className="option-dropdown">
-                <li>
+                {/* <li>
                   <button
                     onClick={() => {
                       setOption(false);
@@ -43,7 +43,7 @@ const TransactCard = ({ name, accountnum, bankName, phone }) => {
                   >
                     Edit
                   </button>
-                </li>
+                </li> */}
                 <li>
                   <button
                     onClick={() => {
@@ -64,7 +64,7 @@ const TransactCard = ({ name, accountnum, bankName, phone }) => {
           {name}
         </h5>
 
-        <p className="text-sm font-montserrat text-[11px]">{accountnum}</p>
+        <p className="text-sm font-montserrat text-[11px]">{accountNumber}</p>
         <p className="text-sm font-montserrat text-[11px]">{bankName}</p>
         <p className="text-sm font-montserrat text-[11px]">{phone}</p>
       </div>

@@ -11,11 +11,17 @@ import AddNewQuantityModal from "./AddNewQuantityModal";
 import ModalHeaderTitle from "../ModalHeaderTitle/ModalHeaderTitle";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import useItemStock from "../../hooks/useItemStock";
 
-const ItemDetailsModal = ({ openItem, setOpenItem }) => {
+const ItemDetailsModal = ({ 
+  openItem, setOpenItem,
+  itemId,
+  setItemId
+}) => {
   const [addNewQuantity, setAddNewQuantity] = useState(false);
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.up("sm"));
+  const { onEdit, initialValues } = useItemStock()
   const data = [
     "Independent Technician",
     "Single workshop",
@@ -40,12 +46,17 @@ const ItemDetailsModal = ({ openItem, setOpenItem }) => {
   };
 
   const handleClose = () => setOpenItem(false);
+  useEffect(() => {
+    if(itemId) {
+      onEdit(itemId)
+    }
+  },[itemId]);
 
   return (
     <>
       <Modal
         open={openItem}
-        onClose={handleClose}
+        onClose={() => {handleClose(), setItemId(-1)}}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
@@ -54,7 +65,7 @@ const ItemDetailsModal = ({ openItem, setOpenItem }) => {
             <div className="flex justify-between w-full">
               <ModalHeaderTitle title=" Item Detail" />
 
-              <button onClick={() => setOpenItem(false)}>
+              <button onClick={() => {setOpenItem(false), setItemId(-1)}}>
                 <img src={CloseIcon} alt="" />
               </button>
             </div>
@@ -65,8 +76,10 @@ const ItemDetailsModal = ({ openItem, setOpenItem }) => {
                   <AppInput
                     hasPLaceHolder={true}
                     placeholderTop="Name"
-                    placeholder="Labels"
+                    placeholder="Name"
                     className="bg-[#F5F5F5] border-[#F5F5F5] h-14"
+                    value={initialValues.name}
+                    disabled
                   />
                 </div>
 
@@ -74,8 +87,10 @@ const ItemDetailsModal = ({ openItem, setOpenItem }) => {
                   <AppInput
                     hasPLaceHolder={true}
                     placeholderTop="Selling Rate/Price"
-                    placeholder="Labels"
+                    placeholder="Selling Rage/Price"
                     className="bg-[#F5F5F5] border-[#F5F5F5] h-14"
+                    value={initialValues.sellingPrice}
+                    disabled
                   />
                 </div>
               </div>
@@ -85,8 +100,10 @@ const ItemDetailsModal = ({ openItem, setOpenItem }) => {
                   <AppInput
                     hasPLaceHolder={true}
                     placeholderTop="Type"
-                    placeholder="I’ve been typed"
+                    placeholder="Type"
                     className="bg-[#F5F5F5] border-[#F5F5F5] h-14"
+                    value={initialValues.type}
+                    disabled
                   />
                 </div>
 
@@ -94,8 +111,10 @@ const ItemDetailsModal = ({ openItem, setOpenItem }) => {
                   <AppInput
                     hasPLaceHolder={true}
                     placeholderTop="Buy Rate/Price"
-                    placeholder="Labels"
+                    placeholder="Buy Rate/Price"
                     className="bg-[#F5F5F5] border-[#F5F5F5] h-14"
+                    value={initialValues.buyingPrice}
+                    disabled
                   />
                 </div>
               </div>
@@ -105,8 +124,10 @@ const ItemDetailsModal = ({ openItem, setOpenItem }) => {
                   <AppInput
                     hasPLaceHolder={true}
                     placeholderTop="Item Unit"
-                    placeholder="I’ve been typed"
+                    placeholder="Unit"
                     className="bg-[#F5F5F5] border-[#F5F5F5] h-14"
+                    value={initialValues.unit}
+                    disabled
                   />
                 </div>
 
@@ -114,8 +135,10 @@ const ItemDetailsModal = ({ openItem, setOpenItem }) => {
                   <AppInput
                     hasPLaceHolder={true}
                     placeholderTop="Qty in Stock"
-                    placeholder="I’ve been typed"
+                    placeholder="Quantity"
                     className="bg-[#F5F5F5] border-[#F5F5F5] h-14"
+                    value={initialValues.quantity}
+                    disabled
                   />
                 </div>
               </div>
@@ -124,8 +147,10 @@ const ItemDetailsModal = ({ openItem, setOpenItem }) => {
               <AppInput
                 hasPLaceHolder={true}
                 placeholderTop="Part Number"
-                placeholder="Labels"
+                placeholder="Part number"
                 className="bg-[#F5F5F5] border-[#F5F5F5] h-14"
+                value={initialValues.partNumber}
+                disabled
               />
             </div>
 
@@ -142,15 +167,23 @@ const ItemDetailsModal = ({ openItem, setOpenItem }) => {
             </div>
 
             <div className="w-full mt-5">
-              <CustomTextArea topTitle="Note/Remark" placeholder="Labels" />
+              <CustomTextArea
+                topTitle="Note/Remark"
+                placeholder="Note/Remark"
+                value={initialValues.description}
+                disabled
+              />
             </div>
           </div>
         </Box>
       </Modal>
 
       <AddNewQuantityModal
+        setItemId
+        itemId={itemId}
         addNewQuantity={addNewQuantity}
         setAddNewQuantity={setAddNewQuantity}
+        setOpenItem={setOpenItem}
       />
     </>
   );

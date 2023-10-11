@@ -18,7 +18,7 @@ import Invoice from "./pages/auth/Invoice.jsx";
 import Payment from "./pages/auth/Payment.jsx";
 import Expenses from "./pages/auth/Expenses.jsx";
 import NewTransaction from "./pages/auth/NewTransaction.tsx";
-import SavedBeneficiaries from "./pages/auth/SavedBeneficiaries.jsx";
+import SavedBeneficiaries from "./pages/auth/SavedBeneficiaries.tsx";
 import WelcomeAuthenticationPage from "./pages/unauth/WelcomeAuthenticationPage.jsx";
 import LoginPage from "./pages/unauth/LoginPage.jsx";
 import Settings from "./pages/auth/Settings.jsx";
@@ -26,7 +26,7 @@ import Profile from "./pages/auth/Profile.jsx";
 import AutoHyveProfile from "./pages/auth/AutoHyveProfile.jsx";
 import GenerateEstimate from "./pages/auth/GenerateEstimate.jsx";
 import GenerateEstimateEstimate from "./pages/auth/GenerateEstimateEstimate.jsx";
-import EditEstimate from "./pages/auth/EditEstimate.jsx";
+import EditEstimate from "./pages/auth/EditEstimate.tsx";
 import GenerateInvoice from "./pages/auth/GenerateInvoice.jsx";
 import EditInvoice from "./pages/auth/EditInvoice.jsx";
 import Reminder from "./pages/auth/Reminder.jsx";
@@ -130,7 +130,7 @@ const router = createBrowserRouter([
         element: <PrivateRoute ><Profile/></PrivateRoute>,
       },
       {
-        path: "/autoHyveProfile",
+        path: "/autoHyveProfile/:id",
         element: <PrivateRoute><AutoHyveProfile/></PrivateRoute>,
       },
       {

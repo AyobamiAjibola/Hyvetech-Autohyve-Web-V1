@@ -60,7 +60,6 @@ export default function NewPasswordModal({ setNewPasswordModal, newPasswordModal
     const userData = localStorage.getItem("user_data")
     
     const retrievedObject = JSON.parse(userData);
-    console.log(retrievedObject.phone)
     const phone = retrievedObject.phone
 
     const newPhone = `${phone}`.startsWith("234")
@@ -72,6 +71,7 @@ export default function NewPasswordModal({ setNewPasswordModal, newPasswordModal
     const data = { ...retrievedObject, phone: newPhone};
     dispatch(garageSignUpAction({
         ...data,
+        email: data.email.toLowerCase(),
         password: values.password,
         confirm_password: values.confirmPassword
       }))

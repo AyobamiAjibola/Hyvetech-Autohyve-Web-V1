@@ -29,17 +29,18 @@ const Sidebar = ({ show, setShow, openNav, setOpenNav }) => {
     }
   }, [active]);
 
-  useEffect(() => {
-    if(location.pathname === '/dashboard') {
-      localStorage.setItem("active", "Dashboard");
-    }
-  }, []);
-
+  //**** USE THIS WHEN WE DECIDE ON HOME PAGE */
   // useEffect(() => {
-  //   if(location.pathname === '/vin-decoder') {
-  //     localStorage.setItem("active", "VIN Decoder");
+  //   if(location.pathname === '/dashboard') { // THIS SHOULD BE /home ONCE WE DECIDE
+  //     localStorage.setItem("active", "Dashboard");
   //   }
   // }, []);
+
+  useEffect(() => {
+    if(location.pathname === '/vin-decoder') {
+      localStorage.setItem("active", "VIN Decoder");
+    }
+  }, []);
 
   const toggleDropdown = () => {
     setShowDropdown(!showDropdown);

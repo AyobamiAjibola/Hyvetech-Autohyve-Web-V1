@@ -17,11 +17,6 @@ import InsuranceIcon from "../../src/assets/svgs/InsuranceIcon.svg"
 
 export const sidebarItemsCooperate = [
   {
-    name: "Dashboard",
-    path: "/dashboard",
-    icon: DashboardIcon,
-  },
-  {
     name: "VIN Decoder",
     path: "/vin-decoder",
     icon: vinIcon,
@@ -42,6 +37,11 @@ export const sidebarItemsIndividual = [
 ];
 
 export const subSidebarItems = [
+  {
+    name: "Dashboard",
+    path: "/dashboard",
+    icon: DashboardIcon,
+  },
   {
     name: "Customers",
     path: "/customers",

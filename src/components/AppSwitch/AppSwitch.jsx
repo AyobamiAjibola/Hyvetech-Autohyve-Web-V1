@@ -1,14 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./AppSwitch.module.css";
 
-const AppSwitch = ({ userId }) => {
+const AppSwitch = () => {
   const [checked, setChecked] = useState(false);
+
   const handleChange = (e) => {
     e.stopPropagation();
     setChecked(!checked);
   };
-  console.log(userId, 'id')
-  
 
   return (
     <label

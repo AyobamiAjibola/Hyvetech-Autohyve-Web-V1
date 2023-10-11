@@ -12,12 +12,20 @@ import ModalHeaderTitle from "../ModalHeaderTitle/ModalHeaderTitle";
 import CustomDate from "../CustomDate/CustomDate";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import useItemStock from "../../hooks/useItemStock";
+import useAppSelector from "../../hooks/useAppSelector";
 
-const AddNewQuantityModal = ({ addNewQuantity, setAddNewQuantity }) => {
+const AddNewQuantityModal = ({ addNewQuantity, setAddNewQuantity, itemId, setOpenItem }) => {
   const handleClose = () => setAddNewQuantity(false);
 
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.up("sm"));
+  const { handleAddStock } = useItemStock();
+  const [data, setData] = useState({
+    id: -1,
+    quantity: 0
+  });
+  const itemReducer = useAppSelector(state => state.itemStockReducer);
 
   const style = {
     position: "absolute",
@@ -36,6 +44,16 @@ const AddNewQuantityModal = ({ addNewQuantity, setAddNewQuantity }) => {
     py: 5,
   };
 
+  useEffect(() => {
+    setData({...data, id: itemId})
+  },[itemId]);
+
+  useEffect(() => {
+    if(itemReducer.addStockStatus === 'completed') {
+      setOpenItem(false)
+    }
+  },[itemReducer.addStockStatus])
+
   return (
     <>
       <Modal
@@ -53,45 +71,32 @@ const AddNewQuantityModal = ({ addNewQuantity, setAddNewQuantity }) => {
           </div>
 
           <div className="mt-8 gap-8 flex-col justify-center">
-            <div className="mt-10 w-[100%] md:w-[50%] mb-5">
+            {/* <div className="mt-10 w-[100%] md:w-[50%] mb-5">
               <InputHeader text="Date" />
               <CustomDate />
-
-              {/* <InputHeader text="Date" />
-                  <div
-                    className="bg-[#F5F5F5] flex p-3 relative py-4 rounded-xl items-center justify-between"
-                    onClick={() => setOpenStart(!openStart)}
-                  >
-                    <span className="text-sm text-[#A5A5A5]">{calender}</span>
-                    <FaCalendarAlt color="#A5A5A5" />
-                  </div>
-
-                  {openStart && (
-                    <SingleAppCalender
-                      setCalender={setCalender}
-                      setOpenStart={setOpenStart}
-                      openStart={openStart}
-                    />
-                  )} */}
-            </div>
+            </div> */}
             <div className=" w-full">
               <div className="w-full">
                 <AppInput
                   hasPLaceHolder={true}
                   placeholderTop="Quantity"
-                  placeholder="Labels"
+                  placeholder="Quantity"
+                  type="number"
                   className="bg-[#F5F5F5] border-[#F5F5F5] h-14"
+                  onChange={(e) => {
+                    setData({...data, quantity: +e.target.value})
+                  }}
                 />
               </div>
 
-              <div className="w-full mt-5">
+              {/* <div className="w-full mt-5">
                 <AppInput
                   hasPLaceHolder={true}
                   placeholderTop="Cost"
                   placeholder="Labels"
                   className="bg-[#F5F5F5] border-[#F5F5F5] h-14"
                 />
-              </div>
+              </div> */}
             </div>
           </div>
 
@@ -100,8 +105,9 @@ const AddNewQuantityModal = ({ addNewQuantity, setAddNewQuantity }) => {
 
             <AppBtn
               title="SAVE"
-              className="font-medium w-[90%] md:w-[100px] mt-5"
-              onClick={() => setAddNewQuantity(false)}
+              className="font-medium w-[90%] md:w-[300px] mt-5"
+              onClick={() => {handleAddStock(data), setAddNewQuantity(false)}}
+              spinner={itemReducer.addStockStatus === 'loading'}
             />
           </div>
         </Box>

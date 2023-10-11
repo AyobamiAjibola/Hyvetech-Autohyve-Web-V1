@@ -23,7 +23,6 @@ export const signInAction = asyncThunkWrapper<ApiResponseSuccess<any>, any>(SIGN
 export const garageSignUpAction = asyncThunkWrapper<ApiResponseSuccess<string>, IGarageSignupModel>(
   GARAGE_SIGN_UP,
   async args => {
-    console.log(args, 'args')
     const response = await axiosClient.post(`${API_ROOT}/garage-sign-up`, args);
 
     return response.data;

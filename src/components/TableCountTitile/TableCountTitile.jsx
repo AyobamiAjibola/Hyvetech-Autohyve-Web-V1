@@ -1,8 +1,8 @@
 import React from "react";
 
 const TableCountTitile = ({
-  title = "Showing 12 results out of 56",
-  className,
+  title,
+  className
 }) => {
   return (
     <div

@@ -61,25 +61,35 @@ const SignHyveModal = ({
     dispatch(clearLoginStatus());
   }, []);
 
-  useEffect(() => {
-    const isLoggedIn = sessionStorage.getItem(settings.auth.admin);
+  // useEffect(() => {
+  //   const isLoggedIn = sessionStorage.getItem(settings.auth.admin);
 
-    if (!isLoggedIn) {
-      navigate('/');
-    } else if(isLoggedIn) {
-      const { accountType } = jwt_decode(isLoggedIn);
-      accountType === "cooperate" || accountType === null 
-        ? navigate('/dashboard')
-        : navigate('/vin-decoder')
-    };
-  }, [navigate]);
+  //   if (!isLoggedIn) {
+  //     navigate('/');
+  //   } else if(isLoggedIn) {
+  //     const { accountType } = jwt_decode(isLoggedIn);
+  //     accountType === "cooperate" || accountType === null 
+  //       ? navigate('/dashboard')
+  //       : navigate('/vin-decoder')
+  //   };
+  // }, [navigate]);
 
-  useEffect(() => {
+  //******** USE THIS WHEN WE DECIDE ON THE HOME PAGE */
+  // useEffect(() => {
+  //   if (authReducer.signingInStatus === 'completed') {
+  //     const { accountType } = jwt_decode(authReducer.authToken);
+  //     accountType === "cooperate" || accountType === null 
+  //       ? navigate('/dashboard') // THIS SHOULD BE /home ONCE WE DECIDE
+  //       : navigate('/vin-decoder')
+  //   }
+  // }, [authReducer.authToken, authReducer.signingInStatus]);
+
+   useEffect(() => {
     if (authReducer.signingInStatus === 'completed') {
-      const { accountType } = jwt_decode(authReducer.authToken);
-      accountType === "cooperate" || accountType === null 
-        ? navigate('/dashboard')
-        : navigate('/vin-decoder')
+      // const { accountType } = jwt_decode(authReducer.authToken);
+      // accountType === "cooperate" || accountType === null 
+      //   ? navigate('/dashboard')
+      navigate('/vin-decoder')
     }
   }, [authReducer.authToken, authReducer.signingInStatus]);
 

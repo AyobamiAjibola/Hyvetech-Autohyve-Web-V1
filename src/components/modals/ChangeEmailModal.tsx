@@ -8,8 +8,6 @@ import { Form, Formik } from "formik";
 import { showError, showMessage } from "../../helpers/notification";
 import axiosClient from "../../config/axiosClient";
 import { useNavigate } from "react-router-dom";
-// import useAppDispatch from "../../hooks/useAppDispatch";
-// import { logoutAction } from "../../reducers/authReducer";
 
 const formData = {
     email: "",

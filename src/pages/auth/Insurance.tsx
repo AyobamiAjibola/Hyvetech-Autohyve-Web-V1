@@ -4,8 +4,8 @@ import DashboardWrapper from '../../components/DashboardWrapper/DashboardWrapper
 function Insurance () {
     return (
         <DashboardWrapper>
-            <div>
-                Insurance
+            <div className='flex justify-center font-montserrat font-bold text-xl'>
+                Comming Soon
             </div>
         </DashboardWrapper>
     )

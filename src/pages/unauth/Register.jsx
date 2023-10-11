@@ -45,12 +45,7 @@ const createUserSchema = Yup.object().shape({
   district: Yup.string().required().label("District"),
   address: Yup.string().required().label("Address"),
   accountType: Yup.string().required().label("Account Type"),
-  name: Yup.string().label("Business Name"),
-  // name: Yup.string().when('accountType', {
-  //   is: 'cooperate',
-  //   then: Yup.string().required('Business Name is required').label("Business Name"),
-  //   otherwise: Yup.string().label("Business Name"),
-  // }),
+  name: Yup.string().label("Business Name")
 });
 
 
@@ -102,7 +97,7 @@ const Register = () => {
     localStorage.setItem('user_data', data);
 
     dispatch(preSignUpAction({
-      email: values.email,
+      email: values.email.toLowerCase(),
       phone: values.phone
     }))
   }

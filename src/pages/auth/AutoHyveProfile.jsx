@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import DashboardWrapper from "../../components/DashboardWrapper/DashboardWrapper";
 import TabBtn from "../../components/TabBtn/TabBtn";
 import HyveUserProfile from "../../components/HyveUserProfile/HyveUserProfile";
@@ -7,12 +7,21 @@ import ServiceReminder from "../../components/ServiceReminder/ServiceReminder";
 import GenerateEstimateModal from "../../components/AutoHyveModals/GenerateEstimateModal";
 import GenerateEstimate from "./GenerateEstimate";
 import { useNavigate } from "react-router-dom";
+import { getReminderAction } from "../../store/actions/serviceReminderActions";
+import useAppDispatch from "../../hooks/useAppDispatch";
 
 const AutoHyveProfile = () => {
   const data = ["Profile", "Vehicles", "Service Reminder"];
   const [view, setView] = useState(0);
   const [showEstimate, setShowEstimate] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useAppDispatch()
+
+  useEffect(() => {
+    if(view === 2) {
+      dispatch(getReminderAction())
+    }
+  },[view])
 
   return (
     <DashboardWrapper>

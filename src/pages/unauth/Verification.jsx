@@ -82,7 +82,6 @@ const Verification = () => {
   //     setLoading(false)
   //   }
   // }
-  console.log(authReducer.preSignUpStatus, 'status')
 
   return (
     <>
