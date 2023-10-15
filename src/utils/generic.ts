@@ -9,6 +9,26 @@ export function formatNumberToIntl(amount: number) {
   }).format(amount);
 }
 
+export function wordBreaker(sentence: string, maxWordsPerSentence: number) {
+  const words = sentence?.split(' ');
+  const sentences = [];
+  let currentSentence = [];
+
+  for (let i = 0; i < words?.length; i++) {
+    currentSentence.push(words[i]);
+    if (currentSentence?.length >= maxWordsPerSentence) {
+      sentences.push(currentSentence.join(' '));
+      currentSentence = [];
+    }
+  }
+
+  if (currentSentence.length > 0) {
+    sentences.push(currentSentence.join(' '));
+  }
+
+  return sentences
+}
+
 export function formatCamelCase(input: string) {
   // Replace capital letters with a space followed by the lowercase letter
   const formatted = input.replace(/[A-Z]/g, (match) => ` ${match.toLowerCase()}`);

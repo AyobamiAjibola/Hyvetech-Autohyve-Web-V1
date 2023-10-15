@@ -16,7 +16,7 @@ import ModalHeaderTitle from "../ModalHeaderTitle/ModalHeaderTitle";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import reminderModel from "../Forms/models/reminderModel";
-import { Autocomplete, Button, CircularProgress, Grid, InputAdornment, TextField, Typography, createFilterOptions } from "@mui/material";
+import { Autocomplete, Button, CircularProgress, InputAdornment, TextField, Typography, createFilterOptions } from "@mui/material";
 import { IDriversFilterData, IVINDecoderSchema } from "@app-interfaces";
 import useAppSelector from "../../hooks/useAppSelector";
 import useAppDispatch from "../../hooks/useAppDispatch";
@@ -37,6 +37,8 @@ import { nextServiceDate, reminderStatus } from "../../utils/generic";
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { getSingleInvoice } from "../../store/actions/invoiceActions";
+import { clearGetSingleInvoiceStatus } from "../../store/reducers/invoiceReducer";
 
 const { schema, fields, initialValues: _initialValues } = reminderModel;
 const filterOptions = createFilterOptions({
@@ -182,24 +184,17 @@ const AddNewReminderModal = ({
 
   const filterData = (_text: string) => {
     const text = _text.toLowerCase();
-    setNoOptionsText('Click Enter to Initialize Search');
+    setNoOptionsText("Click Enter to Initialize Search");
+
     const _temp: any = [];
     rawOption.map((_item: any) => {
-      // filter logic
-      if ((_item?.raw?.email || '').toLowerCase() == text) {
-        // check if it's an exact match to email
+      if ((_item?.raw?.firstName || "").toLowerCase().includes(text)) {
         _temp.push(_item);
-      } else if ((_item?.raw?.phone || '').toLowerCase() == text) {
-        // check if it's an exact match to phone
+      } else if ((_item?.raw?.lastName || "").toLowerCase().includes(text)) {
         _temp.push(_item);
-      } else if ((_item?.raw?.companyName || '').toLowerCase() == text) {
-        // check if it's an exact match to phone
+      } else if ((_item?.raw?.companyName || "").toLowerCase().includes(text)) {
         _temp.push(_item);
-      } else if ((_item?.raw?.firstName || '').toLowerCase() == text) {
-        // check if it's an exact match to phone
-        _temp.push(_item);
-      } else if ((_item?.raw?.lastName || '').toLowerCase() == text) {
-        // check if it's an exact match to phone
+      } else if ((_item?.raw?.email || "").toLowerCase().includes(text)) {
         _temp.push(_item);
       }
     });
@@ -222,11 +217,12 @@ const AddNewReminderModal = ({
 
   useEffect(() => {
     // @ts-ignore
-    if (customerReducer.getCustomerStatus === 'completed' || invoiceReducer.sendInvoiceStatus === 'completed') {
+    if (customerReducer.getCustomerStatus === 'completed' || 
+    invoiceReducer.getSingleInvoiceStatus === 'completed') {
       const _customer: any = invoiceReducer.invoice?.estimate
                               ? invoiceReducer.invoice?.estimate.customer
                               : customerReducer.customer;
-
+      console.log(_customer, 'customer')
       const inv_vehicle = invoiceReducer.invoice?.estimate.vehicle;
 
       if (_customer != undefined) {
@@ -285,11 +281,28 @@ const AddNewReminderModal = ({
     };
   }, [timer, dispatch]);
 
-  // useEffect(() => {
-  //   const _invoiceId = sessionStorage.getItem('id');
-  //   const invoiceId = _invoiceId && parseInt(_invoiceId) || -1
-  //   dispatch(getSingleInvoice(invoiceId))
-  // }, [dispatch, sessionStorage]);
+  useEffect(() => {
+    const _invoiceId = sessionStorage.getItem('invoiceId');
+    const invoiceId = _invoiceId && parseInt(_invoiceId) || -1
+    dispatch(getSingleInvoice(invoiceId))
+
+    return () => {
+      sessionStorage.removeItem("invoiceId")
+      dispatch(clearGetSingleInvoiceStatus())
+    }
+  }, [dispatch, sessionStorage]);
+
+  const openModal = sessionStorage.getItem("open_modal");
+  useEffect(() => {
+    if(openModal === 'true') {
+      setOpenNewReminder(true)
+    }
+
+    return () => {
+      sessionStorage.removeItem("open_modal")
+    }
+  },[sessionStorage, openModal])
+
   useEffect(() => {
     if (vehicleReducer.getVehicleVINStatus === 'completed') {
       const tempVehicleDetails = vehicleReducer.vehicleVINDetails;
@@ -417,7 +430,7 @@ const AddNewReminderModal = ({
               </button>
             </div>
 
-            <div className="mt-10 w-[100%] md:w-[60%]">
+            <div className="mt-10 w-[100%] md:w-[60%] mb-10">
               {/* <SearchInput /> */}
               <Autocomplete
                 filterOptions={filterOptions}
@@ -436,9 +449,35 @@ const AddNewReminderModal = ({
                 }}
                 noOptionsText={noOptionsText}
                 disabled={showEdit}
+                sx={{
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "transparent", // Remove border color
+                    fontSize: "14px"
+                  },
+                  "& label": {
+                    fontSize: "12px",
+                    fontFamily: "montserrat",
+                    color: "#A5A5A5",
+                    paddingTop: '4px'
+                  },
+                  "& input": {
+                    fontSize: "12px",
+                    fontFamily: "montserrat",
+                    marginRight: '-50px'
+                  },
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "transparent", // Remove border color on focus
+                  },
+                  "&:hover .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "transparent", // Remove border color on hover
+                  },
+                }}
                 renderInput={props => (
                   <TextField
                     {...props}
+                    className={`bg-[#F5F5F5] border-[#F5F5F5] h-14 w-full 
+                          placeholder-[#A5A5A5] placeholderText h-[55px] rounded-[20px] 
+                          font-montserrat`}
                     label="Search customer by First name, last name, car plate number."
                     onChange={e => {
                       filterData(e.target.value);
@@ -459,16 +498,20 @@ const AddNewReminderModal = ({
                     }}
                     InputProps={{
                         ...props.InputProps,
+                        classes: {
+                          root: "custome-input-root",
+                          input: "custome-input-root",
+                        },
                         endAdornment: (
                         <React.Fragment>
                             {partnerReducer.getPartnerFilterDataStatus === 'loading'
                             ? ( <CircularProgress color="inherit" size={20} /> )
                             : <Button
                                 sx={{
-                                    zIndex: 1,
-                                    cursor: 'pointer',
-                                    backgroundColor: '#181818', color: 'white',
-                                    '&:hover': {color: '#181818', backgroundColor: 'white', boxShadow: 2}
+                                  zIndex: 1,
+                                  cursor: 'pointer',
+                                  backgroundColor: '#181818', color: 'white',
+                                  '&:hover': {color: '#181818', backgroundColor: 'white', boxShadow: 2}
                                 }}
                               >
                                 <Search fontSize='medium'/>
@@ -483,41 +526,37 @@ const AddNewReminderModal = ({
                 options={showDrop ? options : []}
                 forcePopupIcon={false}
               />
-
-              {userInfo.firstName.length != 0 && (
-                <Grid style={{ padding: 20 }} xs={12} container mt={4}>
-                  <Grid item xs={11}>
-                    <Grid item xs={12} container>
-                      <Typography sx={{fontSize: 18}} gutterBottom className="font-montserrat">
-                        {values?.firstName || 'First Name & '} {values?.lastName || 'Last Name'}
-                      </Typography>{' '}
-                      <br />
-                    </Grid>
-
-                    {(userInfo?.companyName || '').length != 0 && (
-                      <Grid xs={12} container>
-                        <Typography sx={{fontSize: 18}} gutterBottom className="font-montserrat">{userInfo?.companyName || 'First Name & '}</Typography> <br />
-                      </Grid>
-                    )}
-
-                    <Grid item xs={12} container>
-                      <Typography sx={{fontSize: 18}} gutterBottom className="font-montserrat">{values?.email || 'Email'}</Typography> <br />
-                    </Grid>
-
-                    <Grid item xs={12} container>
-                      <Typography sx={{fontSize: 18}} gutterBottom className="font-montserrat">{values?.phone || 'Phone'}</Typography> <br />
-                    </Grid>
-                  </Grid>
-                </Grid>
-              )}
             </div>
+
+            {userInfo.firstName.length != 0 && (
+              <div className="flex md:gap-14 gap-2 mt-15 w-[100%] md:flex-row flex-col">
+                <div className="flex flex-col">
+                  <span className="text-sm font-semibold">First Name</span>
+                  <span className="text-sm font-light">{values?.firstName || ''}</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-sm font-semibold">Last Name</span>
+                  <span className="text-sm font-light">{values?.lastName || ''}</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-sm font-semibold">Phone Number</span>
+                  <span className="text-sm font-light">{values?.phone || ''}</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-sm font-semibold">Email</span>
+                  <span className="text-sm font-light">{values?.email || ''}</span>
+                </div>
+              </div>
+            )}
+
+            <hr className="mt-10" />
 
             <form
               autoComplete="off" autoCorrect="off"
               onSubmit={formik.handleSubmit}
             >
               <div>
-                <div className="flex  flex-col md:flex-row mt-2 md:mt-10 w-full gap-5">
+                <div className="flex flex-col md:flex-row mt-2 md:mt-10 w-full gap-5">
                   <div className="w-full">
                     <InputHeader text={fields.vin.label} />
                     <Autocomplete
@@ -529,6 +568,29 @@ const AddNewReminderModal = ({
                       value={values.vin}
                       fullWidth
                       // disabled={props.disabled}
+                      sx={{
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "transparent", // Remove border color
+                          fontSize: "12px"
+                        },
+                        "& label": {
+                          fontSize: "12px",
+                          fontFamily: "montserrat",
+                          color: "#A5A5A5",
+                          paddingTop: '4px'
+                        },
+                        "& input": {
+                          fontSize: "12px",
+                          fontFamily: "montserrat",
+                          marginRight: '-50px'
+                        },
+                        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "transparent", // Remove border color on focus
+                        },
+                        "&:hover .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "transparent", // Remove border color on hover
+                        },
+                      }}
                       renderInput={params =>
                         <TextField
                           className={`bg-[#F5F5F5] border-[#F5F5F5] h-14 w-full 
@@ -544,6 +606,7 @@ const AddNewReminderModal = ({
                               {vehicleReducer.getVehicleVINStatus === 'loading' && <CircularProgress size={25} />}
                             </InputAdornment>
                             ),
+                           
                             classes: {
                               root: "custome-input-root",
                               input: "custome-input-root",

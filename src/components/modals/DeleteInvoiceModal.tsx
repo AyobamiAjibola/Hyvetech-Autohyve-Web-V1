@@ -1,8 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import CloseIcon from "../../assets/svgs/close-circle.svg";
-import SuccessfulPaymentModal from "../Dashboard/SuccessfulPaymentModal";
-import useItemStock from "../../hooks/useItemStock";
 import useAppSelector from "../../hooks/useAppSelector";
+import useInvoice from "../../hooks/useInvoice";
+import useAppDispatch from "../../hooks/useAppDispatch";
+import { getInvoicesAction } from "../../store/actions/invoiceActions";
+import { showMessage } from "../../helpers/notification";
+import { clearDeleteEstimateStatus } from "../../store/reducers/estimateReducer";
 
 interface IProps {
   deletemodal: boolean;
@@ -14,7 +17,7 @@ interface IProps {
   setDeletemodal?: any
 }
 
-const DeleteModal = ({
+const DeleteInvoiceModal = ({
   deletemodal,
   itemId,
   setItemId,
@@ -22,29 +25,41 @@ const DeleteModal = ({
   closeDeleteModal,
   title, setDeletemodal
 }: IProps ) => {
-  const [successModal, setSuccessModal] = useState(false);
-  const { handleDelete } = useItemStock();
-  const itemReducer = useAppSelector(state => state.itemStockReducer);
-
-  const closeSuccessModal = () => setSuccessModal(!successModal);
+  const { handleDelete } = useInvoice();
+  const invoiceReducer = useAppSelector(state => state.invoiceReducer);
+  const dispatch = useAppDispatch();
 
   const handleDeleteItem = () => {
     handleDelete(itemId)
   }
 
   useEffect(() => {
-    if(itemReducer.deleteItemStatus === 'completed') {
+    if(invoiceReducer.deleteInvoiceStatus === 'completed') {
+      setItemId(-1)
+      setDeletemodal(false)
+      dispatch(getInvoicesAction())
+      showMessage(
+        "Invoice",
+        "Invoice deleted successfully",
+        "success"
+      )
+    } else if(invoiceReducer.deleteInvoiceStatus === 'failed') {
+      showMessage(
+        "Invoice",
+       invoiceReducer.deleteInvoiceError,
+        "error"
+      )
       setItemId(-1)
       setDeletemodal(false)
     }
-  },[itemReducer.deleteItemStatus]);
+
+    return () => {
+      dispatch(clearDeleteEstimateStatus())
+    }
+  },[invoiceReducer.deleteInvoiceStatus]);
 
   return (
     <>
-      <SuccessfulPaymentModal
-        successModal={successModal}
-        closeSuccessModal={closeSuccessModal}
-      />
       {deletemodal && (
         <div
           className="overlay h-screen w-screen flex fixed justify-center items-center"
@@ -94,4 +109,4 @@ const DeleteModal = ({
   );
 };
 
-export default DeleteModal;
+export default DeleteInvoiceModal;

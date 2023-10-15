@@ -32,37 +32,37 @@ export const options = {
   categoryPercentage: 0.7,
 };
 
-// const labels = [
-//   "12am - 3am",
-//   "3am - 6am",
-//   "6am- 9am",
-//   "9am - 12pm",
-//   "12pm - 3pm",
-//   "3pm - 6pm",
-//   "6pm - 9pm",
-// ];
+const labels = [
+  "12am - 3am",
+  "3am - 6am",
+  "6am- 9am",
+  "9am - 12pm",
+  "12pm - 3pm",
+  "3pm - 6pm",
+  "6pm - 9pm",
+];
 
-// export const data = {
-//   labels,
-//   // datasets: [
-//   //   {
-//   //     label: "Total Sales",
-//   //     data: [7, 8, 5, 3, 8, 4, 6],
-//   //     backgroundColor: "#FAA21B",
-//   //   },
-//   //   {
-//   //     label: "Total Receipts",
-//   //     data: [4, 9, 8, 2, 8, 7, 8],
-//   //     backgroundColor: "#FFD89B",
-//   //   },
-//   // ],
-// };
+export const data = {
+  labels,
+  datasets: [
+    {
+      label: "Total Sales",
+      data: [7, 8, 5, 3, 8, 4, 6],
+      backgroundColor: "#FAA21B",
+    },
+    {
+      label: "Total Receipts",
+      data: [4, 9, 8, 2, 8, 7, 8],
+      backgroundColor: "#FFD89B",
+    },
+  ],
+};
 
 export default function CustomBarChart(props) {
-  const labels = props.categories
-  const data = {
-    labels,
-    datasets: props.series
-  };
+  // const labels = props.categories
+  // const data = {
+  //   labels,
+  //   datasets: props.series
+  // };
   return <Bar options={options} data={data} width={300} />;
 }

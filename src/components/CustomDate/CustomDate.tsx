@@ -16,7 +16,7 @@ import { FaCalendarAlt } from "react-icons/fa";
 const CustomDate = ({ 
   placeholder, 
   className,
-  lastDate, onChange
+  lastDate, onChange, name
 }: any) => {
   // console.log(new Date(lastDate), moment(lastDate).format('YYYY-MM-DD'), 'val')
   return (
@@ -29,8 +29,6 @@ const CustomDate = ({
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <InputHeader text={placeholder} />
         <MobileDatePicker
-          value={lastDate}
-          onChange={onChange}
           sx={{
             width: "100%",
 

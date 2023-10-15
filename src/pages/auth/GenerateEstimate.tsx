@@ -27,14 +27,12 @@ import capitalize from "capitalize";
 import { getOwnersFilterDataAction, getPartnerAction, getPartnerFilterDataAction } from "../../store/actions/partnerActions";
 import useAdmin from "../../hooks/useAdmin";
 import useItemStock from "../../hooks/useItemStock";
-import WarrantyFields from "./Estimate/WarrantyFields";
-import QuantityFields from "./Estimate/QuantityFields";
-import { formatNumberToIntl } from "../../utils/generic";
 import { Util } from "../../helpers/Util";
 import { ESTIMATE_STATUS } from "../../config/constants";
-import { clearGetCustomerStatus, clearGetCustomersStatus } from "../../store/reducers/customerReducer";
+import { clearGetCustomerStatus } from "../../store/reducers/customerReducer";
 import { clearGetRemindersStatus } from "../../store/reducers/serviceReminderReducer";
-import { clearCreateEstimateStatus, clearSendDraftEstimateStatus, clearUpdateEstimateStatus } from "../../store/reducers/estimateReducer";
+import { clearUpdateCustomerStatus } from "../../store/reducers/customerReducer";
+import { clearCreateEstimateStatus, clearSaveEstimateStatus } from "../../store/reducers/estimateReducer";
 
 const { fields, schema, initialValues: _initialValues } = estimateModel;
 
@@ -49,9 +47,8 @@ export type PartArgs = IPart & {
   values: IEstimateValues;
 };
 
-const EditEstimate = () => {
+const GenerateEstimate = () => {
   const location = useLocation()
-  const data = ["Individual", "Co-operate"];
   const [openStart, setOpenStart] = useState(false);
   const [openReminder, setOpenReminder] = useState<boolean>(false);
   const [check, setCheck] = useState(false);
@@ -100,9 +97,9 @@ const EditEstimate = () => {
 
   const { 
     initialValues, 
-    onEdit, setGrandTotal, setPartTotal,
-    setLabourTotal, grandTotal, handleUpdateEstimate,
-    handleSendDraftEstimate, discount, discountType, 
+    setGrandTotal, setPartTotal,
+    setLabourTotal, grandTotal, handleSaveEstimate,
+    handleCreateEstimate, discount, discountType, 
     setDiscount, setDiscountType
   } = useEstimate();
 
@@ -113,7 +110,9 @@ const EditEstimate = () => {
     validationSchema: schema,
     initialValues: initialValues,
     onSubmit: (values) => {
-      save ? handleUpdateEstimate(values) : handleSendDraftEstimate(values)
+      save 
+        ? handleSaveEstimate(values)
+        : handleCreateEstimate(values, mileageUnit)
     },
     validateOnBlur: true,
   });
@@ -138,17 +137,17 @@ const EditEstimate = () => {
     return total;
   }, [values.labours]);
 
-  // const calculateTaxLabour = useCallback(() => {
-  //   if (!enableTaxLabor) {
-  //     setVat(0);
-  //     return;
-  //   }
-  //   const vat = 7.5 * 0.01;
-  //   const tax = _labourTotal * vat;
+  const calculateTaxLabour = useCallback(() => {
+    if (!enableTaxLabor) {
+      setVat(0);
+      return;
+    }
+    const vat = 7.5 * 0.01;
+    const tax = _labourTotal * vat;
 
-  //   setFieldValue("tax", tax);
-  //   setVat(tax);
-  // }, [enableTaxLabor, _labourTotal, setFieldValue]);
+    setFieldValue("tax", tax);
+    setVat(tax);
+  }, [enableTaxLabor, _labourTotal, setFieldValue]);
 
   const dispatch = useAppDispatch();
   const partnerReducer = useAppSelector(state => state.partnerReducer);
@@ -158,6 +157,8 @@ const EditEstimate = () => {
   const invoiceReducer = useAppSelector(state => state.invoiceReducer);
   const itemReducer = useAppSelector((state) => state.itemStockReducer);
   const estimateReducer = useAppSelector(state => state.estimateReducer);
+  const [fetchCustomerData, setFetchCustomerData] = useState(false);
+  const [removeSessionStorage, setRemoveSessionStorage] = useState<boolean>(false);
 
   const [vehicleReminder, setVehicleReminder] = useState<any>(reminderReducer.reminders)
 
@@ -203,14 +204,6 @@ const EditEstimate = () => {
     }
   }
 
-  useEffect(() => {
-    if (location.state) {
-      const state = location.state;
-      onEdit(state.item)
-      setEstimate(state.item);
-    }
-  }, [location.state]);
-
   const filterData = (_text: string) => {
     const text = _text.toLowerCase();
     setNoOptionsText("Click Enter to Initialize Search");
@@ -239,15 +232,15 @@ const EditEstimate = () => {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const vin = e.target.value;
 
-      // setTimer(
-      //   setTimeout(() => {
+      setTimer(
+        setTimeout(() => {
           dispatch(getVehicleVINAction(vin));
-      //   }, 2000)
-      // );
+        }, 2000)
+      );
 
       setFieldValue("vin", vin);
     },
-    [dispatch, setFieldValue, values.vin]
+    [dispatch, setFieldValue]
   );
 
   const getOptionLabel = (option: any) => {
@@ -393,7 +386,7 @@ const EditEstimate = () => {
       const isQuantityValue = quantityValue === e.target.name;
       const isPrice = priceName === e.target.name;
       const isQuantityUnit = quantityUnit === e.target.name;
-      console.log(e.target.name, quantityUnit, 'qunti')
+
       if (isQuantityValue) {
         const part = values.parts[index];
 
@@ -418,6 +411,7 @@ const EditEstimate = () => {
 
   const handleGetDriverInfo = (id?: number) => {
     if (id) {
+      setFetchCustomerData(true)
       dispatch(getCustomerAction(id));
     }
   };
@@ -442,12 +436,22 @@ const EditEstimate = () => {
     }
   }, [reminderReducer.getRemindersStatus, values.vin]);
 
+  const _reminderId = sessionStorage.getItem("reminderId");
+  const customerId = sessionStorage.getItem('customerId')
   useEffect(() => {
     if (
-      customerReducer.getCustomerStatus === "completed"
+      customerReducer.getCustomerStatus === "completed" || 
+      reminderReducer.getRemindersStatus === "completed" &&
+      fetchCustomerData
     ) {
+      const reminderId = (_reminderId && parseInt(_reminderId)) || -1;
+      const __customer: any = reminderReducer.reminders.find((reminder: any) => {
+        if (reminder.id === reminderId) return reminder;
+      });
 
-      const _customer: any = customerReducer.customer;
+      const _customer: any = __customer
+        ? __customer?.customer
+        : customerReducer.customer;
 
       if (_customer != undefined) {
         // upto-populate info
@@ -466,8 +470,10 @@ const EditEstimate = () => {
         setFieldValue(fields.addressType.name, "Home");
 
         setactiveId(_customer.id);
-        const vinList = _customer.vehicles.map((_data: any) => _data?.vin || "");
-          
+        const vinList = __customer
+          ? [__customer.vehicle.vin.toString()]
+          : _customer.vehicles.map((_data: any) => _data?.vin || "");
+
         setvinOptions(vinList);
 
         setUserInfo({
@@ -486,20 +492,47 @@ const EditEstimate = () => {
           address: _customer.contacts[0]?.address || "Abuja (FCT)",
         });
       }
-    }
 
-    return () => {
-      dispatch(clearGetCustomerStatus())
+      if (__customer != undefined) {
+        setFieldValue("vin", __customer.vehicle.vin);
+        setFieldValue("make", __customer.vehicle.make);
+        setFieldValue("model", __customer.vehicle.model);
+        setFieldValue("modelYear", __customer.vehicle.modelYear);
+        setFieldValue("plateNumber", __customer.vehicle.plateNumber);
+      }
     }
 
   }, [
     customerReducer.getCustomerStatus,
     reminderReducer.getRemindersStatus,
+    fetchCustomerData
   ]);
 
   useEffect(() => {
-    dispatch(getReminderAction());
-  }, []);
+    if(customerId) {
+      const cusId = parseInt(customerId) || -1;
+      dispatch(getCustomerAction(cusId))
+    }
+
+    return () => {
+      sessionStorage.removeItem("customerId")
+    }
+  },[customerId])
+
+  useEffect(() => {
+    if(vehicleReducer.getVehicleVINStatus === 'completed') {
+      setFieldValue('make', vehicleReducer.vehicleVINDetails[2].value)
+      setFieldValue('plateNumber', vehicleReducer.vehicleVINDetails[10].value)
+      setFieldValue('model', vehicleReducer.vehicleVINDetails[1].value === null ? null : vehicleReducer.vehicleVINDetails[1].value)
+      setFieldValue('modelYear', vehicleReducer.vehicleVINDetails[4].value)
+    }
+  },[vehicleReducer.getVehicleVINStatus, setFieldValue])
+
+  useEffect(() => {
+    if(_reminderId !== null) {
+      dispatch(getReminderAction());
+    }
+  }, [_reminderId]);
 
   useEffect(() => {
     if (
@@ -528,34 +561,6 @@ const EditEstimate = () => {
   }, [dispatch, partnerId]);
 
   useEffect(() => {
-    setFieldValue('vin', initialValues.vin)
-    setFieldValue('make', initialValues.make)
-    setFieldValue('model', initialValues.model)
-    setFieldValue('modelYear', initialValues.modelYear)
-    setFieldValue('plateNumber', initialValues.plateNumber)
-    setFieldValue('mileage', initialValues.mileage)
-    setMileageUnit(initialValues.mileage.unit)
-    setFieldValue('parts', initialValues.parts)
-    setFieldValue('labours', initialValues.labours)
-    setFieldValue('depositAmount', initialValues.depositAmount)
-    setFieldValue('jobDuration', initialValues.jobDuration)
-    setFieldValue('paidAmount', initialValues.paidAmount)
-    setFieldValue('note', initialValues.note)
-    setFieldValue('internalNote', initialValues.internalNote)
-    setFieldValue('taxPart', initialValues.taxPart)
-    setFieldValue('tax', initialValues.tax)
-  },[initialValues]);
-
-  useEffect(() => {
-    if(vehicleReducer.getVehicleVINStatus === 'completed') {
-      setFieldValue('make', vehicleReducer.vehicleVINDetails[2].value)
-      setFieldValue('plateNumber', vehicleReducer.vehicleVINDetails[10].value)
-      setFieldValue('model', vehicleReducer.vehicleVINDetails[1].value)
-      setFieldValue('modelYear', vehicleReducer.vehicleVINDetails[4].value)
-    }
-  },[vehicleReducer.getVehicleVINStatus, setFieldValue])
-
-  useEffect(() => {
     setSubTotal(_partTotal + _labourTotal);
   }, [_partTotal, _labourTotal]);
 
@@ -570,40 +575,6 @@ const EditEstimate = () => {
     setFieldValue("taxPart", tax);
     setVatPart(tax);
   }, [_partTotal, setFieldValue, enableTaxPart]);
-
-  useEffect(() => {
-    if (!enableTaxLabor) {
-      setVat(0);
-      return;
-    }
-    const vat = 7.5 * 0.01;
-    const tax = _labourTotal * vat;
-
-    setFieldValue("tax", tax);
-    setVat(tax);
-  }, [enableTaxLabor, _labourTotal, setFieldValue]);
-
-  useEffect(() => {
-    if (
-      values?.taxPart != '0' &&
-      parseInt(values?.taxPart) !== 0
-      ) {
-      setEnableTaxPart(true);
-    } else {
-      setEnableTaxPart(false);
-    }
-  }, [values.taxPart]);
-
-  useEffect(() => {
-    if (
-      values?.tax != '0' &&
-      parseInt(values?.tax) !== 0
-    ) {
-      setEnableTaxLabor(true);
-    } else {
-      setEnableTaxLabor(false);
-    }
-  }, [values.tax]);
 
   useEffect(() => {
     // check for labor
@@ -660,15 +631,35 @@ const EditEstimate = () => {
   };
 
   useEffect(() => {
+    // check for labor
+    if (!enableTaxLabor) {
+      // setFieldValue(fields.tax.name, 0);
+      setVat(0);
+      values.tax = "0";
+    }
+
+    // check for part
+    if (!enableTaxPart) {
+      //setFieldValue(fields.taxPart.name, 0);
+      setVatPart(0);
+
+      values.taxPart = "0";
+    }
+  }, [enableTaxLabor, enableTaxPart]);
+
+  useLayoutEffect(() => {
+    calculateTaxLabour();
+  }, [calculateTaxLabour]);
+
+  useEffect(() => {
     setGrandTotal(subTotal - calculateDiscount(subTotal));
   }, [subTotal]);
 
   useEffect(() => {
-    const _totalVat = +values.tax + +values.taxPart
-    const totalVat = _totalVat === 0 ? vat + vatPart : _totalVat;
+    const totalVat = vat + vatPart;
 
     setVatTotal(totalVat);
-  }, [vat, vatPart, values]);
+  }, [vat, vatPart]);
 
   useEffect(() => {
     setGrandTotal(subTotal + vatTotal - calculateDiscount(subTotal));
@@ -685,18 +676,6 @@ const EditEstimate = () => {
     setDiscount(initialValues?.estimate?.discount || 0);
     setDiscountType(initialValues?.estimate?.discountType || "exact");
   }, [initialValues]);
-  
-  useEffect(() => {
-    if(estimateReducer.updateEstimateStatus === 'completed' ||
-        estimateReducer.sendDraftEstimateStatus === 'completed') {
-      navigate('/estimates')
-    }
-
-    return () => {
-      dispatch(clearSendDraftEstimateStatus());
-      dispatch(clearUpdateEstimateStatus())
-    }
-  },[estimateReducer.updateEstimateStatus, estimateReducer.sendDraftEstimateStatus]);
 
   const sendStatus = useMemo(() => {
     return (
@@ -717,6 +696,65 @@ const EditEstimate = () => {
     estimateReducer.saveEstimateStatus,
     estimateReducer.updateEstimateStatus,
   ]);
+
+  useEffect(() => {
+    if(estimateReducer.saveEstimateStatus === 'completed' 
+    || estimateReducer.createEstimateStatus === 'completed') {
+      navigate('/estimates')
+    }
+
+    return () => {
+      dispatch(clearCreateEstimateStatus());
+      dispatch(clearSaveEstimateStatus())
+    }
+  },[estimateReducer.saveEstimateStatus, estimateReducer.createEstimateStatus]);
+
+  /**** removing the reminder id from storage */
+  const data: any = {
+    reminderId: undefined,
+  };
+
+  useEffect(() => {
+    if (removeSessionStorage) {
+      Object.keys(data).forEach((key) => {
+        sessionStorage.removeItem(key);
+      });
+    }
+  }, [removeSessionStorage]);
+
+  const handleBeforeUnload = () => {
+    sessionStorage.removeItem('reminderId');
+  };
+
+  const handlePopstate = () => {
+    sessionStorage.removeItem('key');
+  };
+
+  useEffect(() => {
+    window.addEventListener('popstate', handlePopstate);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('popstate', handlePopstate);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (location.pathname !== '/edit-estimate') {
+      sessionStorage.removeItem('key');
+    }
+  }, [location]);
+
+  useEffect(() => {
+    const handlePopstate = () => {
+      sessionStorage.removeItem('key');
+    };
+    window.addEventListener('popstate', handlePopstate);
+    return () => {
+      window.removeEventListener('popstate', handlePopstate);
+    };
+  }, []);
+  /**** removing the reminder id from storage */
 
   return (
     <>
@@ -748,8 +786,7 @@ const EditEstimate = () => {
                     setInputValue(newInputValue);
                   }}
                   noOptionsText={noOptionsText}
-                  className="w-[70%]"
-                  disabled
+                  className="w-[70%] font-sm"
                   sx={{
                     "& .MuiOutlinedInput-notchedOutline": {
                       borderColor: "transparent", // Remove border color
@@ -777,7 +814,7 @@ const EditEstimate = () => {
                         font-montserrat`
                       }
                       {...props}
-                      label="Search customer by First name, last name, car plate number."
+                      label="Search customer."
                       onChange={(e) => {
                         filterData(e.target.value);
                       }}
@@ -794,6 +831,9 @@ const EditEstimate = () => {
                       onBlur={() => {
                         setShowDrop(false);
                       }}
+                      // InputLabelProps={{
+                      //   shrink: false
+                      // }}
                       InputProps={{
                         ...props.InputProps,
                         classes: {
@@ -806,7 +846,7 @@ const EditEstimate = () => {
                               "loading" ||
                             partnerReducer.getPartnerFilterDataStatus ===
                               "loading" ? (
-                              <CircularProgress color="inherit" size={20} sx={{color: '#FAA21B'}}/>
+                              <CircularProgress color="inherit" size={20} sx={{color: '#FAA21B'}} />
                             ) : (
                               <Button
                                 sx={{
@@ -888,7 +928,6 @@ const EditEstimate = () => {
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
                       value={values.firstName}
-                      disabled={true}
                     />
                     {formik.touched.firstName && formik.errors.firstName && (
                       <div>{formik.errors.firstName}</div>
@@ -904,7 +943,6 @@ const EditEstimate = () => {
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
                       value={values.lastName}
-                      disabled={true}
                     />
                     {formik.touched.lastName && formik.errors.lastName && (
                       <div>{formik.errors.lastName}</div>
@@ -925,7 +963,6 @@ const EditEstimate = () => {
                       }}
                       onBlur={formik.handleBlur}
                       value={values.phone}
-                      disabled={true}
                     />
                     {formik.touched.phone && formik.errors.phone && (
                       <div>{formik.errors.phone}</div>
@@ -941,7 +978,6 @@ const EditEstimate = () => {
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
                       value={values.address}
-                      disabled={true}
                     />
                     {formik.touched.address && formik.errors.address && (
                       <div>{formik.errors.address}</div>
@@ -961,7 +997,6 @@ const EditEstimate = () => {
                       }}
                       value={values.vin}
                       fullWidth
-                      disabled
                       sx={{
                         "& .MuiOutlinedInput-notchedOutline": {
                           borderColor: "transparent", // Remove border color
@@ -1002,8 +1037,7 @@ const EditEstimate = () => {
                             endAdornment: (
                               <InputAdornment position="end" sx={{ position: 'absolute', left: '80%' }}>
                                 {vehicleReducer.getVehicleVINStatus === 'loading' && 
-                                  <CircularProgress size={25} sx={{color: '#FAA21B'}} />
-                                }
+                                <CircularProgress size={20} sx={{color: '#FAA21B'}}/>}
                               </InputAdornment>
                             ),
                             classes: {
@@ -1024,7 +1058,6 @@ const EditEstimate = () => {
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
                       value={values.modelYear}
-                      disabled={true}
                     />
                   </div>
 
@@ -1037,7 +1070,6 @@ const EditEstimate = () => {
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
                       value={values.make}
-                      disabled={true}
                     />
                   </div>
 
@@ -1050,7 +1082,6 @@ const EditEstimate = () => {
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
                       value={values.model}
-                      disabled={true}
                     />
                   </div>
                 </div>
@@ -1065,7 +1096,6 @@ const EditEstimate = () => {
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
                       value={values.plateNumber}
-                      disabled={true}
                     />
                   </div>{" "}
                   <div className="w-full">
@@ -1081,8 +1111,6 @@ const EditEstimate = () => {
                       data={milesData}
                       setUnit={setMileageUnit}
                       unit={mileageUnit}
-                      unitDisable={true}
-                      disabled={true}
                     />
                   </div>
                 </div>
@@ -1185,6 +1213,9 @@ const EditEstimate = () => {
                             label={''}
                             onChange={formik.handleChange}
                             name={`parts.${index}.name`}
+                            InputLabelProps={{
+                              shrink: false
+                            }}
                             InputProps={{
                               ...params.InputProps,
                               classes: {
@@ -1202,10 +1233,9 @@ const EditEstimate = () => {
                                     },
                                   }}
                                 >
-                                  {itemReducer.getItemsStatus ===
-                                    "loading" && (
+                                  { itemReducer.getItemsStatus === "loading" && (
                                     <CircularProgress
-                                      size={25}
+                                      size={20}
                                       sx={{color: '#FAA21B'}}
                                     />
                                   )}
@@ -1345,14 +1375,6 @@ const EditEstimate = () => {
                             isOptionEqualToValue
                           }
                           // @ts-ignore
-                          onChange={(_, newValue) => {
-                            _handleChangeService(
-                              { target: { value: newValue } },
-                              index
-                            );
-                          }}
-                          //@ts-ignore
-                          value={labour.title}
                           sx={{
                             "& .MuiOutlinedInput-notchedOutline": {
                               borderColor: "transparent", // Remove border color
@@ -1376,6 +1398,14 @@ const EditEstimate = () => {
                               borderColor: "transparent", // Remove border color on hover
                             },
                           }}
+                          onChange={(_, newValue) => {
+                            _handleChangeService(
+                              { target: { value: newValue } },
+                              index
+                            );
+                          }}
+                          //@ts-ignore
+                          value={labour.title}
                           renderInput={(params) => (
                             <TextField
                               {...params}
@@ -1405,7 +1435,7 @@ const EditEstimate = () => {
                                     {itemReducer.getItemsStatus ===
                                       "loading" && (
                                       <CircularProgress
-                                        size={25}
+                                        size={20}
                                         sx={{color: '#FAA21B'}}
                                       />
                                     )}
@@ -1613,7 +1643,11 @@ const EditEstimate = () => {
                               disabled:cursor-not-allowed text-[#717073]`
                         : 'text-[#000] bg-[#FAA21B]'}`
                   }
-                  onClick={() => setSave(false)}
+                  onClick={() => {
+                    setSave(false)
+                    setFetchCustomerData(false)
+                    setRemoveSessionStorage(true);
+                  }}
                   spinner={sendStatus}
                   disabled={initialValues.status === ESTIMATE_STATUS.invoiced}
                 />
@@ -1628,7 +1662,8 @@ const EditEstimate = () => {
                   }
                   onClick={() => {
                     setSave(true)
-                    // setRemoveSessionStorage(true);
+                    setFetchCustomerData(false)
+                    setRemoveSessionStorage(true);
                   }}
                   spinner={saveStatus}
                   disabled={
@@ -1650,4 +1685,4 @@ const EditEstimate = () => {
   );
 };
 
-export default EditEstimate;
+export default GenerateEstimate;

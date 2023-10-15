@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useMemo } from "react";
 import CloseIcon from "../../assets/svgs/close-circle.svg";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
@@ -6,15 +6,33 @@ import logoEstimate from "../../assets/images/logoEstimate.png";
 import documentdownload from "../../assets/images/document-download.png";
 import mingcutelinkfill from "../../assets/images/mingcute_link-fill.png";
 import mdi_share from "../../assets/images/mdi_share.png";
-import Sorting from "../Sorting/Sorting";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { hashString } from "react-hash-string";
+import useAdmin from "../../hooks/useAdmin";
+import { wordBreaker } from "../../utils/generic";
+import moment from "moment";
+import { Util } from "../../helpers/Util";
 
-const PaymentDetails = ({ openPaymentDetails, setOpenPaymentDetails }) => {
-  const items = ["Generate  Invoice", "Duplicate Estimate", "Mark as sent"];
+const PaymentDetails = ({ 
+  openPaymentDetails, 
+  setOpenPaymentDetails, 
+  setItem, item,
+  _downloading,
+  _generateDownload,
+  handleShareLink,
+  handleShareLinkNoMessage,
+  handleSharePdf,
+  downloading
+}: any) => {
   const tableData = Array(3).fill("");
-  const [select, setSelect] = useState("Select Option");
-  const handleClose = () => setOpenPaymentDetails(false);
+  const handleClose = () => {
+    setItem(null)
+    setOpenPaymentDetails(false)
+  };
+  const { user } = useAdmin();
+
+  const partnerName = (user?.partner?.name || " ")
 
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.up("sm"));
@@ -35,6 +53,22 @@ const PaymentDetails = ({ openPaymentDetails, setOpenPaymentDetails }) => {
     py: 5,
   };
 
+  const partnerAddress = wordBreaker(user?.partner?.contact?.address as string, 5);
+  const parts = item?.invoice?.estimate?.parts.map(JSON.parse);
+  const labours = item?.invoice?.estimate?.labours.map(JSON.parse);
+
+  const amountDue = useMemo(() => {
+    let amount;
+    if(item?.invoice?.grandTotal === item?.amount) {
+      amount = 0
+    } else if (item?.invoice?.grandTotal < item.amount) {
+      amount = item?.invoice?.grandTotal - item.amount
+    } else if (item?.invoice?.grandTotal > item.amount) {
+      amount = item?.invoice?.grandTotal - item.amount
+    }
+    return amount;
+  },[item?.invoice?.grandTotal, item?.amount]);
+
   return (
     <>
       <Modal
@@ -49,7 +83,7 @@ const PaymentDetails = ({ openPaymentDetails, setOpenPaymentDetails }) => {
               <div className="top-10 relative">
                 <img src={logoEstimate} alt="" className="w-[80px]" />
               </div>
-              <button onClick={() => setOpenPaymentDetails(false)}>
+              <button onClick={handleClose}>
                 <img src={CloseIcon} alt="" />
               </button>
             </div>
@@ -66,7 +100,7 @@ const PaymentDetails = ({ openPaymentDetails, setOpenPaymentDetails }) => {
                   Payment Receipt
                 </h5>
                 <span className="text-sm font-montserrat font-light">
-                  DRC-64846004
+                  {`${partnerName[0]}RC-${hashString(`${partnerName[0]}C${item?.id}`)}`}
                 </span>
               </div>
 
@@ -75,16 +109,20 @@ const PaymentDetails = ({ openPaymentDetails, setOpenPaymentDetails }) => {
                   Demo Workshop
                 </h5>
                 <span className="text-sm pb-1  font-montserrat font-light">
-                  17 Odunayo Street
+                  {partnerAddress}
                 </span>
                 <span className="text-sm pb-1  font-montserrat font-light">
-                  Portacourt,Nigeria.
+                  {user?.partner?.contact?.state}, {user?.partner?.contact?.country}.
                 </span>
                 <span className="text-sm pb-1  font-montserrat font-light">
-                  +23490873476343
+                  {user?.partner?.phone
+                    ? `${user?.partner?.phone?.startsWith('0')}`
+                      ? `${user?.partner?.phone}`
+                      : `+${user?.partner?.phone}` 
+                    : ''}
                 </span>
                 <span className="text-sm pb-1  font-montserrat font-light">
-                  demo@gmail.com
+                  {user?.partner.email}
                 </span>
               </div>
             </div>
@@ -95,19 +133,23 @@ const PaymentDetails = ({ openPaymentDetails, setOpenPaymentDetails }) => {
                   Billing Information
                 </h5>
                 <span className="text-sm pb-1 font-montserrat font-light">
-                  Ayo Testa
+                  {item?.customer?.title || ''} {item?.customer?.firstName} {item?.customer?.lastName}
                 </span>
                 <span className="text-sm pb-1  font-montserrat font-light">
-                  Portacourt,Nigeria.
+                  {wordBreaker(item?.customer?.contacts.address, 5)}
                 </span>
                 <span className="text-sm pb-1  font-montserrat font-light">
-                  demo@gmail.com
+                  {item?.customer?.contacts.state} {item?.customer?.contacts.country || ''}
                 </span>
                 <span className="text-sm pb-1  font-montserrat font-light">
-                  +23490873476343
+                  {item?.customer?.email}
                 </span>
                 <span className="text-sm pb-1  font-montserrat font-light">
-                  test
+                  {item?.customer?.phone
+                    ? `${item?.customer?.phone?.startsWith('0')}`
+                      ? `${item?.customer?.phone}`
+                      : `+${item?.customer?.phone}` 
+                    : ''}
                 </span>
               </div>
             </div>
@@ -121,7 +163,7 @@ const PaymentDetails = ({ openPaymentDetails, setOpenPaymentDetails }) => {
                   Invoice Date
                 </span>
                 <span className="text-sm font-light font-montserrat">
-                  Mon, May 15 2023
+                  {moment(item?.invoice.updatedAt).format('DD/MM/YYYY')}
                 </span>
               </div>
 
@@ -130,7 +172,7 @@ const PaymentDetails = ({ openPaymentDetails, setOpenPaymentDetails }) => {
                   Payment Date
                 </span>
                 <span className="text-sm font-light font-montserrat">
-                  Mon, May 15 2023
+                  {moment(item?.paidAt).format('DD/MM/YYYY')}
                 </span>
               </div>
             </div>
@@ -141,7 +183,7 @@ const PaymentDetails = ({ openPaymentDetails, setOpenPaymentDetails }) => {
                   Mode of payment
                 </span>
                 <span className="text-sm font-light font-montserrat">
-                  Transfer
+                  {item?.type}
                 </span>
               </div>
               <div className="flex flex-col gap-1">
@@ -149,7 +191,7 @@ const PaymentDetails = ({ openPaymentDetails, setOpenPaymentDetails }) => {
                   Payment Reference
                 </span>
                 <span className="text-sm font-light font-montserrat">
-                  DRC-64845206
+                  {`${partnerName[0]}RC-${hashString(`${partnerName[0]}C${item?.id}`)}`}
                 </span>
               </div>
             </div>
@@ -170,28 +212,53 @@ const PaymentDetails = ({ openPaymentDetails, setOpenPaymentDetails }) => {
                 </th>
               </thead>
 
-              {tableData.map((item, index) => {
+              {parts?.length > 0 &&
+                parts?.map((item: any, index: number) => {
+                  return (
+                    <tbody>
+                      <tr
+                        // onClick={() => setOpenItem(true)}
+                        className="cursor-pointer table-hover"
+                      >
+                        <td className="font-montserrat text-xs cursor-pointer">
+                          {index + 1}
+                        </td>
+                        <td className="font-montserrat flex items-center gap-2 text-xs">
+                          <span>{item.name}</span>
+                        </td>
+                        <td className="font-montserrat text-xs">{item.quantity.quantity} {item.quantity.unit}</td>
+                        <td className="font-montserrat text-xs">
+                          {Util.formAmount(+item.price)}
+                        </td>
+                        <td className="font-montserrat text-xs">{Util.formAmount(+item.amount)}</td>
+                      </tr>
+                    </tbody>
+                  );
+                })
+              }
+
+            {labours?.length > 0 &&
+              labours?.map((item: any, index: number) => {
                 return (
                   <tbody>
                     <tr
-                      onClick={() => setOpenItem(true)}
+                      // onClick={() => setOpenItem(true)}
                       className="cursor-pointer table-hover"
                     >
                       <td className="font-montserrat text-xs cursor-pointer">
                         {index + 1}
                       </td>
                       <td className="font-montserrat flex items-center gap-2 text-xs">
-                        <span>Brake Pads (Front) [EBC124YG]</span>
+                        <span>{item.title}</span>
                       </td>
-                      <td className="font-montserrat text-xs">1</td>
-                      <td className="font-montserrat text-xs">
-                        43,000.00 x 5 pcs
-                      </td>
-                      <td className="font-montserrat text-xs">215,000.00</td>
+                      <td className="font-montserrat text-xs" />
+                      <td className="font-montserrat text-xs"/>
+                      <td className="font-montserrat text-xs">{Util.formAmount(+item.cost)}</td>
                     </tr>
                   </tbody>
                 );
-              })}
+              })
+            }
             </table>
           </div>
 
@@ -206,64 +273,70 @@ const PaymentDetails = ({ openPaymentDetails, setOpenPaymentDetails }) => {
               <div className=" border-[1px] py-4 border-[#CACACA] px-10  rounded-[20px]">
                 <div className="flex justify-between mb-2">
                   <span className="text-sm font-light">Sub-Total:</span>
-                  <span className="text-sm">₦270,000.00</span>
+                  <span className="text-sm">{Util.formAmount(item?.invoice?.estimate.laboursTotal + item?.invoice?.estimate.partsTotal)}</span>
                 </div>
                 <div className="flex justify-between mb-2">
                   <span className="text-sm font-light">VAT:</span>
-                  <span className="text-sm">₦20,250.00</span>
+                  <span className="text-sm">{Util.formAmount(item?.invoice?.estimate.tax + item?.invoice?.estimate.taxPart)}</span>
                 </div>
                 <div className="flex justify-between mb-2">
                   <span className="text-sm font-light">Discount:</span>
-                  <span className="text-sm">₦5,000.00</span>
-                </div>
-                <div className="flex justify-between mb-2">
-                  <span className="text-sm font-light">Discount:</span>
-                  <span className="text-sm">₦285,250.00</span>
+                  <span className="text-sm">{Util.formAmount(item?.invoice?.estimate.discount)}</span>
                 </div>
               </div>
               <p className="text-xs font-light font-montserrat text-right mt-1">
-                Job Duration: 1days
+                Job Duration: {item?.invoice?.estimate.jobDurationValue} {item?.invoice?.estimate.jobDurationUnit}(s)
               </p>
 
               <div className=" border-[1px] mt-5 py-4 border-[#CACACA] px-10  rounded-[20px]">
                 <div className="flex justify-between mb-2">
                   <span className="text-sm font-light">Paid:</span>
-                  <span className="text-sm">₦270,000.00</span>
+                  <span className="text-sm">{Util.formAmount(item?.amount)}</span>
                 </div>
                 <div className="flex justify-between mb-2">
                   <span className="text-sm font-light">Balance Due:</span>
-                  <span className="text-sm">₦20,250.00</span>
+                  <span className="text-sm">{Util.formAmount(amountDue)}</span>
                 </div>
                 <div className="flex justify-between mb-2">
                   <span className="text-sm font-light">Refund Due:</span>
-                  <span className="text-sm">₦5,000.00</span>
+                  <span className="text-sm">{Util.formAmount(amountDue && amountDue < 0 ? amountDue : 0)}</span>
+                </div>
+                <div className="flex justify-between mb-2">
+                  <span className="text-sm font-light">Grand Total:</span>
+                  <span className="text-sm">{Util.formAmount(item?.invoice?.grandTotal)}</span>
                 </div>
               </div>
             </div>
           </div>
 
           <div className="flex flex-col md:flex-row  justify-end gap-3 md:gap-10 mr-5 mt-5">
-            <div className="border-[1px] mt-5 cursor-pointer py-4 border-[#CACACA] gap-3 px-10  rounded-[20px] flex items-center">
+            <div className="border-[1px] mt-5 cursor-pointer py-4 border-[#CACACA] gap-3 px-10  rounded-[20px] flex items-center"
+              onClick={() => _generateDownload()}
+            >
               <img
                 src={documentdownload}
                 alt=""
                 className="w-[24px] h-[24px]"
               />
               <span className="text-[11px] font-montserrat font-semibold">
-                Download PDF
+                {_downloading ? 'Downloading...' : 'Download PDF'}
               </span>
             </div>
-            <div className="border-[1px] cursor-pointer mt-5 py-4 flex items-center gap-3 border-[#CACACA] px-10  rounded-[20px]">
+            <div className="border-[1px] cursor-pointer mt-5 py-4 flex items-center gap-3 border-[#CACACA] px-10  rounded-[20px]"
+              onClick={() => {document.documentElement.clientWidth <= 912 ? handleShareLink() : handleShareLinkNoMessage()}}
+            >
               <img
                 src={mingcutelinkfill}
                 alt=""
                 className="w-[24px] h-[24px]"
               />
               <span className="text-[11px] font-montserrat font-semibold">
-                Share Unique Link
+                {downloading ? 'Sharing...' : 'Share unique link'}
               </span>
             </div>
-            <div className="border-[1px] mt-5 py-4 cursor-pointer flex items-center gap-3 border-[#CACACA] px-10  rounded-[20px]">
+            <div className="border-[1px] mt-5 py-4 cursor-pointer flex items-center gap-3 border-[#CACACA] px-10  rounded-[20px]"
+              onClick={() => handleSharePdf()}
+            >
               <img src={mdi_share} alt="" className="w-[24px] h-[24px]" />
               <span className="text-[11px] font-montserrat font-semibold">
                 Share PDF

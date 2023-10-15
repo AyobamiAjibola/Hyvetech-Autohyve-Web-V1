@@ -24,6 +24,7 @@ import settings from "../../config/settings";
 import { Util } from "../../helpers/Util";
 import { ESTIMATE_STATUS } from "../../config/constants";
 import { IconButton } from "@mui/material";
+import DeleteEstimateModal from "../../components/modals/DeleteEstimateModal";
 
 const API_ROOT = settings.api.baseURL;
 
@@ -36,10 +37,16 @@ const Estimates = () => {
   const [openEstimateDetails, setOpenEstimateDetails] = useState(false);
   const navigate = useNavigate();
   const refOne = useRef(null);
-  const tableData = Array(3).fill("");
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
-  const { estimates } = useEstimate();
+  const [itemId, setItemId] = useState(-1);
+  const [estimate, setEstimate] = useState(null)
+  const { 
+    estimates, 
+    onDelete, 
+    setShowDelete, 
+    showDelete
+  } = useEstimate();
   const hideOnClickOutside = (e) => {
     if (refOne.current && !refOne.current.contains(e.target)) {
       setOpenImport(false);
@@ -77,11 +84,12 @@ const Estimates = () => {
 
   const closeDeleteModal = (event) => {
     event.stopPropagation();
-    setDeletemodal(!deletemodal);
+    // setDeletemodal(!deletemodal);
+    setShowDelete(!showDelete)
   };
 
-  const openDetails = (event) => {
-    event.stopPropagation();
+  const openDetails = (e) => {
+    e.stopPropagation();
     setOpenEstimateDetails(!openEstimateDetails);
   };
 
@@ -116,7 +124,7 @@ const Estimates = () => {
     <DashboardWrapper>
       <>
         <div className="flex flex-col gap-5 md:flex-row justify-between items-center">
-          <AppTabBtn
+          {/* <AppTabBtn
             icon={<BsDownload />}
             title="Export Items"
             className="w-full text-[#000] btn-secondary md:hidden flex"
@@ -126,8 +134,8 @@ const Estimates = () => {
             icon={<AiOutlinePlus />}
             title="Generate Estimate"
             className="w-full  text-[#000] btn-secondary md:hidden flex"
-            onClick={() => navigate("/generate-estimate-estimate")}
-          />
+            onClick={() => navigate("/generate-estimate")}
+          /> */}
           <Sorting
             items={items}
             select={select}
@@ -139,7 +147,7 @@ const Estimates = () => {
               icon={<AiOutlinePlus />}
               title="Generate Estimate"
               className="w-[200px]  text-[#000] btn-secondary"
-              onClick={() => navigate("/generate-estimate-estimate")}
+              onClick={() => navigate("/generate-estimate")}
             />
             <div className="relative">
               <AppTabBtn
@@ -232,7 +240,7 @@ const Estimates = () => {
               return (
                 <tbody>
                   <tr
-                    onClick={openDetails}
+                    onClick={(e) => {openDetails(e), setEstimate(item)}}
                     className="cursor-pointer table-hover"
                   >
                     <td
@@ -253,11 +261,12 @@ const Estimates = () => {
                     <td className="font-montserrat text-xs">{moment(item.createdAt).format('DD/MM/YYYY')}</td>
                     <td className="font-montserrat text-xs">{item.code.split('_')[0]}</td>
                     <td className="font-montserrat flex items-center gap-2 text-xs">
-                        <img
-                          src={ item.profileImageUrl ? `${API_ROOT}/${item.profileImageUrl}` : profilePicx }
-                          alt=""
-                          className="w-[20px] h-[20px]"
-                        />
+                      <img
+                        src={ item.profileImageUrl ? `${API_ROOT}/${item.profileImageUrl}` : profilePicx }
+                        alt="customer photo"
+                        crossOrigin="anonymous"
+                        className="w-[20px] h-[20px]"
+                      />
                       <span>{item.customer.title || ''} {item.customer.firstName || ''} {item.customer.lastName || ''}</span>
                     </td>
                     <td className="font-montserrat text-xs">
@@ -293,21 +302,25 @@ const Estimates = () => {
                       <IconButton
                         onClick={() => {
                           navigate("/edit-estimate", { state: { item } })
-                          sessionStorage.setItem('editMode', true)
-                          sessionStorage.setItem('id', item.id)
+                          sessionStorage.setItem('estimateCode', item.code.split('_')[0])
                         }}
-                        disabled
                       >
                         <GrEdit
                           size={13}
                         />
                       </IconButton>
-                      <img
-                        src={TrashIcon}
-                        alt=""
-                        className="w-[15px] cursor-pointer"
-                        onClick={closeDeleteModal}
-                      />
+                      <IconButton
+                        onClick={(e) => {
+                          setItemId(item.id)
+                          closeDeleteModal(e)
+                        }}
+                      >
+                        <img
+                          src={TrashIcon}
+                          alt=""
+                          className="w-[15px] cursor-pointer"
+                        />
+                      </IconButton>
                     </td>
                   </tr>
                 </tbody>
@@ -337,17 +350,21 @@ const Estimates = () => {
           setOpenCreatCustomer={setOpenCreatCustomer}
         />
 
-        <DeleteModal
-          deletemodal={deletemodal}
-          setDeletemodal={setDeletemodal}
+        <DeleteEstimateModal
+          deletemodal={showDelete}
+          setDeletemodal={setShowDelete}
           title={"Are you sure you want to delete this Estimate"}
           description="Are you sure you want to carry out this action? If you proceed, you will not be able to undo this action."
           closeDeleteModal={closeDeleteModal}
+          itemId={itemId}
+          setItemId={setItemId}
         />
 
         <EstimateDetailsModal
           openEstimateDetails={openEstimateDetails}
           setOpenEstimateDetails={setOpenEstimateDetails}
+          estimate={estimate}
+          setEstimate={setEstimate}
         />
       </>
     </DashboardWrapper>

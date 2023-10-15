@@ -20,6 +20,10 @@ interface IInvoiceState {
   sendInvoiceSuccess: string;
   sendInvoiceError: string;
 
+  getSingleInvoiceStatus: IThunkAPIStatus;
+  getSingleInvoiceSuccess: string;
+  getSingleInvoiceError: string;
+
   invoices: IInvoice[];
   invoice?: IInvoice;
 }
@@ -40,6 +44,10 @@ const initialState: IInvoiceState = {
   sendInvoiceStatus: 'idle',
   sendInvoiceSuccess: '',
   sendInvoiceError: '',
+
+  getSingleInvoiceStatus: 'idle',
+  getSingleInvoiceSuccess: '',
+  getSingleInvoiceError: '',
 
   invoice: undefined,
   invoices: [],
@@ -71,6 +79,12 @@ const invoiceSlice = createSlice({
       state.sendInvoiceStatus = 'idle';
       state.sendInvoiceSuccess = '';
       state.sendInvoiceError = '';
+    },
+
+    clearGetSingleInvoiceStatus(state: IInvoiceState) {
+      state.getSingleInvoiceStatus = 'idle';
+      state.getSingleInvoiceSuccess = '';
+      state.getSingleInvoiceError = '';
     },
   },
   extraReducers: builder => {
@@ -125,14 +139,14 @@ const invoiceSlice = createSlice({
 
     builder
       .addCase(getSingleInvoice.pending, state => {
-        state.sendInvoiceStatus = 'loading';
+        state.getSingleInvoiceStatus = 'loading';
       })
       .addCase(getSingleInvoice.fulfilled, (state, action) => {
-        state.sendInvoiceStatus = 'completed';
+        state.getSingleInvoiceStatus = 'completed';
         state.invoice = action.payload.result as IInvoice;
       })
       .addCase(getSingleInvoice.rejected, (state, action) => {
-        state.sendInvoiceStatus = 'failed';
+        state.getSingleInvoiceStatus = 'failed';
 
         if (action.payload) {
           state.sendInvoiceError = action.payload.message;
@@ -161,7 +175,8 @@ export const {
   clearGetInvoicesStatus,
   clearSaveInvoiceStatus,
   clearSendInvoiceStatus,
-  clearDeleteInvoiceStatus
+  clearDeleteInvoiceStatus,
+  clearGetSingleInvoiceStatus
 } = invoiceSlice.actions;
 
 export default invoiceSlice.reducer;

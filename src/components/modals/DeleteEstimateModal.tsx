@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import CloseIcon from "../../assets/svgs/close-circle.svg";
 import SuccessfulPaymentModal from "../Dashboard/SuccessfulPaymentModal";
-import useItemStock from "../../hooks/useItemStock";
 import useAppSelector from "../../hooks/useAppSelector";
+import AppBtn from "../AppBtn/AppBtn";
+import useEstimate from "../../hooks/useEstimate";
 
 interface IProps {
   deletemodal: boolean;
@@ -11,33 +12,30 @@ interface IProps {
   setCustomerId?: any,
   closeDeleteModal?: any,
   title: string,
-  setDeletemodal?: any
+  setDeletemodal?: any;
+  onDelete: any
 }
 
-const DeleteModal = ({
+const DeleteEstimateModal = ({
   deletemodal,
   itemId,
   setItemId,
-  setCustomerId,
   closeDeleteModal,
   title, setDeletemodal
 }: IProps ) => {
   const [successModal, setSuccessModal] = useState(false);
-  const { handleDelete } = useItemStock();
-  const itemReducer = useAppSelector(state => state.itemStockReducer);
+  const estimateReducer = useAppSelector(state => state.estimateReducer);
+
+  const { handleDelete } = useEstimate();
 
   const closeSuccessModal = () => setSuccessModal(!successModal);
 
-  const handleDeleteItem = () => {
-    handleDelete(itemId)
-  }
-
   useEffect(() => {
-    if(itemReducer.deleteItemStatus === 'completed') {
+    if(estimateReducer.deleteEstimateStatus === 'completed') {
       setItemId(-1)
       setDeletemodal(false)
     }
-  },[itemReducer.deleteItemStatus]);
+  },[estimateReducer.deleteEstimateStatus]);
 
   return (
     <>
@@ -53,7 +51,7 @@ const DeleteModal = ({
           <div className=" rounded-md bg-white py-8 px-3">
             <div className="modal-header pt-0 bg-white px-8">
               <div className="flex justify-end w-full">
-                <button onClick={(event) => {closeDeleteModal(event), setCustomerId(-1), setItemId(-1)}}>
+                <button onClick={(event) => {setItemId(-1), closeDeleteModal(event)}}>
                   <img src={CloseIcon} alt="" />
                 </button>
               </div>
@@ -73,18 +71,23 @@ const DeleteModal = ({
             <div className="body">
               {/* view */}
 
-              <div className=" flex gap-4 mt-4 justify-center items-center px-4 md:px-10">
-                <button
-                  onClick={(event) => {closeDeleteModal(event), setItemId(-1)}}
-                  className="btn btn-secondary uppercase"
-                >
-                  Cancel
-                </button>
-                <button className="btn btn-primary uppercase bg-primary"
-                  onClick={handleDeleteItem}
-                >
-                  Delete
-                </button>
+              <div className=" flex gap-4 mt-6 justify-center items-center px-4 md:px-10">
+                <AppBtn 
+                  title={"CANCEL"}
+                  type="button"
+                  onClick={(event:any) => {
+                    setItemId(-1)
+                    closeDeleteModal(event)
+                  }}
+                  className={`btn btn-secondary uppercase md:w-[100px] w-[100%]`}
+                />
+                <AppBtn 
+                  title={"DELETE"}
+                  type="button"
+                  onClick={() => handleDelete(itemId)}
+                  className={`font-semibold md:w-[100px] w-[100%]`}
+                  spinner={estimateReducer.deleteEstimateStatus === 'loading'}
+                />
               </div>
             </div>
           </div>
@@ -94,4 +97,4 @@ const DeleteModal = ({
   );
 };
 
-export default DeleteModal;
+export default DeleteEstimateModal;

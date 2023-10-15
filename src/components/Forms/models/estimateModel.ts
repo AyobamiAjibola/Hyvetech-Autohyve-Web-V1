@@ -312,6 +312,7 @@ const initialValues: IEstimateValues = {
   tax: '0',
   taxPart: '0',
   note: '',
+  internalNote: ''
 };
 
 const schema = Yup.object().shape({

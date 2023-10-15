@@ -420,6 +420,7 @@ select.none {
   outline: none !important;
   box-shadow: none !important;
   border: none !important;
+  border-color: transparent !important;
 }
 
 .form-group {

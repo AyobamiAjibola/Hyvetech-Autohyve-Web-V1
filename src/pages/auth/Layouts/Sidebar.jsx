@@ -52,7 +52,7 @@ const Sidebar = ({ show, setShow, openNav, setOpenNav }) => {
       setAccountType(payload.accountType)
     }
   },[token]);
-  console.log(active, location.pathname, 'active')
+
   return (
     <>
       <div

@@ -1,0 +1,459 @@
+import { useCallback, useEffect, useState } from 'react';
+import { IInvoice } from '@app-models';
+import useAppDispatch from './useAppDispatch';
+import useAppSelector from './useAppSelector';
+import {
+  deleteInvoiceAction,
+  getInvoicesAction,
+  saveInvoiceAction,
+  sendInvoiceAction,
+} from '../store/actions/invoiceActions';
+import { clearGetInvoicesStatus } from '../store/reducers/invoiceReducer';
+import { CustomHookMessage } from '@app-types';
+import estimateModel, { IEstimateValues, ILabour, IPart } from '../components/Forms/models/estimateModel';
+import { initRefundCustomerAction } from '../store/actions/transactionActions';
+import { clearSaveEstimateStatus, clearUpdateEstimateStatus } from '../store/reducers/estimateReducer';
+import { showMessage } from '../helpers/notification';
+import settings from '../config/settings';
+
+const callbackUrl = `${settings.api.baseURL}/invoices`;
+
+function getUpdateData(
+  invoiceId: number | undefined,
+  values: IEstimateValues,
+  partTotal: number,
+  labourTotal: number,
+  grandTotal: number,
+  refundable: number,
+  dueAmount: number,
+) {
+  return {
+    id: invoiceId,
+    parts: values.parts,
+    labours: values.labours,
+    tax: values.tax,
+    addressType: values.addressType,
+    address: values.address,
+    depositAmount: values.depositAmount,
+    additionalDeposit: values.additionalDeposit,
+    jobDurationValue: values.jobDuration.count,
+    jobDurationUnit: values.jobDuration.interval,
+    // partsTotal: Math.round(partTotal),
+    // laboursTotal: Math.round(labourTotal),
+    // grandTotal: Math.round(grandTotal),
+    // refundable: Math.round(refundable),
+    // dueAmount: Math.round(dueAmount),
+    partsTotal: partTotal.toFixed(2),
+    laboursTotal: labourTotal.toFixed(2),
+    grandTotal: grandTotal.toFixed(2),
+    refundable: refundable.toFixed(2),
+    dueAmount: dueAmount.toFixed(2),
+    note: values.note,
+    internalNote: values.internalNote,
+  };
+}
+
+export default function useInvoice() {
+  const [invoices, setInvoices] = useState<IInvoice[]>([]);
+  const [invoice, setInvoice] = useState<IInvoice>();
+  const [initialValues, setInitialValues] = useState<IEstimateValues>(estimateModel.initialValues);
+  const [labourTotal, setLabourTotal] = useState<number>(0);
+  const [partTotal, setPartTotal] = useState<number>(0);
+  const [grandTotal, setGrandTotal] = useState<number>(0);
+  const [dueBalance, setDueBalance] = useState<number>(0);
+  const [refundable, setRefundable] = useState<number>(0);
+  const [success, setSuccess] = useState<CustomHookMessage>();
+  const [error, setError] = useState<CustomHookMessage>();
+  const [showEdit, setShowEdit] = useState<boolean>(false);
+  const [showRefund, setShowRefund] = useState<boolean>(false);
+  const [estimateId, setEstimateId] = useState<number>();
+  const [invoiceId, setInvoiceId] = useState<number>();
+  const [save, setSave] = useState<boolean>(false);
+  const [discount, setDiscount] = useState(0);
+  const [showDelete, setShowDelete] = useState<boolean>(false);
+
+  const [discountType, setDiscountType] = useState('exact');
+
+  const invoiceReducer = useAppSelector(state => state.invoiceReducer);
+  const dispatch = useAppDispatch();
+
+  const handleReset = useCallback(() => {
+    dispatch(clearGetInvoicesStatus());
+    dispatch(clearSaveEstimateStatus());
+    dispatch(clearUpdateEstimateStatus());
+  }, [dispatch]);
+
+  useEffect(() => {
+    void dispatch(getInvoicesAction());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (invoiceReducer.getInvoicesStatus === 'completed') {
+      const invoices = invoiceReducer.invoices.map(value => ({ ...value }));
+
+      const newInvoices: IInvoice[] = [];
+
+      for (let i = 0; i < invoices.length; i++) {
+        const draft = invoices[i].draftInvoice;
+
+        if (draft) {
+          const parts = draft.parts.length ? draft.parts.map(part => JSON.parse(part)) : [];
+          const labours = draft.labours.length ? draft.labours.map(labour => JSON.parse(labour)) : [];
+
+          const draftInvoice = {
+            ...draft,
+            parts,
+            labours,
+            estimate: invoices[i].estimate,
+            transactions: invoices[i].transactions,
+          };
+
+          draftInvoice.id = invoices[i].id;
+
+          newInvoices.push(draftInvoice);
+
+          continue;
+        }
+        newInvoices.push(invoices[i]);
+      }
+
+      setInvoices(newInvoices);
+    }
+  }, [dispatch, invoiceReducer.getInvoicesStatus, invoiceReducer.invoices]);
+
+  useEffect(() => {
+    if (invoiceReducer.getInvoicesStatus === 'failed') {
+      showMessage(
+        'Invoice',
+        invoiceReducer.getInvoicesError,
+        'error'
+      )
+    }
+  }, [dispatch, handleReset, invoiceReducer.getInvoicesError, invoiceReducer.getInvoicesStatus]);
+
+  useEffect(() => {
+    if (invoiceReducer.saveInvoiceStatus === 'completed') {
+      showMessage(
+        'Invoice',
+        'Invoice saved successfully',
+        'success'
+      )
+      dispatch(getInvoicesAction());
+      handleReset();
+    }
+  }, [dispatch, handleReset, invoiceReducer.saveInvoiceStatus, invoiceReducer.saveInvoiceSuccess]);
+
+  useEffect(() => {
+    if (invoiceReducer.saveInvoiceStatus === 'failed') {
+      showMessage(
+        'Invoice',
+        invoiceReducer.saveInvoiceError,
+        'error'
+      )
+    }
+  }, [dispatch, handleReset, invoiceReducer.saveInvoiceError, invoiceReducer.saveInvoiceStatus]);
+
+  useEffect(() => {
+    if (invoiceReducer.sendInvoiceStatus === 'completed') {
+      showMessage(
+        'Invoice',
+        "Invoice sent successfully",
+        "success"
+      )
+      dispatch(getInvoicesAction());
+      handleReset();
+    }
+  }, [dispatch, handleReset, invoiceReducer.sendInvoiceStatus, invoiceReducer.sendInvoiceSuccess]);
+
+  useEffect(() => {
+    if (invoiceReducer.sendInvoiceStatus === 'failed') {
+      showMessage(
+        "invoice",
+        invoiceReducer.sendInvoiceError,
+        "error"
+      )
+    }
+  }, [dispatch, handleReset, invoiceReducer.sendInvoiceError, invoiceReducer.sendInvoiceStatus]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearGetInvoicesStatus());
+      dispatch(clearSaveEstimateStatus());
+      dispatch(clearUpdateEstimateStatus());
+      setSave(false);
+      setInvoiceId(undefined);
+      setEstimateId(undefined);
+      setSuccess(undefined);
+      setError(undefined);
+      setRefundable(0);
+      setGrandTotal(0);
+      setPartTotal(0);
+      setDueBalance(0);
+    };
+  }, [dispatch]);
+
+  const onEdit = useCallback(
+    (_invoice: any) => {
+      void dispatch(getInvoicesAction());
+
+      const invoice = invoices.find(invoice => invoice.id === _invoice.id) || _invoice;
+
+      if (invoice && invoice.estimate) {
+        const driver = invoice.estimate.rideShareDriver;
+        const customer = invoice.estimate.customer;
+        const vehicle = invoice.estimate.vehicle;
+        const firstName = driver ? driver.firstName : customer.firstName;
+        const lastName = driver ? driver.lastName : customer.lastName;
+        const phone = driver ? driver.phone : customer.phone;
+        const make = vehicle && vehicle.make ? vehicle.make : '';
+        const model = vehicle && vehicle.model ? vehicle.model : '';
+        const plateNumber = vehicle && vehicle.plateNumber ? vehicle.plateNumber : '';
+        const vin = vehicle && vehicle.vin ? vehicle.vin : '';
+        const modelYear = vehicle && vehicle.modelYear ? vehicle.modelYear : '';
+        const address = invoice.estimate.address ? invoice.estimate.address : '';
+        const addressType = invoice.estimate.addressType ? invoice.estimate.addressType : '';
+        const mileage = {
+          count: vehicle && vehicle.mileageValue ? vehicle.mileageValue : '',
+          unit: vehicle && vehicle.mileageUnit ? vehicle.mileageUnit : '',
+        };
+        const note = invoice.estimate.note ? invoice.estimate.note : '';
+        const internalNote = invoice.estimate.internalNote ? invoice.estimate.internalNote : ''
+
+        if (invoice.edited && invoice.draftInvoice) {
+          const draftInvoice = invoice.draftInvoice;
+
+          const parts = draftInvoice.parts.map((part: any) => JSON.parse(part)) as IPart[];
+          const labours = draftInvoice.labours.map((labour: any) => JSON.parse(labour)) as ILabour[];
+          const jobDuration = { count: `${draftInvoice.jobDurationValue}`, interval: draftInvoice.jobDurationUnit };
+          const depositAmount = `${draftInvoice.depositAmount}`;
+          const tax = `${draftInvoice.tax}`;
+          const taxPart = `${draftInvoice.taxPart}`;
+          const status = draftInvoice.status;
+
+          setInitialValues(prevState => ({
+            ...prevState,
+            firstName,
+            lastName,
+            phone,
+            make,
+            model,
+            plateNumber,
+            vin,
+            modelYear,
+            address,
+            addressType,
+            jobDuration,
+            depositAmount,
+            tax,
+            mileage,
+            parts,
+            labours,
+            status,
+            invoice,
+            taxPart,
+            note,
+            internalNote
+          }));
+
+          setGrandTotal(draftInvoice.grandTotal);
+          setPartTotal(draftInvoice.partsTotal);
+          setLabourTotal(draftInvoice.laboursTotal);
+          setDueBalance(draftInvoice.dueAmount);
+          setRefundable(draftInvoice.refundable);
+          setInvoiceId(invoice.id);
+        }
+
+        if (invoice.edited && !invoice.draftInvoice) {
+          const parts = invoice.parts as unknown as IPart[];
+          const labours = invoice.labours as unknown as ILabour[];
+          const jobDuration = { count: `${invoice.jobDurationValue}`, interval: invoice.jobDurationUnit };
+          const depositAmount = `${invoice.depositAmount}`;
+          const tax = `${invoice.tax}`;
+          const taxPart = `${invoice.taxPart}`;
+          const status = invoice.estimate.status;
+
+          setInitialValues(prevState => ({
+            ...prevState,
+            firstName,
+            lastName,
+            phone,
+            make,
+            model,
+            plateNumber,
+            vin,
+            modelYear,
+            address,
+            addressType,
+            jobDuration,
+            depositAmount,
+            tax,
+            taxPart,
+            mileage,
+            parts,
+            labours,
+            status,
+            invoice,
+            note,
+            internalNote
+          }));
+
+          setGrandTotal(invoice.grandTotal);
+          setPartTotal(invoice.partsTotal);
+          setLabourTotal(invoice.laboursTotal);
+          setDueBalance(invoice.dueAmount);
+          setRefundable(invoice.refundable);
+          setInvoiceId(invoice.id);
+        }
+
+        if (!invoice.edited) {
+          const estimate = invoice.estimate;
+
+          const parts = estimate.parts as unknown as any;
+          const labours = estimate.labours as unknown as any;
+          const jobDuration = { count: `${estimate.jobDurationValue}`, interval: estimate.jobDurationUnit };
+          const depositAmount = `${invoice.depositAmount}`;
+          const tax = `${estimate.tax}`;
+          const taxPart = `${estimate.taxPart}`;
+          const status = estimate.status;
+
+          const _parts = parts?.length && parts.map((part: any) => JSON.parse(part));
+          const _labours = labours?.length && labours.map((labour: any) => JSON.parse(labour));
+
+          setInitialValues(prevState => ({
+            ...prevState,
+            firstName,
+            lastName,
+            phone,
+            make,
+            model,
+            plateNumber,
+            vin,
+            modelYear,
+            address,
+            addressType,
+            jobDuration,
+            depositAmount,
+            tax,
+            taxPart,
+            mileage,
+            parts: _parts,
+            labours: _labours,
+            status,
+            invoice,
+            note,
+          }));
+
+          setGrandTotal(estimate.grandTotal);
+          setPartTotal(estimate.partsTotal);
+          setLabourTotal(estimate.laboursTotal);
+          setDueBalance(invoice.dueAmount);
+          setRefundable(invoice.refundable);
+          setInvoiceId(invoice.id);
+        }
+
+        setInvoice(invoice);
+        setEstimateId(estimateId);
+        setShowEdit(true);
+      }
+    },
+    [dispatch, estimateId, invoices],
+  );
+
+  const onDelete = useCallback((id: number) => {
+    setInvoiceId(id);
+    setShowDelete(true);
+  }, []);
+
+  const handleDelete = useCallback((id: number) => {
+    if (id) void dispatch(deleteInvoiceAction(id));
+  }, [dispatch]);
+
+  const handleInitiateRefund = () => {
+    void dispatch(
+      initRefundCustomerAction({
+        callbackUrl,
+        amount: refundable,
+        invoiceId,
+      }),
+    );
+  };
+
+  const handleSaveInvoice = (values: IEstimateValues) => {
+    const parts = values.parts;
+    const labours = values.labours;
+
+    if (!parts.length) return showMessage("error", 'Parts Items Cannot not be empty!', "error");
+    if (!labours.length) return showMessage("error", 'Labour Items Cannot not be empty!', "error");
+
+    const data = getUpdateData(invoiceId, values, partTotal, labourTotal, grandTotal, refundable, dueBalance);
+
+    setSave(false);
+    void dispatch(saveInvoiceAction({ ...data, discount, discountType, taxPart: values.taxPart }));
+  };
+
+  const handleSendInvoice = (values: IEstimateValues) => {
+    const parts = values.parts;
+    const labours = values.labours;
+
+    if (!parts.length) return showMessage("Invoice", 'Parts Items Cannot not be empty!', "error");
+    if (!labours.length) return showMessage("Invoice", 'Labour Items Cannot not be empty!', "error");
+
+    const data = getUpdateData(invoiceId, values, partTotal, labourTotal, grandTotal, refundable, dueBalance);
+
+    void dispatch(sendInvoiceAction({ ...data, discount, discountType, taxPart: values.taxPart }));
+  };
+
+  const handleCloseEdit = () => {
+    setShowEdit(false);
+    setSave(false);
+    setInvoiceId(undefined);
+    setEstimateId(undefined);
+    setSuccess(undefined);
+    setError(undefined);
+    setRefundable(0);
+    setGrandTotal(0);
+    setPartTotal(0);
+    setDueBalance(0);
+    setInitialValues(estimateModel.initialValues);
+    void dispatch(getInvoicesAction());
+  };
+
+  return {
+    discount,
+    discountType,
+    invoices,
+    error,
+    setError,
+    onEdit,
+    showEdit,
+    setShowEdit,
+    initialValues,
+    labourTotal,
+    grandTotal,
+    partTotal,
+    setSuccess,
+    success,
+    setLabourTotal,
+    setPartTotal,
+    setGrandTotal,
+    dueBalance,
+    setDueBalance,
+    refundable,
+    setRefundable,
+    showRefund,
+    setShowRefund,
+    save,
+    setSave,
+    handleInitiateRefund,
+    handleSaveInvoice,
+    handleSendInvoice,
+    handleCloseEdit,
+    invoice,
+    setDiscountType,
+    setDiscount,
+    showDelete,
+    setShowDelete,
+    onDelete,
+    handleDelete,
+  };
+}

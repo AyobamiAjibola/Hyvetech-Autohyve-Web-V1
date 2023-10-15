@@ -17,6 +17,18 @@ import AddNewExpensesModal from "../../components/AutoHyveModals/AddNewExpensesM
 import TableCountTitile from "../../components/TableCountTitile/TableCountTitile";
 import TableActionButton from "../../components/TableActionButton/TableActionButton";
 import ExpensesDetailsModal from "../../components/AutoHyveModals/ExpensesDetailsModal";
+import useAppSelector from "../../hooks/useAppSelector";
+import useAppDispatch from "../../hooks/useAppDispatch";
+import useAdmin from "../../hooks/useAdmin";
+import { deleteExpenseAction, getExpensesAction, updateExpenseAction } from "../../store/actions/expenseAction";
+import { showMessage } from "../../helpers/notification";
+import { clearCreateEspenseStatus, clearDeleteExpenseStatus, clearUpdateExpenseDetailStatus } from "../../store/reducers/expenseReducer";
+import Pagination from "../../components/Pagination/Pagination";
+import { Util } from "../../helpers/Util";
+import { IconButton } from "@mui/material";
+import moment from "moment";
+import { EXPENSE_STATUS } from "../../config/constants";
+import DeleteExpenseModal from "../../components/modals/DeleteExpenseModal";
 
 const Expenses = () => {
   const [newExpenses, setNewExpenses] = useState(false);
@@ -33,10 +45,89 @@ const Expenses = () => {
       setOpenImport(false);
     }
   };
+  const expenseReduder = useAppSelector(state => state.expenseReducer);
+  const dispatch = useAppDispatch();
+  const [showAddReferenceForm, setReferenceForm] = useState(false);
+  const [reference, setReference] = useState('');
+  const [expenseId, setExpenseId] = useState(-1);
+  const { isTechAdmin } = useAdmin();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [item, setItem] = useState(null);
 
   useEffect(() => {
     document.addEventListener("click", hideOnClickOutside, true);
   }, []);
+
+  useEffect(() => {
+    dispatch(getExpensesAction());
+  }, []);
+
+  const handleAddReference = () => {
+    dispatch(updateExpenseAction({ reference, id: expenseId }));
+    setExpenseId(-1);
+    setReference('');
+    setReferenceForm(false);
+  };
+
+  const updateExpenseReference = (expenseId) => {
+    setReferenceForm(true);
+    setExpenseId(expenseId);
+  };
+
+  useEffect(() => {
+    if (expenseReduder.deleteExpenseStatus === 'failed') {
+      showMessage(
+        'Expense',
+        expenseReduder.deleteExpenseError,
+        'error'
+      );
+    } else if (expenseReduder.deleteExpenseStatus === 'completed') {
+      showMessage(
+        'Expense',
+        'Expense deleted successfully',
+        'success'
+      );
+      setDeletemodal(false)
+      dispatch(getExpensesAction());
+    }
+
+    return () => {
+      dispatch(clearDeleteExpenseStatus());
+    }
+  }, [expenseReduder.deleteExpenseStatus]);
+
+  useEffect(() => {
+    if (expenseReduder.updateExpenseDetailStatus === 'failed') {
+      showMessage('Expense', expenseReduder.updateExpenseDetailError, 'error');
+    } else if (expenseReduder.updateExpenseDetailStatus === 'completed') {
+      showMessage('Expense', 'Expense updated successfully', 'success');
+
+      dispatch(getExpensesAction());
+    }
+
+    return () => {
+      dispatch(clearUpdateExpenseDetailStatus())
+    }
+  }, [expenseReduder.updateExpenseDetailStatus]);
+
+  useEffect(() => {
+    if (expenseReduder.createExpenseStatus === 'failed') {
+      showMessage('Expense', expenseReduder.createExpenseError, 'error');
+    } else if (expenseReduder.createExpenseStatus === 'completed') {
+      showMessage('Expense', 'Expense created successfully', 'success');
+
+      dispatch(getExpensesAction());
+    }
+
+    return () => {
+      dispatch(clearCreateEspenseStatus());
+    }
+  }, [expenseReduder.createExpenseStatus]);
+
+  const handleExpenseDelete = (id) => {
+    dispatch(deleteExpenseAction({ id }));
+  };
 
   const toggleCarts = (id) => {
     if (checkBoxValue.includes(id)) {
@@ -73,6 +164,35 @@ const Expenses = () => {
     "Date (Descending)",
   ];
 
+  // Function to handle changes in the search input
+  const handleSearchChange = (e) => {
+    const inputValue = e.target.value;
+    const cleanedInput = inputValue.replace(/[^a-zA-Z0-9 ]/g, '');
+
+    setSearchQuery(cleanedInput);
+    setCurrentPage(1); // Reset to the first page when the search query changes
+  };
+
+  // Function to filter data based on the search query
+  const filteredData = expenseReduder.expenses.filter((item) =>
+    // item.customer.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    item.code.includes(searchQuery)
+  );
+
+  const itemsPerPage = filteredData.length === expenseReduder.expenses.length ? 10 : filteredData.length;
+
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentData = filteredData.slice(startIndex, endIndex);
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
+  console.log(filteredData, 'filtered')
+
   return (
     <DashboardWrapper>
       <>
@@ -101,7 +221,10 @@ const Expenses = () => {
 
         <div className="flex justify-between md:flex-row flex-col items-start md:items-center mt-5 md:mt-16">
           <div className="w-[100%] md:w-[50%]">
-            <SearchInput />
+            <SearchInput 
+              handleSearchChange={handleSearchChange}
+              searchQuery={searchQuery}
+            />
           </div>
 
           <TableCountTitile />
@@ -130,10 +253,15 @@ const Expenses = () => {
               <th className="font-montserrat  text-xs text-left">Action</th>
             </thead>
 
-            {tableData.map((item, index) => {
+            {currentData.length > 0 &&
+            currentData.map((item, index) => {
               return (
-                <tbody onClick={detailModal}>
-                  <tr className="cursor-pointer table-hover">
+                <tbody 
+                  onClick={(e) => {
+                    detailModal(e), setItem(item)}}>
+                  <tr className="cursor-pointer table-hover"
+                    key={index}
+                  >
                     <td
                       className="font-montserrat text-xs cursor-pointer"
                       onClick={() => toggleCarts(index)}
@@ -149,33 +277,38 @@ const Expenses = () => {
                       ]}
                     </td>
                     <td className="font-montserrat flex items-center gap-2 text-xs">
-                      26/01/2023
+                      {moment(item.dateModified).format('DD/MM/YYYY')}
                     </td>
-                    <td className="font-montserrat text-xs">EXP-550001</td>
-                    <td className="font-montserrat text-xs">Direct Cost</td>
-                    <td className="font-montserrat text-xs">₦ 25,000.00</td>
-                    <td className="font-montserrat text-xs">Vendor 1</td>
-                    <td className="font-montserrat text-xs">INV-530001</td>
+                    <td className="font-montserrat text-xs">{item.code}</td>
+                    <td className="font-montserrat text-xs">{item.category.name}</td>
+                    <td className="font-montserrat text-xs">{Util.formAmount(item.amount)}</td>
+                    <td className="font-montserrat text-xs">{item.beneficiary.name}</td>
+                    <td className="font-montserrat text-xs">{item.invoiceCode?.split('_')[0]}</td>
                     <td className="font-montserrat text-xs">
-                      Client-Name-00010
+                      {item.reference}
                     </td>
                     <td className="font-montserrat text-xs">
                       <span
                         className={`py-2 flex justify-center  w-20 items-center  ${
-                          index == 1 ? "bg-primary" : "bg-gray-300"
+                          item.status == EXPENSE_STATUS.paid ? "bg-primary" : "bg-gray-300"
                         } px-4`}
                         style={{ borderRadius: 10 }}
                       >
-                        {index == 1 ? "Active" : "Inactive"}
+                        {item.status == EXPENSE_STATUS.paid ? "PAID" : "UNPAID"}
                       </span>
                     </td>
 
                     <td className="flex gap-3 items-center justify-center ">
-                      <HiOutlineTrash
-                        size={15}
-                        className="text-center cursor-pointer"
-                        onClick={closeDeleteModal}
-                      />
+                      <IconButton
+                        onClick={(e) => {
+                          setExpenseId(item.id)
+                          closeDeleteModal(e)}}
+                      >
+                        <HiOutlineTrash
+                          size={15}
+                          className="text-center cursor-pointer"
+                        />
+                      </IconButton>
                     </td>
                   </tr>
                 </tbody>
@@ -184,25 +317,11 @@ const Expenses = () => {
           </table>
         </div>
         <div className="md:block gap-3 flex flex-col">
-          <div className="flex justify-between mb-10  w-full mt-4">
-            <AppTabBtn
-              icon={<BsDownload />}
-              title="Export Items"
-              className="w-full md:flex hidden text-[#000] btn-secondary"
-              // onClick={() => navigate("/generate-invoice")}
-            />
-            <div className="flex items-center gap-3">
-              <div className="border-[1px] rounded-[5px] p-3 border-[#D9D9D9] cursor-pointer">
-                <HiChevronLeft color="#D9D9D9" />
-              </div>
-              <div className="border-[1px] rounded-[5px] px-5 py-2 border-[#D9D9D9]">
-                1
-              </div>
-              <div className="border-[1px] rounded-[5px] p-3 border-[#D9D9D9] cursor-pointer">
-                <HiChevronRight color="#D9D9D9" />
-              </div>
-            </div>
-          </div>
+          {filteredData.length !== 0 && (<Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />)}
         </div>
         {/* <div className="flex justify-between flex-col md:flex-row md:gap-0 gap-5 w-[99%] mt-10">
           <AppTabBtn
@@ -239,14 +358,19 @@ const Expenses = () => {
         <ExpensesDetailsModal
           expenseDetailmodal={expenseDetailmodal}
           setExpenseDetailmodal={setExpenseDetailmodal}
+          item={item}
+          setItem={setItem}
         />
 
-        <DeleteModal
+        <DeleteExpenseModal
           deletemodal={deletemodal}
           setDeletemodal={setDeletemodal}
           title={"Delete Record Expenses"}
           description="Are you sure you want to carry out this action? If you proceed, you will not be able to undo this action."
           closeDeleteModal={closeDeleteModal}
+          setExpenseId={setExpenseId}
+          expenseId={expenseId}
+          handleExpenseDelete={handleExpenseDelete}
         />
       </>
     </DashboardWrapper>

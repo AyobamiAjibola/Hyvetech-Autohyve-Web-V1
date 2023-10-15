@@ -114,6 +114,11 @@ const customerSlice = createSlice({
       state.getCustomersSuccess = '';
       state.getCustomersError = '';
     },
+    clearGetCustomerStatus(state: ICustomerState) {
+      state.getCustomerStatus = 'idle';
+      state.getCustomerSuccess = '';
+      state.getCustomerError = '';
+    },
     clearUpdateCustomerStatus(state: ICustomerState) {
       state.updateCustomerStatus = 'idle';
       state.updateCustomerSuccess = '';
@@ -289,6 +294,13 @@ const customerSlice = createSlice({
   },
 });
 
-export const { clearGetCustomersStatus, clearImportCustomerStatus, clearAddCustomerStatus, clearUpdateCustomerStatus, clearGetNewCustomersStatus } = customerSlice.actions;
+export const { 
+  clearGetCustomersStatus, 
+  clearImportCustomerStatus, 
+  clearAddCustomerStatus, 
+  clearUpdateCustomerStatus, 
+  clearGetNewCustomersStatus,
+  clearGetCustomerStatus
+} = customerSlice.actions;
 
 export default customerSlice.reducer;

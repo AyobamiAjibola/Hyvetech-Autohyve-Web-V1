@@ -64,7 +64,7 @@ export const subSidebarItems = [
   },
   {
     name: "Invoices",
-    path: "/invoice",
+    path: "/invoices",
     icon: InvoiceIcon,
   },
   {

@@ -19,6 +19,7 @@ import settings from '../config/settings';
 import { CustomJwtPayload } from '@app-interfaces';
 import {
   clearCreateEstimateStatus,
+  clearDeleteEstimateStatus,
   clearSaveEstimateStatus,
   clearSendDraftEstimateStatus,
   clearUpdateEstimateStatus,
@@ -57,6 +58,7 @@ export default function useEstimate() {
     dispatch(clearSaveEstimateStatus());
     dispatch(clearUpdateEstimateStatus());
     dispatch(clearSendDraftEstimateStatus());
+    dispatch(clearDeleteEstimateStatus());
     setSave(false);
   }, [dispatch]);
 
@@ -209,7 +211,7 @@ export default function useEstimate() {
     }
   }, [dispatch, estimateReducer.sendDraftEstimateStatus, estimateReducer.sendDraftEstimateSuccess, handleReset]);
 
-  const handleCreateEstimate = (values: IEstimateValues, options?: FormikHelpers<IEstimateValues>) => {
+  const handleCreateEstimate = (values: IEstimateValues, mileageUnit: string, options?: FormikHelpers<IEstimateValues>, ) => {
     const depositAmount = values.depositAmount;
 
     if (depositAmount === 'null' || !depositAmount)
@@ -248,8 +250,8 @@ export default function useEstimate() {
       model: values.model,
       plateNumber: values.plateNumber,
       modelYear: values.modelYear,
-      mileageValue: values.mileage.count,
-      mileageUnit: values.mileage.unit,
+      mileageValue: values.mileage.count.toString(),
+      mileageUnit: mileageUnit,
       partsTotal: partTotal.toFixed(2),
       laboursTotal: labourTotal.toFixed(2),
       grandTotal: grandTotal.toFixed(2),
@@ -289,7 +291,7 @@ export default function useEstimate() {
       model: values.model,
       plateNumber: values.plateNumber,
       modelYear: values.modelYear,
-      mileageValue: values.mileage.count,
+      mileageValue: values.mileage.count.toString(),
       mileageUnit: values.mileage.unit,
       partsTotal: partTotal.toFixed(2),
       laboursTotal: labourTotal.toFixed(2),
@@ -302,10 +304,6 @@ export default function useEstimate() {
       note: values.note,
       internalNote: values.internalNote,
     };
-
-    console.log(data);
-
-    console.log(Object.keys(data), 'realsentdata');
 
     dispatch(saveEstimateAction(data));
   };
@@ -418,7 +416,7 @@ export default function useEstimate() {
       void dispatch(getEstimatesAction());
       
       const estimate = estimates.find(estimate => estimate.id === _estimate.id) || _estimate;
-      
+
       if (estimate) {
         const driver = estimate.rideShareDriver;
         const customer = estimate.customer;
@@ -445,6 +443,7 @@ export default function useEstimate() {
           jobDuration: { count: `${estimate.jobDurationValue}`, interval: estimate.jobDurationUnit },
           depositAmount: `${estimate.depositAmount}`,
           tax: `${estimate.tax}`,
+          taxPart: `${estimate.taxPart}`,
           mileage: {
             count: vehicle && vehicle.mileageValue ? vehicle.mileageValue : '',
             unit: vehicle && vehicle.mileageUnit ? vehicle.mileageUnit : '',
@@ -454,12 +453,13 @@ export default function useEstimate() {
           status: estimate.status,
           estimate: { ...estimate },
           note: estimate.note,
+          internalNote: estimate.internalNote,
         }));
 
         setGrandTotal(estimate.grandTotal);
         setPartTotal(estimate.partsTotal);
         setLabourTotal(estimate.laboursTotal);
-        setEstimateId(estimateId);
+        setEstimateId(estimate.id);
         setShowEdit(true);
       } else showMessage('Estimate', 'An Error Occurred. Please try again or contact support', 'error');
     },
@@ -471,10 +471,10 @@ export default function useEstimate() {
     setShowDelete(true);
   }, []);
 
-  const handleDelete = useCallback(() => {
-    if (estimateId) void dispatch(deleteEstimateAction(estimateId));
+  const handleDelete = useCallback((id: number) => {
+    if (id) void dispatch(deleteEstimateAction(id));
     setShowDelete(false);
-  }, [dispatch, estimateId]);
+  }, [dispatch]);
 
   const onView = (estimateId: number) => {
     setEstimateId(estimateId);

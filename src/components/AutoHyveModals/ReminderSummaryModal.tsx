@@ -87,7 +87,6 @@ export default function ReminderSummaryModal({
   };
 
   const data: any = {
-    open_modal: 'true',
     id: reminder?.id
   }
 
@@ -108,7 +107,7 @@ export default function ReminderSummaryModal({
     }
 
     if(value === "Generate Estimate") {
-      navigate('/estimates');
+      navigate('/generate-estimate');
       Object.entries(data).forEach(([key, value]) => {
         //@ts-ignore
         sessionStorage.setItem(key, value);
@@ -150,7 +149,7 @@ Should I send you an estimate and schedule you in?`
   const _resetServiceDate = () => {
 
     const data ={
-      id: reminder?.id,
+      reminderId: reminder?.id,
     }
     void dispatch(resetLastDateAction(data))
   }
@@ -239,52 +238,50 @@ Should I send you an estimate and schedule you in?`
                   label="Select an action"
                   onChange={handleChange}
                   sx={{
-                    width: "100%",
-                    backgroundColor: '#F5F5F5',
                     borderRadius: '20px',
-        
+                    backgroundColor: '#F5F5F5',
                     "& .MuiOutlinedInput-notchedOutline": {
-                      borderColor: 'transparent', // Remove border color
-                    
-                      "&:hover": {
-                        ".MuiOutlinedInput-notchedOutline": {
-                          borderColor: 'transparent' // Border color on hover
-                        }
-                      }
+                      borderColor: "transparent"
                     },
-                    
                     "& label": {
-                      fontSize: "10px",
+                      fontSize: "12px",
                       fontFamily: "montserrat",
-                      color: "#A5A5A5",
-                      paddingTop: "5px",
-                      paddingLeft: "17px",
+                      color: "#A5A5A5"
                     },
-                    "& .MuiOutlinedInput-root": {
-                      "&:hover .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "red", // Remove border color on hover
-                      },
-                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "red", // Remove border color on focus
-                      },
-                      borderRadius: "20px",
-                      backgroundColor: "#F5F5F5",
-        
-                      borderColor: "transparent",
-                      height: "53px",
-                      border: "none",
+                    "& input": {
+                      fontSize: "12px",
+                      fontFamily: "montserrat",
+                      borderRadius: '20px',
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "transparent", // Remove border color on focus
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "transparent", // Remove border color on hover
                     },
                   }}
                 >
                   <MenuItem value="">
                   ...
                   </MenuItem>
-                  <MenuItem value={'Generate Estimate'} className={classes.select}>Generate Estimate</MenuItem>
-                  <MenuItem value={'Share Reminder'} className={classes.select}>Share Reminder</MenuItem>
-                  <MenuItem value={'Delete Reminder'} className={classes.select}>Delete Reminder</MenuItem>
+                  <MenuItem value={'Generate Estimate'} className={classes.select}
+                    sx={{fontSize: "14px",
+                    fontFamily: "montserrat"}}
+                  >Generate Estimate</MenuItem>
+                  <MenuItem value={'Share Reminder'} className={classes.select}
+                    sx={{fontSize: "14px",
+                    fontFamily: "montserrat"}}
+                  >Share Reminder</MenuItem>
+                  <MenuItem value={'Delete Reminder'} className={classes.select}
+                    sx={{fontSize: "14px",
+                    fontFamily: "montserrat"}}
+                  >Delete Reminder</MenuItem>
                   <Divider orientation='horizontal'/>
-                  <ListSubheader>Service Status</ListSubheader>
-                  <MenuItem value={'Service Status'} className={classes.select}>Mark as done</MenuItem>
+                  <ListSubheader sx={{fontFamily: "montserrat"}}>Service Status</ListSubheader>
+                  <MenuItem value={'Service Status'} className={classes.select}
+                    sx={{fontSize: "14px",
+                    fontFamily: "montserrat"}}
+                  >Mark as done</MenuItem>
                   <Box
                     sx={{
                       display: 'flex',
@@ -295,8 +292,9 @@ Should I send you an estimate and schedule you in?`
                     <MenuItem></MenuItem>
                     <Typography
                       sx={{
-                        fontSize: '12px', pl: 1, pr: 1, mr: 1,
-                        fontStyle: 'italic'
+                        fontSize: '10px', pl: 1, pr: 1, mr: 1,
+                        fontStyle: 'italic', fontFamily: "montserrat",
+                        fontWeight: 'bold'
                       }}
                     >
                       Marked done {markedStatus}

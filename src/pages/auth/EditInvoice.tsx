@@ -1,7 +1,7 @@
-import React, { ChangeEvent, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { FaCalendarAlt, FaPlus } from "react-icons/fa";
-import AppInput, { MyTextInput } from "../../components/AppInput/AppInput";
-import AppInputWithPhone, { AppInputPhone } from "../../components/AppInputWithPhone/AppInputWithPhone";
+import React, { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { FaCalendarAlt } from "react-icons/fa";
+import AppInput from "../../components/AppInput/AppInput";
+import { AppInputPhone } from "../../components/AppInputWithPhone/AppInputWithPhone";
 import InputHeader from "../../components/InputHeader/InputHeader";
 import DropDownHalfParts from "../../components/DropDownHalf/DropDownHalfParts";
 import DropDownHalf from "../../components/DropDownHalf/DropDownHalf";
@@ -9,39 +9,29 @@ import DeleteBox from "../../components/DeleteBox/DeleteBox";
 import CustomTextArea from "../../components/CustomTextArea/CustomTextArea";
 import AppBtn from "../../components/AppBtn/AppBtn";
 import ReminderModal from "../../components/AutoHyveModals/ReminderModal";
-import AppDropDown from "../../components/AppDropDown/AppDropDown";
-import CustomDate from "../../components/CustomDate/CustomDate";
-import { FieldArray, Form, Formik, useFormik } from "formik";
+import { useFormik } from "formik";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import estimateModel, { IEstimateValues, IPart } from "../../components/Forms/models/estimateModel";
-import { Autocomplete, Box, Button, Checkbox, CircularProgress, Divider, Grid, IconButton, InputAdornment, TextField, Typography, createFilterOptions } from "@mui/material";
+import { Autocomplete, CircularProgress, Divider, InputAdornment, TextField } from "@mui/material";
 import { getVehicleVINAction } from "../../store/actions/vehicleActions";
 import useAppDispatch from "../../hooks/useAppDispatch";
 import useAppSelector from "../../hooks/useAppSelector";
-import { IDriversFilterData } from "@app-interfaces";
 import { getReminderAction } from "../../store/actions/serviceReminderActions";
-import useEstimate from "../../hooks/useEstimate";
-import { getCustomerAction } from "../../store/actions/customerActions";
-import { Remove, Search, ToggleOff, ToggleOn } from "@mui/icons-material";
 import capitalize from "capitalize";
 import { getOwnersFilterDataAction, getPartnerAction, getPartnerFilterDataAction } from "../../store/actions/partnerActions";
 import useAdmin from "../../hooks/useAdmin";
 import useItemStock from "../../hooks/useItemStock";
-import WarrantyFields from "./Estimate/WarrantyFields";
-import QuantityFields from "./Estimate/QuantityFields";
-import { formatNumberToIntl } from "../../utils/generic";
 import { Util } from "../../helpers/Util";
-import { ESTIMATE_STATUS } from "../../config/constants";
-import { clearGetCustomerStatus, clearGetCustomersStatus } from "../../store/reducers/customerReducer";
-import { clearGetRemindersStatus } from "../../store/reducers/serviceReminderReducer";
-import { clearCreateEstimateStatus, clearSendDraftEstimateStatus, clearUpdateEstimateStatus } from "../../store/reducers/estimateReducer";
+import useInvoice from "../../hooks/useInvoice";
+import { getInvoicesAction } from "../../store/actions/invoiceActions";
+import { clearSaveInvoiceStatus, clearSendInvoiceStatus } from "../../store/reducers/invoiceReducer";
 
 const { fields, schema, initialValues: _initialValues } = estimateModel;
 
-const filterOptions = createFilterOptions({
-  matchFrom: "any",
-  stringify: (option: IDriversFilterData) => `${option.query}`,
-});
+// const filterOptions = createFilterOptions({
+//   matchFrom: "any",
+//   stringify: (option: IDriversFilterData) => `${option.query}`,
+// });
 
 export type PartArgs = IPart & {
   handleChange: (e: any) => void;
@@ -49,38 +39,26 @@ export type PartArgs = IPart & {
   values: IEstimateValues;
 };
 
-const EditEstimate = () => {
+const EditInvoice = () => {
   const location = useLocation()
-  const data = ["Individual", "Co-operate"];
-  const [openStart, setOpenStart] = useState(false);
+  // const data = ["Individual", "Co-operate"];
+  // const [openStart, setOpenStart] = useState(false);
   const [openReminder, setOpenReminder] = useState<boolean>(false);
-  const [check, setCheck] = useState(false);
-  const [estimate, setEstimate] = useState<any>();
-  const [vinOptions, setvinOptions] = useState<any>([]);
-  const [timer, setTimer] = useState<NodeJS.Timer>();
-  const [activeId, setactiveId] = useState<number>(0);
-  const [userInfo, setUserInfo] = useState({
-    accountType: "",
-    firstName: "",
-    email: "",
-    lastName: "",
-    companyName: "",
-    phone: "",
-    creditRating: "N/A",
-    state: "Abuja (FCT)",
-    district: "",
-    address: "",
-  });
-  const [value, setValue] = useState<IDriversFilterData | null>(null);
-  const [inputValue, setInputValue] = useState("");
+  // const [check, setCheck] = useState(false);
+  const [_invoice, setInvoice] = useState<any>();
+  const [vinOptions, _] = useState<any>([]);
+  // const [timer, setTimer] = useState<NodeJS.Timer>();
+  // const [activeId, setactiveId] = useState<number>(0);
+  // const [value, setValue] = useState<IDriversFilterData | null>(null);
+  // const [inputValue, setInputValue] = useState("");
   const [mileageUnit, setMileageUnit] = useState<string>("");
-  const [noOptionsText, setNoOptionsText] = useState<any>(
-    "Click Enter to Initialize Search"
-  );
-  const [rawOption, setRawOption] = useState<any>([]);
-  const [fetch, setFetch] = useState<boolean>(false);
-  const [showDrop, setShowDrop] = useState<boolean>(false)
-  const [options, setOptions] = useState<IDriversFilterData[]>([]);
+  // const [noOptionsText, setNoOptionsText] = useState<any>(
+  //   "Click Enter to Initialize Search"
+  // );
+  // const [rawOption, setRawOption] = useState<any>([]);
+  // const [fetch, setFetch] = useState<boolean>(false);
+  // const [showDrop, setShowDrop] = useState<boolean>(false)
+  // const [options, setOptions] = useState<IDriversFilterData[]>([]);
   const { items } = useItemStock();
   const [enableTaxPart, setEnableTaxPart] = useState<boolean>(false);
   const [enableTaxLabor, setEnableTaxLabor] = useState<boolean>(false);
@@ -101,10 +79,10 @@ const EditEstimate = () => {
   const { 
     initialValues, 
     onEdit, setGrandTotal, setPartTotal,
-    setLabourTotal, grandTotal, handleUpdateEstimate,
-    handleSendDraftEstimate, discount, discountType, 
-    setDiscount, setDiscountType
-  } = useEstimate();
+    setLabourTotal, grandTotal, discount, discountType, 
+    setDiscount, setDiscountType, dueBalance, setDueBalance,
+    setRefundable, refundable, handleSaveInvoice, handleSendInvoice
+  } = useInvoice();
 
   const params = useParams();
   const admin = useAdmin();
@@ -113,7 +91,8 @@ const EditEstimate = () => {
     validationSchema: schema,
     initialValues: initialValues,
     onSubmit: (values) => {
-      save ? handleUpdateEstimate(values) : handleSendDraftEstimate(values)
+      console.log(values, 'values')
+      save ? handleSaveInvoice(values) : handleSendInvoice(values)
     },
     validateOnBlur: true,
   });
@@ -138,26 +117,14 @@ const EditEstimate = () => {
     return total;
   }, [values.labours]);
 
-  // const calculateTaxLabour = useCallback(() => {
-  //   if (!enableTaxLabor) {
-  //     setVat(0);
-  //     return;
-  //   }
-  //   const vat = 7.5 * 0.01;
-  //   const tax = _labourTotal * vat;
-
-  //   setFieldValue("tax", tax);
-  //   setVat(tax);
-  // }, [enableTaxLabor, _labourTotal, setFieldValue]);
-
   const dispatch = useAppDispatch();
-  const partnerReducer = useAppSelector(state => state.partnerReducer);
-  const customerReducer = useAppSelector(state => state.customerReducer);
+  // const partnerReducer = useAppSelector(state => state.partnerReducer);
+  // const customerReducer = useAppSelector(state => state.customerReducer);
   const vehicleReducer = useAppSelector(state => state.vehicleReducer);
   const reminderReducer = useAppSelector(state => state.serviceReminderReducer);
   const invoiceReducer = useAppSelector(state => state.invoiceReducer);
   const itemReducer = useAppSelector((state) => state.itemStockReducer);
-  const estimateReducer = useAppSelector(state => state.estimateReducer);
+  // const estimateReducer = useAppSelector(state => state.estimateReducer);
 
   const [vehicleReminder, setVehicleReminder] = useState<any>(reminderReducer.reminders)
 
@@ -190,46 +157,46 @@ const EditEstimate = () => {
     {label: "Year(s)", value: 'year'}
   ];
 
-  const toggleFetch = () => {
-    setFetch(!fetch);
-  };
+  // const toggleFetch = () => {
+  //   setFetch(!fetch);
+  // };
 
-  function handleSearch() {
-    if ((inputValue || "").length == 0) {
-      setShowDrop(false);
-    } else {
-      setNoOptionsText("No result Found");
-      setShowDrop(true);
-    }
-  }
+  // function handleSearch() {
+  //   if ((inputValue || "").length == 0) {
+  //     setShowDrop(false);
+  //   } else {
+  //     setNoOptionsText("No result Found");
+  //     setShowDrop(true);
+  //   }
+  // }
 
   useEffect(() => {
     if (location.state) {
       const state = location.state;
       onEdit(state.item)
-      setEstimate(state.item);
+      setInvoice(state.item);
     }
   }, [location.state]);
 
-  const filterData = (_text: string) => {
-    const text = _text.toLowerCase();
-    setNoOptionsText("Click Enter to Initialize Search");
+  // const filterData = (_text: string) => {
+  //   const text = _text.toLowerCase();
+  //   setNoOptionsText("Click Enter to Initialize Search");
 
-    const _temp: any = [];
-    rawOption.map((_item: any) => {
-      if ((_item?.raw?.firstName || "").toLowerCase().includes(text)) {
-        _temp.push(_item);
-      } else if ((_item?.raw?.lastName || "").toLowerCase().includes(text)) {
-        _temp.push(_item);
-      } else if ((_item?.raw?.companyName || "").toLowerCase().includes(text)) {
-        _temp.push(_item);
-      } else if ((_item?.raw?.email || "").toLowerCase().includes(text)) {
-        _temp.push(_item);
-      }
-    });
+  //   const _temp: any = [];
+  //   rawOption.map((_item: any) => {
+  //     if ((_item?.raw?.firstName || "").toLowerCase().includes(text)) {
+  //       _temp.push(_item);
+  //     } else if ((_item?.raw?.lastName || "").toLowerCase().includes(text)) {
+  //       _temp.push(_item);
+  //     } else if ((_item?.raw?.companyName || "").toLowerCase().includes(text)) {
+  //       _temp.push(_item);
+  //     } else if ((_item?.raw?.email || "").toLowerCase().includes(text)) {
+  //       _temp.push(_item);
+  //     }
+  //   });
 
-    setOptions(_temp);
-  };
+  //   setOptions(_temp);
+  // };
 
   const partnerId = useMemo(() => {
     return +(params.id as unknown as string) || admin.user?.partner?.id;
@@ -393,7 +360,7 @@ const EditEstimate = () => {
       const isQuantityValue = quantityValue === e.target.name;
       const isPrice = priceName === e.target.name;
       const isQuantityUnit = quantityUnit === e.target.name;
-      console.log(e.target.name, quantityUnit, 'qunti')
+
       if (isQuantityValue) {
         const part = values.parts[index];
 
@@ -416,11 +383,11 @@ const EditEstimate = () => {
     [setFieldValue, values.parts]
   );
 
-  const handleGetDriverInfo = (id?: number) => {
-    if (id) {
-      dispatch(getCustomerAction(id));
-    }
-  };
+  // const handleGetDriverInfo = (id?: number) => {
+  //   if (id) {
+  //     dispatch(getCustomerAction(id));
+  //   }
+  // };
 
   const calculateDiscount = useCallback(
     (total: number) => {
@@ -442,82 +409,82 @@ const EditEstimate = () => {
     }
   }, [reminderReducer.getRemindersStatus, values.vin]);
 
-  useEffect(() => {
-    if (
-      customerReducer.getCustomerStatus === "completed"
-    ) {
+  // useEffect(() => {
+  //   if (
+  //     customerReducer.getCustomerStatus === "completed"
+  //   ) {
 
-      const _customer: any = customerReducer.customer;
+  //     const _customer: any = customerReducer.customer;
 
-      if (_customer != undefined) {
-        // upto-populate info
-        setFieldValue(fields.firstName.name, _customer.firstName);
-        setFieldValue(fields.lastName.name, _customer.lastName);
-        setFieldValue(fields.phone.name, _customer.phone);
-        setFieldValue(fields.email.name, _customer.email);
-        setFieldValue(
-          fields.state.name,
-          _customer.contacts[0]?.state || "Abuja (FCT)"
-        );
-        setFieldValue(
-          fields.address.name,
-          _customer.contacts[0]?.address || " ."
-        );
-        setFieldValue(fields.addressType.name, "Home");
+  //     if (_customer != undefined) {
+  //       // upto-populate info
+  //       setFieldValue(fields.firstName.name, _customer.firstName);
+  //       setFieldValue(fields.lastName.name, _customer.lastName);
+  //       setFieldValue(fields.phone.name, _customer.phone);
+  //       setFieldValue(fields.email.name, _customer.email);
+  //       setFieldValue(
+  //         fields.state.name,
+  //         _customer.contacts[0]?.state || "Abuja (FCT)"
+  //       );
+  //       setFieldValue(
+  //         fields.address.name,
+  //         _customer.contacts[0]?.address || " ."
+  //       );
+  //       setFieldValue(fields.addressType.name, "Home");
 
-        setactiveId(_customer.id);
-        const vinList = _customer.vehicles.map((_data: any) => _data?.vin || "");
+  //       setactiveId(_customer.id);
+  //       const vinList = _customer.vehicles.map((_data: any) => _data?.vin || "");
           
-        setvinOptions(vinList);
+  //       setvinOptions(vinList);
 
-        setUserInfo({
-          accountType:
-            (_customer?.companyName || "").length === 0
-              ? "individual"
-              : "corporate",
-          email: _customer.email,
-          firstName: _customer.firstName,
-          lastName: _customer.lastName,
-          companyName: _customer.companyName,
-          phone: _customer.phone,
-          creditRating: _customer.creditRating,
-          state: _customer.contacts[0]?.state || "Abuja (FCT)",
-          district: _customer.contacts[0]?.district || "Abuja (FCT)",
-          address: _customer.contacts[0]?.address || "Abuja (FCT)",
-        });
-      }
-    }
+  //       setUserInfo({
+  //         accountType:
+  //           (_customer?.companyName || "").length === 0
+  //             ? "individual"
+  //             : "corporate",
+  //         email: _customer.email,
+  //         firstName: _customer.firstName,
+  //         lastName: _customer.lastName,
+  //         companyName: _customer.companyName,
+  //         phone: _customer.phone,
+  //         creditRating: _customer.creditRating,
+  //         state: _customer.contacts[0]?.state || "Abuja (FCT)",
+  //         district: _customer.contacts[0]?.district || "Abuja (FCT)",
+  //         address: _customer.contacts[0]?.address || "Abuja (FCT)",
+  //       });
+  //     }
+  //   }
 
-    return () => {
-      dispatch(clearGetCustomerStatus())
-    }
+  //   return () => {
+  //     dispatch(clearGetCustomerStatus())
+  //   }
 
-  }, [
-    customerReducer.getCustomerStatus,
-    reminderReducer.getRemindersStatus,
-  ]);
+  // }, [
+  //   customerReducer.getCustomerStatus,
+  //   reminderReducer.getRemindersStatus,
+  // ]);
 
   useEffect(() => {
     dispatch(getReminderAction());
   }, []);
 
-  useEffect(() => {
-    if (
-      partnerReducer.getOwnersFilterDataStatus === "completed" ||
-      partnerReducer.getPartnerFilterDataStatus === "completed"
-    ) {
-      // setOptions(partnerReducer.ownersFilterData);
-      setRawOption(
-        !fetch
-          ? partnerReducer.partnerFilterData
-          : partnerReducer.ownersFilterData
-      );
-    }
-  }, [
-    partnerReducer.ownersFilterData,
-    partnerReducer.getOwnersFilterDataStatus,
-    fetch,
-  ]);
+  // useEffect(() => {
+  //   if (
+  //     partnerReducer.getOwnersFilterDataStatus === "completed" ||
+  //     partnerReducer.getPartnerFilterDataStatus === "completed"
+  //   ) {
+  //     // setOptions(partnerReducer.ownersFilterData);
+  //     setRawOption(
+  //       !fetch
+  //         ? partnerReducer.partnerFilterData
+  //         : partnerReducer.ownersFilterData
+  //     );
+  //   }
+  // }, [
+  //   partnerReducer.ownersFilterData,
+  //   partnerReducer.getOwnersFilterDataStatus,
+  //   fetch,
+  // ]);
 
   useEffect(() => {
     if (partnerId) {
@@ -544,16 +511,22 @@ const EditEstimate = () => {
     setFieldValue('internalNote', initialValues.internalNote)
     setFieldValue('taxPart', initialValues.taxPart)
     setFieldValue('tax', initialValues.tax)
+    setFieldValue('firstName', initialValues.firstName);
+    setFieldValue('lastName', initialValues.lastName);
+    setFieldValue('phone', initialValues.phone);
+    setFieldValue('email', initialValues.email);
+    setFieldValue('address', initialValues.address || " .");
+    setFieldValue('addressType', initialValues.addressType);
   },[initialValues]);
 
-  useEffect(() => {
-    if(vehicleReducer.getVehicleVINStatus === 'completed') {
-      setFieldValue('make', vehicleReducer.vehicleVINDetails[2].value)
-      setFieldValue('plateNumber', vehicleReducer.vehicleVINDetails[10].value)
-      setFieldValue('model', vehicleReducer.vehicleVINDetails[1].value)
-      setFieldValue('modelYear', vehicleReducer.vehicleVINDetails[4].value)
-    }
-  },[vehicleReducer.getVehicleVINStatus, setFieldValue])
+  // useEffect(() => {
+  //   if(vehicleReducer.getVehicleVINStatus === 'completed') {
+  //     setFieldValue('make', vehicleReducer.vehicleVINDetails[2].value)
+  //     setFieldValue('plateNumber', vehicleReducer.vehicleVINDetails[10].value)
+  //     setFieldValue('model', vehicleReducer.vehicleVINDetails[1].value)
+  //     setFieldValue('modelYear', vehicleReducer.vehicleVINDetails[4].value)
+  //   }
+  // },[vehicleReducer.getVehicleVINStatus, setFieldValue])
 
   useEffect(() => {
     setSubTotal(_partTotal + _labourTotal);
@@ -682,41 +655,35 @@ const EditEstimate = () => {
   }, [discount, discountType]);
 
   useEffect(() => {
-    setDiscount(initialValues?.estimate?.discount || 0);
-    setDiscountType(initialValues?.estimate?.discountType || "exact");
+    setDiscount(initialValues?.invoice?.discount || 0);
+    setDiscountType(initialValues?.invoice?.discountType || "exact");
   }, [initialValues]);
-  
+
   useEffect(() => {
-    if(estimateReducer.updateEstimateStatus === 'completed' ||
-        estimateReducer.sendDraftEstimateStatus === 'completed') {
-      navigate('/estimates')
+    const _depositAmount = parseInt(values.depositAmount);
+    const _dueBalance = grandTotal - _depositAmount;
+
+    setDueBalance(_dueBalance);
+
+    if (_depositAmount > grandTotal) {
+      setRefundable(_depositAmount - grandTotal);
+      setDueBalance(0);
+    } else {
+      setRefundable(0);
+    }
+  }, [grandTotal]);
+
+  useEffect(() => {
+    if(invoiceReducer.sendInvoiceStatus === 'completed' || invoiceReducer.saveInvoiceStatus === 'completed') {
+      navigate('/invoices')
+      dispatch(getInvoicesAction())
     }
 
     return () => {
-      dispatch(clearSendDraftEstimateStatus());
-      dispatch(clearUpdateEstimateStatus())
+      dispatch(clearSendInvoiceStatus())
+      dispatch(clearSaveInvoiceStatus())
     }
-  },[estimateReducer.updateEstimateStatus, estimateReducer.sendDraftEstimateStatus]);
-
-  const sendStatus = useMemo(() => {
-    return (
-      estimateReducer.sendDraftEstimateStatus === "loading" ||
-      estimateReducer.createEstimateStatus === "loading"
-    );
-  }, [
-    estimateReducer.createEstimateStatus,
-    estimateReducer.sendDraftEstimateStatus,
-  ]);
-
-  const saveStatus = useMemo(() => {
-    return (
-      estimateReducer.updateEstimateStatus === "loading" ||
-      estimateReducer.saveEstimateStatus === "loading"
-    );
-  }, [
-    estimateReducer.saveEstimateStatus,
-    estimateReducer.updateEstimateStatus,
-  ]);
+  },[invoiceReducer.sendInvoiceStatus, invoiceReducer.saveInvoiceStatus]);
 
   return (
     <>
@@ -728,7 +695,7 @@ const EditEstimate = () => {
           <div className="rounded-2xl mt-10  bg-white py-8 px-3">
             <div className="mt-10">
               <div className="md:w-[70%] w-[100%] flex gap-2 justify-center items-center">
-                <Autocomplete
+                {/* <Autocomplete
                   filterOptions={filterOptions}
                   inputValue={inputValue}
                   value={value}
@@ -871,7 +838,7 @@ const EditEstimate = () => {
                       </span>
                     </Box>
                   )}
-                </Box>
+                </Box> */}
               </div>
 
               <div className=" w-[100%] border-[1px] rounded-3xl  flex mt-8  px-3 md:px-5 flex-col py-5  border-[#CACACA]">
@@ -952,7 +919,17 @@ const EditEstimate = () => {
                 <div className="flex flex-col md:flex-row gap-5 mt-5">
                   <div className="w-full">
                     <InputHeader text={fields.vin.label} />
-                    <Autocomplete
+                    <AppInput
+                      hasPLaceHolder={true}
+                      placeholderTop={fields.vin.label}
+                      placeholder={fields.vin.label}
+                      name={fields.vin.name}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      value={values.vin}
+                      disabled={true}
+                    />
+                    {/* <Autocomplete
                       options={vinOptions || []}
                       // @ts-ignore
                       onChange={(_, newValue) => {
@@ -961,7 +938,7 @@ const EditEstimate = () => {
                       }}
                       value={values.vin}
                       fullWidth
-                      disabled
+                      // disabled
                       sx={{
                         "& .MuiOutlinedInput-notchedOutline": {
                           borderColor: "transparent", // Remove border color
@@ -1012,7 +989,7 @@ const EditEstimate = () => {
                             },
                           }}
                         />}
-                    />
+                    /> */}
                   </div>
 
                   <div className="w-full">
@@ -1568,11 +1545,11 @@ const EditEstimate = () => {
                       </div>
                       <div className="flex justify-between my-5">
                         <InputHeader text="Due Balance" />
-                        <InputHeader text={Util.formAmount(grandTotal - +values.paidAmount)} />
+                        <InputHeader text={Util.formAmount(dueBalance)} />
                       </div>
                       <div className="flex justify-between my-5">
                         <InputHeader text="Refundable" />
-                        <InputHeader text="₦0.00" />
+                        <InputHeader text={Util.formAmount(+refundable)} />
                       </div>
 
                       <hr />
@@ -1581,21 +1558,6 @@ const EditEstimate = () => {
                         <InputHeader text={Util.formAmount(+grandTotal)} className="font-bold" />
                       </div>
 
-                      {/* <div className="flex items-center gap-3 mt-10">
-                        <div onClick={() => setCheck(!check)}>
-                          {check ? (
-                            <div className="w-[20px] h-[18px] flex items-center justify-center border-[#FAA21B] border-[1px] rounded-[5px]">
-                              <div className="w-[15px] h-[15px] rounded-[6px] bg-[#FAA21B] border-[1px]"></div>
-                            </div>
-                          ) : (
-                            <div className="w-[20px] h-[18px] border-[#000] border-[1px] rounded-[5px]"></div>
-                          )}
-                        </div>
-                        <span className="font-montserrat font-medium text-xs">
-                          customername@gmail.com
-                        </span>
-                      </div> */}
-
                     </div>
                   </div>
                 </div>
@@ -1603,38 +1565,21 @@ const EditEstimate = () => {
 
               <div className="flex justify-end flex-col md:flex-row mt-10 gap-5">
                 <AppBtn
-                  title={ initialValues.status === ESTIMATE_STATUS.sent
-                    ? "SAVE & SEND"
-                    : "SEND"
-                  }
-                  className={`font-semibold 
-                    ${ initialValues.status === ESTIMATE_STATUS.invoiced 
-                        ? `disabled:pointer-events-none disabled:bg-[#E5E5E5] 
-                              disabled:cursor-not-allowed text-[#717073]`
-                        : 'text-[#000] bg-[#FAA21B]'}`
-                  }
-                  onClick={() => setSave(false)}
-                  spinner={sendStatus}
-                  disabled={initialValues.status === ESTIMATE_STATUS.invoiced}
-                />
-                <AppBtn 
-                  title="SAVE" 
-                  className={`font-semibold 
-                    ${initialValues.status === ESTIMATE_STATUS.sent || 
-                      initialValues.status === ESTIMATE_STATUS.invoiced 
-                        ? `disabled:pointer-events-none disabled:bg-[#E5E5E5] 
-                            disabled:cursor-not-allowed text-[#717073]` 
-                        : 'text-[#000] bg-[#FAA21B]'}`
-                  }
+                  title={ "SAVE" }
+                  className={`font-semibold btn bg-secondary`}
                   onClick={() => {
                     setSave(true)
+                  }}
+                  spinner={invoiceReducer.saveInvoiceStatus === "loading"}
+                />
+                <AppBtn 
+                  title="SEND" 
+                  className={`font-semibold bg-primary`}
+                  onClick={() => {
+                    setSave(false)
                     // setRemoveSessionStorage(true);
                   }}
-                  spinner={saveStatus}
-                  disabled={
-                    initialValues.status === ESTIMATE_STATUS.sent ||
-                    initialValues.status === ESTIMATE_STATUS.invoiced
-                  }
+                  spinner={invoiceReducer.sendInvoiceStatus === "loading"}
                 />
               </div>
             </div>
@@ -1650,4 +1595,4 @@ const EditEstimate = () => {
   );
 };
 
-export default EditEstimate;
+export default EditInvoice;

@@ -20,6 +20,7 @@ interface IAppInputProps {
   disabled?: boolean
   name?: any
   onBlur?: any
+  min?: string
 }
 
 const AppInput = ({
@@ -33,7 +34,7 @@ const AppInput = ({
   className,
   type = "text",
   disabled = false,
-  name, onBlur
+  name, onBlur, min
 }: IAppInputProps) => {
   const [pwdfield, setPwdfield] = React.useState(false);
 
@@ -50,6 +51,7 @@ const AppInput = ({
       <div className="prepend w-full">
         <img src={leftImg} alt="" className="pr-10  inline-block" />
         <input
+          min={min}
           onBlur={onBlur}
           name={name}
           disabled={disabled}

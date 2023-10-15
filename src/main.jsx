@@ -14,7 +14,7 @@ import Customers from "./pages/auth/Customers.jsx";
 import Inventory from "./pages/auth/Inventory.jsx";
 import Service from "./pages/auth/Service.jsx";
 import Estimates from "./pages/auth/Estimates.jsx";
-import Invoice from "./pages/auth/Invoice.jsx";
+import Invoices from "./pages/auth/Invoices.tsx";
 import Payment from "./pages/auth/Payment.jsx";
 import Expenses from "./pages/auth/Expenses.jsx";
 import NewTransaction from "./pages/auth/NewTransaction.tsx";
@@ -24,11 +24,11 @@ import LoginPage from "./pages/unauth/LoginPage.jsx";
 import Settings from "./pages/auth/Settings.jsx";
 import Profile from "./pages/auth/Profile.jsx";
 import AutoHyveProfile from "./pages/auth/AutoHyveProfile.jsx";
-import GenerateEstimate from "./pages/auth/GenerateEstimate.jsx";
+import GenerateEstimate from "./pages/auth/GenerateEstimate.tsx";
 import GenerateEstimateEstimate from "./pages/auth/GenerateEstimateEstimate.jsx";
 import EditEstimate from "./pages/auth/EditEstimate.tsx";
 import GenerateInvoice from "./pages/auth/GenerateInvoice.jsx";
-import EditInvoice from "./pages/auth/EditInvoice.jsx";
+import EditInvoice from "./pages/auth/EditInvoice.tsx";
 import Reminder from "./pages/auth/Reminder.jsx";
 import store from "./store";
 import { Provider } from "react-redux";
@@ -90,8 +90,8 @@ const router = createBrowserRouter([
         element: <PrivateRoute><Estimates/></PrivateRoute>,
       },
       {
-        path: "/invoice",
-        element: <PrivateRoute><Invoice/></PrivateRoute>,
+        path: "/invoices",
+        element: <PrivateRoute><Invoices/></PrivateRoute>,
       },
       {
         path: "/generate-invoice",
@@ -138,8 +138,8 @@ const router = createBrowserRouter([
         element: <PrivateRoute><GenerateEstimate/></PrivateRoute>,
       },
       {
-        path: "/generate-estimate-estimate",
-        element: <PrivateRoute><GenerateEstimateEstimate/></PrivateRoute>,
+        path: "/generate-estimate",
+        element: <PrivateRoute><GenerateEstimate/></PrivateRoute>,
       },
       {
         path: "/edit-estimate",

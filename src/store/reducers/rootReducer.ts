@@ -10,6 +10,8 @@ import serviceReminderReducer from "./serviceReminderReducer";
 import itemStockReducer from "./itemStockReducer";
 import invoiceReducer from "./invoiceReducer";
 import estimateReducer from "./estimateReducer";
+import transactionReducer from "./transactionReducer";
+import expenseReducer from "./expenseReducer";
 
 const rootReducer = combineReducers({
     authenticationReducer,
@@ -22,7 +24,9 @@ const rootReducer = combineReducers({
     serviceReminderReducer,
     itemStockReducer,
     invoiceReducer,
-    estimateReducer
+    estimateReducer,
+    transactionReducer,
+    expenseReducer
 });
 
 export default rootReducer;

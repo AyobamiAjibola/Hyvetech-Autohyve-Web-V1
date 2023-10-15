@@ -6,7 +6,7 @@ import AutoHyveVehicles from "../../components/AutoHyveVehicles/AutoHyveVehicles
 import ServiceReminder from "../../components/ServiceReminder/ServiceReminder";
 import GenerateEstimateModal from "../../components/AutoHyveModals/GenerateEstimateModal";
 import GenerateEstimate from "./GenerateEstimate";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getReminderAction } from "../../store/actions/serviceReminderActions";
 import useAppDispatch from "../../hooks/useAppDispatch";
 
@@ -21,7 +21,9 @@ const AutoHyveProfile = () => {
     if(view === 2) {
       dispatch(getReminderAction())
     }
-  },[view])
+  },[view]);
+
+  const params = useParams();
 
   return (
     <DashboardWrapper>
@@ -48,7 +50,9 @@ const AutoHyveProfile = () => {
             <TabBtn
               title="Generate Estimate"
               className="btn-secondary md:w-[200px] w-full md:mt-0 mt-3"
-              onClick={() => navigate("/generate-customer-estimate")}
+              onClick={() => {
+                sessionStorage.setItem("customerId", params.id ), 
+                navigate("/generate-estimate")}}
             />
           )}
         </div>

@@ -49,7 +49,7 @@ const DashboardHeader = ({ show, openNav, setOpenNav, open, setOpen }) => {
           {location.pathname == "/profile" && "Profile"}
           {location.pathname == "/settings" && "Settings"}
           {location.pathname == "/estimates" && "Estimates"}
-          {location.pathname == "/invoice" && "Invoices"}
+          {location.pathname == "/invoices" && "Invoices"}
           {location.pathname == "/payment" && "Payments"}
           {location.pathname == "/vin-decoder" && "VIN Decoder"}
           {location.pathname == "/insurance" && "Insurance"}
@@ -73,7 +73,7 @@ const DashboardHeader = ({ show, openNav, setOpenNav, open, setOpen }) => {
               Edit Invoice
             </span>
           )}
-          {location.pathname == "/generate-estimate-estimate" && (
+          {location.pathname == "/generate-estimate" && (
             <span
               onClick={() => navigate(-1)}
               className="flex items-center cursor-pointer gap-3"
@@ -86,7 +86,7 @@ const DashboardHeader = ({ show, openNav, setOpenNav, open, setOpen }) => {
               onClick={() => navigate(-1)}
               className="flex items-center cursor-pointer gap-3"
             >
-              <IoIosArrowBack size={30} /> EST-23019
+              <IoIosArrowBack size={30} /> {sessionStorage.getItem('estimateCode')}
             </span>
           )}
           {location.pathname == "/generate-customer-estimate" && (

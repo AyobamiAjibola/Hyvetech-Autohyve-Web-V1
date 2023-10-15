@@ -12,8 +12,10 @@ interface IProps {
   onBlur?: any;
   value: any;
   type: string;
-  setUnit?: any
-  unit?: any
+  setUnit?: any;
+  unit?: any;
+  disabled?: boolean;
+  unitDisable?: boolean;
 }
 
 const DropDownHalf = ({
@@ -22,7 +24,9 @@ const DropDownHalf = ({
   placeholder,
   placeholderInput, name, onChange,
   onBlur, value, type,
-  setUnit, unit
+  setUnit, unit,
+  disabled = false,
+  unitDisable = false
 }: IProps) => {
   const [selectedOption, setSelectedOption] = useState("");
   const [open, setOpen] = useState(false);
@@ -49,7 +53,7 @@ const DropDownHalf = ({
     if(unit) {
       setSelectedOption(unit)
     }
-  },[unit])
+  },[unit]);
 
   return (
     <div ref={dateRef}>
@@ -65,6 +69,7 @@ const DropDownHalf = ({
           value={value}
           onChange={onChange}
           onBlur={onBlur}
+          disabled={disabled}
         />
         <div className="flex  items-center w-full  relative">
           <div className="flex items-center w-[100%] justify-between">
@@ -86,7 +91,7 @@ const DropDownHalf = ({
             </div>
           </div>
 
-          {open && (
+          {(open && !unitDisable )&& (
             <div
               style={{ height: 23 * data.length, maxHeight: 80 }}
               className="cursor-pointer flex flex-col z-50 overflow-auto bg-[#A5A5A5] pl-3 drop-down-special rounded-md  absolute top-11 w-[100%] "

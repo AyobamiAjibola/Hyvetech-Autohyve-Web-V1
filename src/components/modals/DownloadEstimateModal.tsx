@@ -1,20 +1,27 @@
 import React from "react";
 import CloseIcon from "../../assets/svgs/close-circle.svg";
 import AppBtn from "../AppBtn/AppBtn";
-import useAppSelector from "../../hooks/useAppSelector";
+import { MESSAGES } from "../../config/constants";
 
-const DeleteReminderModal = ({
-  deletemodal,
+interface IProps {
+  downloadEstimateModal: boolean;
+  closeDeleteModal?: any,
+  title: string,
+  setDownloadEstimateModal?: any;
+  generateInvoice: any;
+  setSelectedValue: any;
+}
+
+const DownloadEstimateModal = ({
+  downloadEstimateModal,
   closeDeleteModal,
-  title, handleDelete, 
-  description, btnLabel
-}: any) => {
-
-  const reminderReducer = useAppSelector(state => state.serviceReminderReducer)
+  title, generateInvoice,
+  setSelectedValue
+}: IProps ) => {
 
   return (
     <>
-      {deletemodal && (
+      {downloadEstimateModal && (
         <div
           className="overlay h-screen w-screen flex fixed justify-center items-center"
           style={{ zIndex: 4000 }}
@@ -22,7 +29,7 @@ const DeleteReminderModal = ({
           <div className=" rounded-md bg-white py-8 px-3">
             <div className="modal-header pt-0 bg-white px-8">
               <div className="flex justify-end w-full">
-                <button onClick={(event) => closeDeleteModal(event)}>
+                <button onClick={(event) => {closeDeleteModal(event)}}>
                   <img src={CloseIcon} alt="" />
                 </button>
               </div>
@@ -32,7 +39,7 @@ const DeleteReminderModal = ({
                   {title}
                 </h5>
                 <h5 className="text-center text-[10px] md:text-sm gray-color font-montserrat">
-                  {description}
+                  {MESSAGES.invoiceCount}
                 </h5>
                 {/* </div> */}
               </div>
@@ -40,19 +47,22 @@ const DeleteReminderModal = ({
             <div className="body">
               {/* view */}
 
-              <div className=" flex gap-4 mt-4 justify-center items-center px-4 md:px-10">
+              <div className=" flex gap-4 mt-6 justify-center items-center px-4 md:px-10">
                 <AppBtn 
-                  title={"CANCEL"}
+                  title={"NO"}
                   type="button"
-                  onClick={(event:any) => closeDeleteModal(event)}
+                  onClick={(event:any) => {
+                    setSelectedValue("")
+                    closeDeleteModal(event)
+                  }}
                   className={`btn btn-secondary uppercase md:w-[100px] w-[100%]`}
                 />
                 <AppBtn 
-                  title={btnLabel}
+                  title={"YES"}
                   type="button"
-                  onClick={handleDelete}
+                  onClick={generateInvoice}
                   className={`font-semibold md:w-[100px] w-[100%]`}
-                  spinner={reminderReducer.deleteReminderStatus === 'loading'}
+                  // spinner={estimateReducer.deleteEstimateStatus === 'loading'}
                 />
               </div>
             </div>
@@ -63,4 +73,4 @@ const DeleteReminderModal = ({
   );
 };
 
-export default DeleteReminderModal;
+export default DownloadEstimateModal;

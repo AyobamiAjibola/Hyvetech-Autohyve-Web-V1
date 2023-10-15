@@ -21,6 +21,20 @@ import TableCountTitile from "../../components/TableCountTitile/TableCountTitile
 import TableActionButton from "../../components/TableActionButton/TableActionButton";
 import AppSwitch from "../../components/AppSwitch/AppSwitch";
 import PaymentDetails from "../../components/AutoHyveModals/PaymentDetails";
+import useAppDispatch from "../../hooks/useAppDispatch";
+import useAppSelector from "../../hooks/useAppSelector";
+import useAdmin from "../../hooks/useAdmin";
+import settings from "../../config/settings";
+import axiosClient from '../../config/axiosClient';
+import { getpaymentRecievedAction } from "../../store/actions/transactionActions";
+import Pagination from "../../components/Pagination/Pagination";
+import moment from "moment";
+import { 
+  hashString, 
+} from 'react-hash-string'
+import { Util } from "../../helpers/Util";
+import { IconButton } from "@mui/material";
+import DeletePaymentModal from "../../components/modals/DeletePaymentModal";
 
 const Payment = () => {
   const [openCreatCustomer, setOpenCreatCustomer] = useState(false);
@@ -34,7 +48,174 @@ const Payment = () => {
   const [openEstimateDetails, setOpenEstimateDetails] = useState(false);
   const navigate = useNavigate();
   const refOne = useRef(null);
+  const transactionReducer = useAppSelector(state => state.transactionReducer);
+  const dispatch = useAppDispatch();
+  const [records, setRecords] = useState([])
+  const { isTechAdmin, user } = useAdmin();
+  const [receiptData, setReceiptData] = useState(null)
+  const [activeRecord, setactiveRecord] = useState(null)
+  const [receiptId, setReceiptId] = useState()
+  const [_downloading, _setDownloading] = useState(false)
+  const [downloading, setDownloading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [transaction, setTransaction] = useState(null);
+
+  const partnerName = (user?.partner?.name || " ")
+
   const tableData = Array(3).fill("");
+
+  useEffect(()=>{
+    // reverse
+    const temp = [];
+    const __old = transactionReducer?.paymentRecieve || [];
+
+    for (let index = (__old.length - 1); index >= 0; index--) {
+      const element = __old[index];
+      temp.push(element);
+    }
+
+    setRecords(temp);
+
+  }, [transactionReducer?.paymentRecieve]);
+
+  useEffect(()=>{
+    if( transactionReducer.deletePaymentRecievedStatus == "completed" ){
+      // @ts-ignore
+      dispatch(getpaymentRecievedAction());
+    }
+
+  }, [transactionReducer.deletePaymentRecievedStatus])
+
+  useEffect(()=>{
+    // @ts-ignore
+    dispatch(getpaymentRecievedAction());
+  }, [dispatch]);
+
+  const _generateDownload = async () => {
+    const rName = `${partnerName[0]}RC-${hashString(`${partnerName[0]}C${receiptData?.id}`)}` + '.pdf';
+
+    // @ts-ignore
+    const payload = {
+      type: 'RECEIPT',
+      id: receiptId || -1,
+      rName,
+    };
+    _setDownloading(true);
+
+    try {
+      const response = await axiosClient.post(`${settings.api.rest}/request-pdf`, payload);
+      console.log(response.data);
+    } catch (e) {
+      console.log(e);
+    }
+
+    setTimeout(() => {
+      _setDownloading(false);
+      window.open(`${settings.api.baseURL}/uploads/pdf/${rName}`);
+      setShowReceipt(false);
+    }, 3000);
+  };
+
+    //share pdf logic --- start
+  const generateDownload = async () => {
+    const rName = `${partnerName[0]}RC-${hashString(`${partnerName[0]}C${receiptData?.id}`)}` + '.pdf';
+    // @ts-ignore
+    const payload = {
+      type: 'RECEIPT',
+      id: receiptId || -1,
+      rName,
+    };
+    setDownloading(true);
+
+    try {
+      const response = await axiosClient.post(`${settings.api.rest}/request-pdf`, payload);
+      console.log(response.data);
+    } catch (e) {
+      console.log(e);
+    }
+
+    // setTimeout(() => {
+      setDownloading(false);
+      setShowReceipt(false);
+      dispatch(getpaymentRecievedAction());
+    // }, 1000);
+  };
+  const handleShareLink = async () => {
+
+    generateDownload()
+
+    const fileName = `${partnerName[0]}RC-${hashString(`${partnerName[0]}C${receiptData?.id}`)}`
+    const fileUrl  = `${settings.api.baseURL}/uploads/pdf/${fileName}.pdf`;
+    const message = `${receiptData?.invoice?.estimate?.partner.name} has sent you a receipt.\nAmount Paid: NGN${formatNumberToIntl(receiptData?.amount)}\n\n` + fileUrl
+
+    try {
+
+      const shareData = {
+        title: 'Receipt',
+        text: `${message}`
+        // url: fileUrl
+      };
+
+      await navigator.share(shareData);
+
+      console.log('File shared successfully');
+    } catch (error) {
+      console.error('Error sharing file:', error);
+    }
+  };
+
+  const handleShareLinkNoMessage = async () => {
+
+    generateDownload()
+
+    const fileName = `${partnerName[0]}RC-${hashString(`${partnerName[0]}C${receiptData?.id}`)}`
+    const fileUrl  = `${settings.api.baseURL}/uploads/pdf/${fileName}.pdf`;
+
+    try {
+      const shareData = {
+        title: 'Receipt',
+        // text: `${message}`
+        url: fileUrl
+      };
+
+      await navigator.share(shareData);
+
+      console.log('File shared successfully');
+    } catch (error) {
+      console.error('Error sharing file:', error);
+    }
+  };
+
+  const handleSharePdf = async () => {
+    generateDownload()
+
+    const fileName = `${partnerName[0]}RC-${hashString(`${partnerName[0]}C${receiptData?.id}`)}`
+    const fileUrl  = `${settings.api.baseURL}/uploads/pdf/${fileName}.pdf`;
+    const message = `${receiptData?.invoice?.estimate?.partner.name} has sent you a receipt.`
+
+    try {
+      const response = await axiosClient.get(fileUrl, { responseType: 'blob' });
+      const blob = response.data;
+      const file = new File([blob], `${message} - ${fileName}_receipt.pdf`, { type: 'application/pdf' });
+
+      const shareData = {
+        title: 'Receipt',
+        text: `${message}`,
+        // url: fileUrl
+        files: [file]
+      };
+
+      await navigator.share(shareData);
+
+      console.log('File shared successfully');
+    } catch (error) {
+      console.error('Error sharing file:', error);
+    }
+  };
+  //share pdf logic --- end
+
+
   const hideOnClickOutside = (e) => {
     if (refOne.current && !refOne.current.contains(e.target)) {
       setOpenImport(false);
@@ -80,6 +261,34 @@ const Payment = () => {
     setOpenPaymentDetails(!openPaymentDetails);
   };
 
+    // Function to handle changes in the search input
+    const handleSearchChange = (e) => {
+      const inputValue = e.target.value;
+      const cleanedInput = inputValue.replace(/[^a-zA-Z0-9 ]/g, '');
+  
+      setSearchQuery(cleanedInput);
+      setCurrentPage(1); // Reset to the first page when the search query changes
+    };
+  
+    // Function to filter data based on the search query
+    const filteredData = records.filter((item) =>
+      item.customer.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.customer.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.invoice.code.includes(searchQuery) 
+    );
+  
+    const itemsPerPage = filteredData.length === records.length ? 10 : filteredData.length;
+  
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentData = filteredData.slice(startIndex, endIndex);
+  
+    const handlePageChange = (newPage) => {
+      setCurrentPage(newPage);
+    };
+
   return (
     <DashboardWrapper>
       <>
@@ -107,7 +316,10 @@ const Payment = () => {
         </div>
         <div className="flex justify-between md:flex-row flex-col items-start md:items-center mt-5 md:mt-16">
           <div className="w-[100%] md:w-[50%]">
-            <SearchInput />
+            <SearchInput 
+              handleSearchChange={handleSearchChange}
+              searchQuery={searchQuery}
+            />
           </div>
 
           <TableCountTitile />
@@ -140,12 +352,16 @@ const Payment = () => {
               <th className="font-montserrat  text-xs text-left">Action</th>
             </thead>
 
-            {tableData.map((item, index) => {
+            {currentData.map((item, index) => {
               return (
                 <tbody>
                   <tr
-                    onClick={openDetails}
+                    onClick={(e) => {
+                      openDetails(e)
+                      setTransaction(item)
+                    }}
                     className="table-hover cursor-pointer"
+                    key={index}
                   >
                     <td
                       className="font-montserrat text-xs table-hover cursor-pointer"
@@ -162,27 +378,33 @@ const Payment = () => {
                       ]}
                     </td>
 
-                    <td className="font-montserrat text-xs">24/05/2023</td>
-                    <td className="font-montserrat text-xs">EST-53019</td>
+                    <td className="font-montserrat text-xs">{moment(item.updatedAt).format('DD/MM/YYYY')}</td>
+                    <td className="font-montserrat text-xs">{`${partnerName[0]}RC-${hashString(`${partnerName[0]}C${item.id}`)}`}</td>
                     <td className="font-montserrat flex items-center gap-2 text-xs">
                       <img
-                        src={profilePicx}
-                        alt=""
+                        src={ item.customer.profileImageUrl ? `${API_ROOT}/${item.customer.profileImageUrl}` : profilePicx }
+                        alt="customer photo"
+                        crossOrigin="anonymous"
                         className="w-[20px] h-[20px]"
                       />
-                      <span>Mr Olusola Segun</span>
+                      <span>{`${item.customer?.firstName || ""} ${item.customer?.lastName || ""}`}</span>
                     </td>
-                    <td className="font-montserrat text-xs">INV-53003</td>
-                    <td className="font-montserrat text-xs">Transfer</td>
-                    <td className="font-montserrat text-xs">140,184.00</td>
+                    <td className="font-montserrat text-xs">{item.invoice.code.split('_')[0]}</td>
+                    <td className="font-montserrat text-xs">{item.type}</td>
+                    <td className="font-montserrat text-xs">{Util.formAmount(item.amount)}</td>
 
                     <td className="flex gap-3 items-center justify-center ">
-                      <img
-                        src={TrashIcon}
-                        alt=""
-                        className="w-[15px] cursor-pointer"
-                        onClick={closeDeleteModal}
-                      />
+                      <IconButton
+                        onClick={(e) => {closeDeleteModal(e), 
+                          setTransaction(item)
+                        }}
+                      >
+                        <img
+                          src={TrashIcon}
+                          alt=""
+                          className="w-[15px] cursor-pointer"
+                        />
+                      </IconButton>
                     </td>
                   </tr>
                 </tbody>
@@ -192,33 +414,21 @@ const Payment = () => {
         </div>
 
         <div className="md:block gap-3 flex flex-col">
-          <div className="flex justify-between mb-10  w-full mt-4">
-            <AppTabBtn
-              icon={<BsDownload />}
-              title="Export Items"
-              className="w-full md:flex hidden text-[#000] btn-secondary"
-              // onClick={() => navigate("/generate-invoice")}
-            />
-            <div className="flex items-center gap-3">
-              <div className="border-[1px] rounded-[5px] p-3 border-[#D9D9D9] cursor-pointer">
-                <HiChevronLeft color="#D9D9D9" />
-              </div>
-              <div className="border-[1px] rounded-[5px] px-5 py-2 border-[#D9D9D9]">
-                1
-              </div>
-              <div className="border-[1px] rounded-[5px] p-3 border-[#D9D9D9] cursor-pointer">
-                <HiChevronRight color="#D9D9D9" />
-              </div>
-            </div>
-          </div>
+          {filteredData.length !== 0 && (<Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />)}
         </div>
 
-        <DeleteModal
+        <DeletePaymentModal
           deletemodal={deletemodal}
           setDeletemodal={setDeletemodal}
           title={"Delete Payment"}
           description="Are you sure you want to carry out this action? If you proceed, you will not be able to undo this action."
           closeDeleteModal={closeDeleteModal}
+          setItem={setTransaction}
+          item={transaction}
         />
         <AddPaymentModal
           openAddPayment={openAddPayment}
@@ -228,6 +438,14 @@ const Payment = () => {
         <PaymentDetails
           openPaymentDetails={openPaymentDetails}
           setOpenPaymentDetails={setOpenPaymentDetails}
+          setItem={setTransaction}
+          item={transaction}
+          _downloading={_downloading}
+          _generateDownload={_generateDownload}
+          handleShareLink={handleShareLink}
+          handleShareLinkNoMessage={handleShareLinkNoMessage}
+          handleSharePdf={handleSharePdf}
+          downloading={downloading}
         />
       </>
     </DashboardWrapper>
