@@ -66,7 +66,7 @@ const AddPaymentModal = ({
   };
 
   const handleClose = () => {
-    setFromInvoice(false)
+    // setFromInvoice(false)
     setOpenAddPayment(false)
   };
     
@@ -183,7 +183,7 @@ const AddPaymentModal = ({
             <ModalHeaderTitle title=" Generate Payment" />
 
             <button onClick={() => {
-              setFromInvoice(false)
+              // setFromInvoice(false)
               setOpenAddPayment(false)
               }}
             >
@@ -248,7 +248,7 @@ const AddPaymentModal = ({
                             className="bg-[#F5F5F5] border-[#F5F5F5] h-14"
                           />
 
-                          <InputHeader text={"Name"} />
+                          {/* <InputHeader text={"Name"} />
                           <Autocomplete
                             filterOptions={filterOptionsParts}
                             options={partsOnly}
@@ -331,7 +331,7 @@ const AddPaymentModal = ({
                                 }}
                               />
                             )}
-                          />
+                          /> */}
 
                           <InputHeader
                             text=" Add New Item"
