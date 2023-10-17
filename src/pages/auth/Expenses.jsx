@@ -53,7 +53,7 @@ const Expenses = () => {
   const { isTechAdmin } = useAdmin();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
-  const [item, setItem] = useState(null);
+  const [itemId, setItemId] = useState(-1);
 
   useEffect(() => {
     document.addEventListener("click", hideOnClickOutside, true);
@@ -191,8 +191,6 @@ const Expenses = () => {
     setCurrentPage(newPage);
   };
 
-  console.log(filteredData, 'filtered')
-
   return (
     <DashboardWrapper>
       <>
@@ -258,7 +256,7 @@ const Expenses = () => {
               return (
                 <tbody 
                   onClick={(e) => {
-                    detailModal(e), setItem(item)}}>
+                    detailModal(e), setItemId(item.id)}}>
                   <tr className="cursor-pointer table-hover"
                     key={index}
                   >
@@ -358,8 +356,8 @@ const Expenses = () => {
         <ExpensesDetailsModal
           expenseDetailmodal={expenseDetailmodal}
           setExpenseDetailmodal={setExpenseDetailmodal}
-          item={item}
-          setItem={setItem}
+          itemId={itemId}
+          setItemId={setItemId}
         />
 
         <DeleteExpenseModal

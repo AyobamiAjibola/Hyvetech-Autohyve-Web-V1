@@ -223,6 +223,7 @@ export default function ChangePasswordModal({ setOpenModal, openModal, email }) 
         setOpenOtp={setOpenOtp}
         headerTitle="Reset AutoHyve Password"
         subHeader="We sent an OTP to your WhatsApp and as a text message"
+        email={email}
       />
     </>
   );

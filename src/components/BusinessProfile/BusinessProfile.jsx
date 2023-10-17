@@ -24,6 +24,7 @@ import UploadPictureModal from "../modals/UploadPictureModal";
 import UploadCompanyLogoModal from "../modals/UploadCompanyLogoModal";
 import { getUserAction, getUsersAction } from "../../store/actions/userActions";
 import partnerModel from "../Forms/models/partnerModel";
+import Brands from "./Brands";
 
 const API_ROOT = settings.api.baseURL;
 
@@ -61,9 +62,7 @@ const BusinessProfile = ({user}) => {
     nameOfManager: "",
     cac: ""
   });
-  const [brands, setBrands] = useState({
-    brands: [{ model: '', from: '', to: '' }],
-});
+  const [userData, setUserData] = useState(null);
   const { fields, schema } = partnerModel;
   const dispatch = useAppDispatch()
   const partnerReducer = useAppSelector(state => state.partnerReducer);
@@ -208,7 +207,7 @@ const BusinessProfile = ({user}) => {
     if(partnerReducer.createPartnerSettingsStatus === 'completed') {
       dispatch(getUserAction(user.id))
       showMessage(
-        "Employment update",
+        "",
         "Profile updated",
         'success'
       )
@@ -228,21 +227,10 @@ const BusinessProfile = ({user}) => {
   },[partnerReducer.createPartnerSettingsStatus]);
 
   useEffect(() => {
-    if(user) {
-      const brands = user?.partner.brands;
-      setBrands({ brands: brands });
-    }
-  },[user])
-
-  const handleSubmitForm = (values) => {
-    dispatch(createPartnerSettingsAction({
-      partnerId: user?.partner.id,
-      data: {
-        ...user?.partner,
-        brands: values
-      }
-    }))
-  }
+      const userData = user?.partner;
+      setUserData(userData);
+  },[]);
+  const brands = user?.partner.brands.map(JSON.parse);
 
   return (
     <>
@@ -544,80 +532,10 @@ const BusinessProfile = ({user}) => {
         )}
       </Formik>
 
-      <Formik
-        enableReinitialize
-        initialValues={{
-          brands: [{model: '', from: '', to: ''}]//user?.partner.brands
-        }}
-        // initialValues={brands}
-        onSubmit={handleSubmitForm}
-      >
-        {({ setFieldValue, values, handleChange, handleBlur }) => ( 
-          <Form>
-            <div className="p-5 md:p-14  hyvepay-setting rounded-3xl mt-14">
-              <div className="flex items-center justify-between">
-                <h5 className="font-bold font-montserrat">Brands</h5>
-
-                <AppBtn title="SAVE" className="font-medium hidden md:flex" />
-              </div>
-
-              <FieldArray
-                name={"brands"}
-                render={arrayHelpers => {
-                  return (
-                    <React.Fragment>
-                      {values.brands.length > 0 &&
-                        values.brands.map((brand, index) => {
-                          return (
-                            <div className="flex flex-col md:flex-row   mb-4 gap-4 w-full mt-5" key={index}>
-                              {Object.keys(brand).map(value => {
-                                return (
-                                  <React.Fragment key={`${value}`}>
-                                    <div className="w-full">
-                                      <MyTextInput
-                                        hasPLaceHolder={true}
-                                        placeholderTop={value}
-                                        placeholder={value}
-                                        className="bg-[#F5F5F5] border-[#F5F5F5]"
-                                        name={`brands.${index}.${value}`}
-                                        onChange={handleChange}
-                                        value={brand[value]}
-                                      />
-                                    </div>
-                                  </React.Fragment>
-                                );
-                              })}
-                              <button className="bg-red-500 h-[50px] w-32  items-center justify-center mt-6 rounded-lg hidden md:flex"
-                                onClick={() => arrayHelpers.remove(index)} type="button"
-                              >
-                                <HiOutlineTrash size={20} color="#fff" className="text-center" />
-                              </button>
-                            </div>
-                          );
-                        })}
-                        <AppBtn
-                          title="Add New Brand"
-                          onClick={() =>
-                            arrayHelpers.push({
-                              model: '',
-                              from: '',
-                              to: ''
-                            })
-                          }
-                        />
-                    </React.Fragment>
-                  );
-                }}
-              />
-
-              <AppBtn
-                title="SAVE"
-                className="font-medium w-full block md:hidden mt-5"
-              />
-            </div>
-          </Form>
-        )}
-      </Formik>
+      <Brands
+        brands={brands}
+        partner={user?.partner}
+      />
 
       <UploadCompanyLogoModal
         openProfile={openProfile}

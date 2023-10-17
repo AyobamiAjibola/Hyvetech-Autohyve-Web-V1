@@ -51,13 +51,9 @@ export type PartArgs = IPart & {
 
 const EditEstimate = () => {
   const location = useLocation()
-  const data = ["Individual", "Co-operate"];
-  const [openStart, setOpenStart] = useState(false);
   const [openReminder, setOpenReminder] = useState<boolean>(false);
-  const [check, setCheck] = useState(false);
   const [estimate, setEstimate] = useState<any>();
   const [vinOptions, setvinOptions] = useState<any>([]);
-  const [timer, setTimer] = useState<NodeJS.Timer>();
   const [activeId, setactiveId] = useState<number>(0);
   const [userInfo, setUserInfo] = useState({
     accountType: "",

@@ -1,8 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import CloseIcon from "../../assets/svgs/close-circle.svg";
 import AppBtn from "../AppBtn/AppBtn";
 import AppInput, { MyTextInput } from "../AppInput/AppInput";
-import AppDropDown from "../AppDropDown/AppDropDown";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import CustomTextArea from "../CustomTextArea/CustomTextArea";
@@ -10,46 +9,54 @@ import InputHeader from "../InputHeader/InputHeader";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import ModalHeaderTitle from "../ModalHeaderTitle/ModalHeaderTitle";
-import CustomDate from "../CustomDate/CustomDate";
-import DeleteBox from "../DeleteBox/DeleteBox";
 import { Form, Formik } from "formik";
-import * as Yup from "yup";
 import useAppSelector from "../../hooks/useAppSelector";
 import useAppDispatch from "../../hooks/useAppDispatch";
 import { clearGetExpenseStatus } from "../../store/reducers/expenseReducer";
-import { getExpenseCategories, getExpenseTypesActions, getSingleExpenseAction } from "../../store/actions/expenseAction";
-import Select from "react-select";
+import { 
+  getExpenseCategories, 
+  getExpenseTypesActions, 
+  getSingleExpenseAction, 
+  updateExpenseDetailAction 
+} from "../../store/actions/expenseAction";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { customStyles } from "../../contsants/customStyles";
 import { getBeneficiariesAction } from "../../store/actions/autoHyveActions";
 import { getInvoicesAction } from "../../store/actions/invoiceActions";
 import { Autocomplete, CircularProgress, TextField } from "@mui/material";
+import { IExpense, IExpenseCategory, IExpenseType, IInvoice } from "@app-models";
+import { useNavigate } from "react-router-dom";
+import { showMessage } from "../../helpers/notification";
+import { formatDate } from "../../utils/generic";
+import { Add } from "@mui/icons-material";
+import AddReferenceModal from "../modals/AddReferenceModal";
+import { getPayStackBanksAction } from "../../store/actions/miscellaneousActions";
 
 const ExpensesDetailsModal = ({
   expenseDetailmodal,
   setExpenseDetailmodal,
-  setItem,
-  item
-}) => {
+  setItemId,
+  itemId
+}: any) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.up("sm"));
   const store = useAppSelector(state => state.expenseReducer);
   const invoiceStore = useAppSelector(state => state.invoiceReducer);
   const dispatch = useAppDispatch();
-  const [expense, setExpense] = useState();
-  const [edit, setEdit] = useState(false)
-  const [formData, setFormData] = useState({
-    note: "",
-    invoiceCode: "",
-    amount: "",
-    category: "",
-    reference: "",
-    type: "",
-    invoice: null,
-    setDate: ""
-  })
+  const [expense, setExpense] = useState<IExpense | null>();
+  const [edit, setEdit] = useState<boolean>(false)
+  const [date, setDate] = useState<any | null>(new Date())
+  const [dateModified, setDateModified] = useState(new Date(date));
+  const [reference, setReference] = useState<string | undefined>('');
+  const [note, setNote] = useState<string | undefined>('');
+  const [amount, setAmount] = useState<string | undefined>('');
+  const [invoiceCode, setInvoiceCode] = useState<string | undefined>('');
+  const [category, setCategory] = useState<IExpenseCategory | null>();
+  const [type, setType] = useState<IExpenseType | null>();
+  const [invoice, setInvoice] = useState<IInvoice | null>();
+  const navigate = useNavigate();
+  const [referenceForm, setReferenceForm] = useState<boolean>(false);
 
   const style = {
     position: "absolute",
@@ -68,8 +75,25 @@ const ExpensesDetailsModal = ({
     py: 5,
   };
 
+  useEffect(() => {
+    if (store.updateExpenseDetailStatus === 'completed') {
+      setType(null);
+      setInvoice(null);
+      setCategory(null);
+      setNote('');
+      setAmount('');
+      navigate('/expenses');
+      setEdit(false)
+      setItemId(-1)
+      setExpenseDetailmodal(false)
+    } else if (store.updateExpenseDetailStatus === 'failed') {
+      showMessage('Expenses', store.updateExpenseDetailError, 'error');
+    }
+  }, [store.updateExpenseDetailStatus]);
+
   const handleClose = () => {
-    setItem(null)
+    setItemId(-1)
+    setEdit(false)
     setExpenseDetailmodal(false)
   };
 
@@ -81,31 +105,58 @@ const ExpensesDetailsModal = ({
   }, [dispatch, store.getExpensesStatus]);
 
   useEffect(() => {
-    dispatch(getSingleExpenseAction(item?.id));
-  }, [item]);
+    dispatch(getSingleExpenseAction(itemId));
+  }, [itemId]);
 
   useEffect(() => {
-    setFormData({
-      note: store?.expense?.note,
-      invoiceCode: store?.expense?.invoiceCode,
-      amount: store?.expense?.amount.toString(),
-      category: store?.expense?.category,
-      reference: store?.expense?.reference,
-      type: store?.expense?.type,
-      invoice: store?.expense?.invoice,
-      date: store?.expense?.dateModified
-    })
-  },[store]);
+    setNote(expense?.note);
+    setInvoiceCode(expense?.invoiceCode);
+    setAmount(expense?.amount?.toString());
+    setCategory(expense?.category);
+    setReference(expense?.reference);
+    setType(expense?.type)
+    setInvoice(expense?.invoice)
+    setDate(expense?.dateModified)
+  },[expense, store])
 
   useEffect(() => {
     dispatch(getBeneficiariesAction());
     dispatch(getExpenseCategories());
     dispatch(getExpenseTypesActions());
     dispatch(getInvoicesAction());
-    // dispatch(getPayStackBanksAction());
+    dispatch(getPayStackBanksAction());
   }, [dispatch]);
 
-  const getOptionLabel = (option) => {
+  useEffect(() => {
+    setDateModified(new Date(date))
+  }, [date])
+  console.log(itemId, edit, 'id')
+  const handleDate = (newValue: any) => {
+    setDateModified(newValue)
+  }
+
+  const handleFormSubmit = () => {
+    if (!amount) return showMessage('Expense', 'Please provide amount', 'error');
+
+    if (isNaN(+amount)) return showMessage('Expense', 'Amount is invalid', 'error');
+
+    if (!category) return showMessage('Expense', 'Please select category', 'error');
+    if (type === null) return showMessage('Expense', 'Please select type', 'error');
+
+    dispatch(
+      updateExpenseDetailAction({
+        category,
+        id: itemId,
+        note,
+        type,
+        invoice,
+        dateModified,
+        amount: amount === undefined ? null : +amount
+      }),
+    );
+  };
+
+  const getOptionLabel = (option: any) => {
     if (typeof option === 'string') {
       return option;
     }
@@ -115,7 +166,7 @@ const ExpensesDetailsModal = ({
     return '';
   };
 
-  const getOptionLabelInv = (option) => {
+  const getOptionLabelInv = (option: any) => {
     if (typeof option === 'string') {
       return option;
     }
@@ -125,15 +176,14 @@ const ExpensesDetailsModal = ({
     return '';
   };
 
-  const isOptionEqualToValue = (option, value) => {
+  const isOptionEqualToValue = (option: any, value: any) => {
     return option === value || option.name === value
   }
 
-  const isOptionEqualToValueInv = (option, value) => {
+  const isOptionEqualToValueInv = (option: any, value: any) => {
     return option === value || option.code === value
   }
 
-  console.log(formData, 'data')
   return (
     <>
       <Modal
@@ -144,7 +194,7 @@ const ExpensesDetailsModal = ({
       >
         <Box sx={style}>
           <div className="flex justify-between w-full">
-            <ModalHeaderTitle title={`Summary ${item?.code}`}  />
+            <ModalHeaderTitle title={`Summary ${expense?.code}`}  />
 
             <button onClick={() => handleClose()}>
               <img src={CloseIcon} alt="" />
@@ -153,46 +203,44 @@ const ExpensesDetailsModal = ({
 
           <div className="flex flex-col mt-5">
             <h3 className="text-lg text-[#494949] font-semibold font-montserrat">
-              {item?.beneficiary.name}
+              {expense?.beneficiary?.name}
             </h3>
-            <span className="text-base font-montserrat">{item?.beneficiary.accountNumber}</span>
-            <span className="text-base font-montserrat">{item?.beneficiary.bankName}</span>
+            <span className="text-base font-montserrat">{expense?.beneficiary?.accountNumber}</span>
+            <span className="text-base font-montserrat">{expense?.beneficiary?.bankName}</span>
           </div>
 
           <Formik
-            enableReinitialize
-            initialValues={formData}
-            onSubmit={(values) => {
-              console.log(values)
+            initialValues={{}}
+            onSubmit={() => {
+              handleFormSubmit();
             }}
-            validationSchema={
-              Yup.object({
-                note: Yup.string().required().label("Note"),
-                invoiceCode: Yup.string().required().label("Invoice Code"),
-                amount: Yup.number().label("Amount"),
-                // category: Yup.string().required().label("Category"),
-                // type: Yup.string().label("Expense type"),
-                reference: Yup.string().label("Reference"),
-                date: Yup.date().label(Date)
-              })
-            }
           >
-            {({ setFieldValue, values, handleChange, handleBlur }) => (
+            {() => (
               <Form>
                 <>
                   <div className="mt-10 w-[100%] md:w-[47%]">
                     <InputHeader text="Date" />
-                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                    {!edit &&
+                      <AppInput
+                        value={formatDate(date)}
+                        hasPLaceHolder={true}
+                        placeholderTop="Date Created"
+                        placeholder="Date Created"
+                        className="bg-[#F5F5F5] border-[#F5F5F5] h-14"
+                        disabled={!edit}
+                      />
+                    }
+                   {edit && <LocalizationProvider dateAdapter={AdapterDateFns}>
                       <DatePicker
                         className={`bg-[#F5F5F5] border-[#F5F5F5] h-14 w-full 
                         placeholder-[#A5A5A5] placeholderText h-[55px] rounded-[20px] 
                         font-montserrat`}
                         disableFuture
-                        minDate={new Date('2023/01/01')}
-                        openTo="day"
+                        minDate={new Date('2000/01/01')}
+                        openTo="year"
                         views={['year', 'month', 'day']}
-                        value={new Date(values.date)}
-                        onChange={(date) => setFieldValue('date', date) }
+                        value={dateModified}
+                        onChange={ handleDate }
                         sx={{
                           width: "100%",
               
@@ -221,13 +269,26 @@ const ExpensesDetailsModal = ({
                             border: "none",
                           },
                         }}
+                        //@ts-ignore
+                        renderInput={(params: any) =>
+                          <TextField
+                            {...params}
+                            fullWidth
+                            label="Date Created"
+                            variant="outlined"
+                            className={`bg-[#F5F5F5] border-[#F5F5F5] h-14 w-full 
+                              placeholder-[#A5A5A5] placeholderText h-[55px] rounded-[20px] 
+                              font-montserrat`
+                            }
+                          />
+                        }
                       />
-                    </LocalizationProvider>
+                    </LocalizationProvider>}
                   </div>
                   <div className="flex md:flex-row flex-col items-start   md:items-center mt-5 gap-5">
                     <div className="md:flex-1 w-full">
                       <InputHeader text="Expense Category" />
-                      <Autocomplete
+                      {edit && <Autocomplete
                         getOptionLabel={getOptionLabel}
                         isOptionEqualToValue={isOptionEqualToValue}
                         fullWidth
@@ -262,7 +323,6 @@ const ExpensesDetailsModal = ({
                             }
                             {...props}
                             label=""
-                            name="category.name"
                             InputProps={{
                               ...props.InputProps,
                               endAdornment: (
@@ -276,11 +336,23 @@ const ExpensesDetailsModal = ({
                             }}
                           />
                         )}
-                        // defaultValue={values.category?.name}
-                        onChange={handleChange}
+                        defaultValue={edit ? category?.name : category}
+                        onChange={(_: any, newValue: any) => {
+                          setCategory(newValue);
+                        }}
                         options={store.expenseCategories}
-                        value={values.category?.name}
                       />
+                    }
+                    {!edit && 
+                      <AppInput
+                        value={expense?.category?.name}
+                        hasPLaceHolder={true}
+                        placeholderTop="Expense category"
+                        placeholder="Expense category"
+                        className="bg-[#F5F5F5] border-[#F5F5F5] h-14"
+                        disabled={!edit}
+                      />
+                    }
                     </div>
 
                     <div className="md:flex-1 w-full mt-5">
@@ -289,10 +361,10 @@ const ExpensesDetailsModal = ({
                         placeholderTop="Amount"
                         placeholder="Amount"
                         name="amount"
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        value={values.amount}
+                        onChange={(e: any) => setAmount(e.target.value)}
+                        value={amount}
                         type="number"
+                        disabled={!edit}
                       />
                     </div>
                   </div>
@@ -300,7 +372,17 @@ const ExpensesDetailsModal = ({
                   <div className="flex items-center flex-col md:flex-row mt-5 gap-5">
                     <div className="md:flex-1 w-full">
                       <InputHeader text="Expense Type/Name" />
-                      <Autocomplete
+                      {!edit && 
+                        <AppInput
+                          value={expense?.type?.name}
+                          hasPLaceHolder={true}
+                          placeholderTop="Expense Type/Name"
+                          placeholder="Expense Type/Name"
+                          className="bg-[#F5F5F5] border-[#F5F5F5] h-14"
+                          disabled={!edit}
+                          />
+                      }
+                      {edit && <Autocomplete
                         getOptionLabel={getOptionLabel}
                         isOptionEqualToValue={isOptionEqualToValue}
                         fullWidth
@@ -348,10 +430,13 @@ const ExpensesDetailsModal = ({
                             }}
                           />
                         )}
-                        // defaultValue={edit ? category?.name : category}
-                        onChange={handleChange}
+                        defaultValue={edit ? type?.name : type}
+                        onChange={(_: any, newValue: any) => {
+                          setType(newValue);
+                        }}
                         options={store.expenseTypes}
                       />
+                    }
                     </div>
 
                     <div className="md:flex-1 w-full mt-5">
@@ -360,19 +445,40 @@ const ExpensesDetailsModal = ({
                         placeholderTop="Payment reference"
                         placeholder="Payment reference"
                         name="reference"
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        value={values.reference}
+                        onChange={(e: any) => setReference(e.target.value)}
+                        value={reference}
+                        disabled={!edit}
+                        className="mb-[-20px]"
                       />
+                      {expense?.status === 'UNPAID' && <span
+                        className="text-[10px] mt-3 ml-3 font-bold font-montserrat text-[#FAA21B] cursor-pointer"
+                        onClick={() => setReferenceForm(true)}
+                      >
+                        <Add sx={{fontSize: '16px'}}/> Add reference
+                      </span>}
+                      {/* {expense?.status === 'PAID' && <span
+                        className="text-[10px] mt-3 ml-3 font-bold font-montserrat text-[#FAA21B] cursor-pointer"
+                        onClick={() => setReferenceForm(true)}
+                      >
+                        <Edit sx={{fontSize: '12px'}}/> Change reference
+                      </span>} */}
                     </div>
                   </div>
                   <div className="flex items-center flex-col md:flex-row mt-5 gap-5">
                     <div className="md:flex-1 w-full">
-                      <Autocomplete
+                      {!edit && <MyTextInput
+                        hasPLaceHolder={true}
+                        placeholderTop="Payment reference"
+                        placeholder="Payment reference"
+                        name="invoice"
+                        value={invoiceCode ? invoiceCode : ''}
+                        onChange={(e: any) => setInvoiceCode(e.target.value)}
+                        disabled={!edit}
+                      />}
+                      {edit && <Autocomplete
                         getOptionLabel={getOptionLabelInv}
                         isOptionEqualToValue={isOptionEqualToValueInv}
                         fullWidth
-                        disabled={values.category?.name === "Others" || values.category?.name === "Overhead"}
                         sx={{
                           "& .MuiOutlinedInput-notchedOutline": {
                             borderColor: "transparent", // Remove border color
@@ -396,6 +502,7 @@ const ExpensesDetailsModal = ({
                             borderColor: "transparent", // Remove border color on hover
                           },
                         }}
+                        disabled={category?.name === "Others" || category?.name === "Overhead"}
                         renderInput={props => (
                           <TextField
                             className={`bg-[#F5F5F5] border-[#F5F5F5] h-14 w-full 
@@ -404,7 +511,7 @@ const ExpensesDetailsModal = ({
                             }
                             {...props}
                             label="Invoice"
-                            disabled={values.category?.name === "Others" || values.category?.name === "Overhead"}
+                            disabled={category?.name === "Others" || category?.name === "Overhead"}
                             InputProps={{
                               ...props.InputProps,
                               endAdornment: (
@@ -418,28 +525,38 @@ const ExpensesDetailsModal = ({
                             }}
                           />
                         )}
-                        // defaultValue={edit ? invoice?.code.split('_')[0] : invoice}
-                        onChange={handleChange}
+                        defaultValue={edit ? invoice?.code.split('_')[0] : invoice}
+                        onChange={(_: any, newValue: any) => {
+                          setInvoice(newValue);
+                        }}
                         options={invoiceStore.invoices}
-                        value={values.invoiceCode}
                       />
+                      }
                     </div>
 
                     <div className="md:flex-1 w-full">
                       <CustomTextArea
                         topTitle="Notes/Remarks" 
                         placeholder="Note" 
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        value={values.note}
+                        value={note}
+                        onChange={(e: any) => setNote(e.target.value)}
                         name="note"
                       />
                     </div>
                   </div>
 
                   <div className="flex md:flex-row flex-col  mt-8 gap-5">
-                    <AppBtn title="EDIT" className="btn-secondary" />
-                    <AppBtn title="SAVE"/>
+                    {expense?.status === "UNPAID" && <AppBtn 
+                      title="EDIT" 
+                      className="btn-secondary" 
+                      type="button"
+                      disabled={edit}
+                      onClick={() => setEdit(true)}
+                    />}
+                    {edit && <AppBtn title="SAVE"
+                      spinner={store.updateExpenseDetailStatus === 'loading'}
+                      disabled={expense?.status === 'PAID'}
+                    />}
                   </div>
                 </>
               </Form>
@@ -447,6 +564,13 @@ const ExpensesDetailsModal = ({
           </Formik>
         </Box>
       </Modal>
+
+      <AddReferenceModal 
+        referenceForm={referenceForm}
+        setReferenceForm={setReferenceForm}
+        itemId={itemId}
+        title="Add reference."
+      />
     </>
   );
 };

@@ -11,6 +11,11 @@ import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import NewPasswordModal from "./NewPasswordModal";
 import { Button, Typography } from "@mui/material";
+import { sendPasswordResetTokenAction } from "../../store/actions/authenicationActions";
+import useAppDispatch from "../../hooks/useAppDispatch";
+import useAppSelector from "../../hooks/useAppSelector";
+import { showMessage } from "../../helpers/notification";
+import { clearSendPasswordResetTokenStatus } from "../../store/reducers/authenticationReducer";
 
 const style = {
   position: 'absolute',
@@ -31,11 +36,15 @@ export default function OtpModal({
   setOpenReset,
   headerTitle = "Confirm OTP",
   subHeader = " We sent you an OTP, check your email address and provide the code",
+  email
 }) {
   const [otp, setOtp] = useState("");
   const [newPasswordModal, setNewPasswordModal] = useState(false);
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.up("sm"));
+  const dispatch = useAppDispatch();
+  const state = useAppSelector(state => state.authenticationReducer)
+
   const handleClose = () => setOpenOtp(false);
   if (openReset) {
     document.body.classList.add("active-modal");
@@ -58,11 +67,37 @@ export default function OtpModal({
     padding: isSmallScreen ? "20px" : "40px",
   };
 
+  const handleResetPassword = () => {
+    dispatch(sendPasswordResetTokenAction({
+      email
+    }))
+  };
+
+  useEffect(() => {
+    if(state.sendPasswordResetTokenStatus === "completed") {
+      showMessage(
+        "Reset password",
+        state.sendPasswordResetTokenSuccess,
+        "success"
+      )
+    } else if(state.sendPasswordResetTokenStatus === "failed") {
+      showMessage(
+        "Reset password",
+        state.sendPasswordResetTokenError,
+        "error"
+      )
+    }
+
+    return () => {
+      dispatch(clearSendPasswordResetTokenStatus())
+    }
+  },[state.sendPasswordResetTokenStatus]);
+
   return (
     <>
       <Modal
         open={openOtp}
-        onClose={handleClose}
+        // onClose={handleClose}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
@@ -96,6 +131,13 @@ export default function OtpModal({
                   renderInput={(props) => <input {...props} />}
                 />
               </div>
+
+              <span
+                className="text-[10px] mt-8 ml-3 font-bold font-montserrat text-[#FAA21B] cursor-pointer flex justify-center items-center"
+                onClick={() => handleResetPassword()}
+              >
+                Resend Token
+              </span>
             </div>
 
             <AppBtn

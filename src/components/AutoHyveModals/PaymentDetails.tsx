@@ -25,7 +25,6 @@ const PaymentDetails = ({
   handleSharePdf,
   downloading
 }: any) => {
-  const tableData = Array(3).fill("");
   const handleClose = () => {
     setItem(null)
     setOpenPaymentDetails(false)
@@ -277,7 +276,7 @@ const PaymentDetails = ({
                 </div>
                 <div className="flex justify-between mb-2">
                   <span className="text-sm font-light">VAT:</span>
-                  <span className="text-sm">{Util.formAmount(item?.invoice?.estimate.tax + item?.invoice?.estimate.taxPart)}</span>
+                  <span className="text-sm">{Util.formAmount(+item?.invoice?.estimate.tax + +item?.invoice?.estimate.taxPart)}</span>
                 </div>
                 <div className="flex justify-between mb-2">
                   <span className="text-sm font-light">Discount:</span>

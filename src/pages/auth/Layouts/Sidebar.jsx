@@ -5,6 +5,7 @@ import hyvePay from "../../../assets/images/Hypelogo.png";
 import HyveIcon from "../../../assets/images/hyvBlackLogo.png";
 import logoutLogo from "../../../assets/images/logoutLogo.png";
 import ArrowCircleLeft from "../../../assets/svgs/arrowcircleleft.svg";
+import ArrowCircleRight from "../../../assets/svgs/arrowcircleRight.svg";
 import { Link, NavLink, useLocation, useMatch, useNavigate } from "react-router-dom";
 import { BiChevronLeft } from "react-icons/bi";
 import LogoutModal from "../../../components/modals/LogoutModal";
@@ -52,6 +53,7 @@ const Sidebar = ({ show, setShow, openNav, setOpenNav }) => {
       setAccountType(payload.accountType)
     }
   },[token]);
+  console.log(show, 'nav')
 
   return (
     <>
@@ -84,9 +86,9 @@ const Sidebar = ({ show, setShow, openNav, setOpenNav }) => {
           </div> */}
 
           <img
-            src={ArrowCircleLeft}
+            src={!show ? ArrowCircleLeft : ArrowCircleRight}
             alt=""
-            className="absolute top-20 -right-3 cursor-pointer  w-[30px] md:block hidden"
+            className="absolute top-20 -right-2.5 cursor-pointer  w-[30px] md:block hidden"
             onClick={() => setShow(!show)}
             style={{ zIndex: 9999 }}
           />
@@ -164,7 +166,6 @@ const Sidebar = ({ show, setShow, openNav, setOpenNav }) => {
               )
             }
 
-
             {accountType === "cooperate" || accountType === null ? (<div>
               <div
                 className={`flex items-center font-montserrat text-white cursor-pointer ${showDropdown && 'mb-4'}`}
@@ -179,7 +180,7 @@ const Sidebar = ({ show, setShow, openNav, setOpenNav }) => {
                 <span
                   className={`ml-4 font-montserrat text-sm text-white`}
                 >
-                  Workshop Management
+                  {!show ? 'Workshop' : ''}
                 </span>
                 {/* {showDropdown ? <KeyboardArrowUp /> : <KeyboardArrowDown />} */}
               </div>

@@ -389,7 +389,7 @@ const Payment = () => {
                       />
                       <span>{`${item.customer?.firstName || ""} ${item.customer?.lastName || ""}`}</span>
                     </td>
-                    <td className="font-montserrat text-xs">{item.invoice.code.split('_')[0]}</td>
+                    <td className="font-montserrat text-xs">{item.invoice ? item.invoice.code.split('_')[0] : 'Item'}</td>
                     <td className="font-montserrat text-xs">{item.type}</td>
                     <td className="font-montserrat text-xs">{Util.formAmount(item.amount)}</td>
 
@@ -433,6 +433,7 @@ const Payment = () => {
         <AddPaymentModal
           openAddPayment={openAddPayment}
           setOpenAddPayment={setOpenAddPayment}
+          // partnerId={records[0].partnerId}
         />
 
         <PaymentDetails

@@ -1,7 +1,7 @@
-import React, { ChangeEvent, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { FaCalendarAlt, FaPlus } from "react-icons/fa";
-import AppInput, { MyTextInput } from "../../components/AppInput/AppInput";
-import AppInputWithPhone, { AppInputPhone } from "../../components/AppInputWithPhone/AppInputWithPhone";
+import React, { ChangeEvent, useCallback, useEffect, useLayoutEffect, useMemo, useState } from "react";
+import { FaCalendarAlt } from "react-icons/fa";
+import AppInput from "../../components/AppInput/AppInput";
+import { AppInputPhone } from "../../components/AppInputWithPhone/AppInputWithPhone";
 import InputHeader from "../../components/InputHeader/InputHeader";
 import DropDownHalfParts from "../../components/DropDownHalf/DropDownHalfParts";
 import DropDownHalf from "../../components/DropDownHalf/DropDownHalf";
@@ -9,12 +9,10 @@ import DeleteBox from "../../components/DeleteBox/DeleteBox";
 import CustomTextArea from "../../components/CustomTextArea/CustomTextArea";
 import AppBtn from "../../components/AppBtn/AppBtn";
 import ReminderModal from "../../components/AutoHyveModals/ReminderModal";
-import AppDropDown from "../../components/AppDropDown/AppDropDown";
-import CustomDate from "../../components/CustomDate/CustomDate";
-import { FieldArray, Form, Formik, useFormik } from "formik";
+import { useFormik } from "formik";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import estimateModel, { IEstimateValues, IPart } from "../../components/Forms/models/estimateModel";
-import { Autocomplete, Box, Button, Checkbox, CircularProgress, Divider, Grid, IconButton, InputAdornment, TextField, Typography, createFilterOptions } from "@mui/material";
+import { Autocomplete, Box, Button, CircularProgress, Divider, InputAdornment, TextField, createFilterOptions } from "@mui/material";
 import { getVehicleVINAction } from "../../store/actions/vehicleActions";
 import useAppDispatch from "../../hooks/useAppDispatch";
 import useAppSelector from "../../hooks/useAppSelector";
@@ -22,16 +20,13 @@ import { IDriversFilterData } from "@app-interfaces";
 import { getReminderAction } from "../../store/actions/serviceReminderActions";
 import useEstimate from "../../hooks/useEstimate";
 import { getCustomerAction } from "../../store/actions/customerActions";
-import { Remove, Search, ToggleOff, ToggleOn } from "@mui/icons-material";
+import { Search, ToggleOff, ToggleOn } from "@mui/icons-material";
 import capitalize from "capitalize";
 import { getOwnersFilterDataAction, getPartnerAction, getPartnerFilterDataAction } from "../../store/actions/partnerActions";
 import useAdmin from "../../hooks/useAdmin";
 import useItemStock from "../../hooks/useItemStock";
 import { Util } from "../../helpers/Util";
 import { ESTIMATE_STATUS } from "../../config/constants";
-import { clearGetCustomerStatus } from "../../store/reducers/customerReducer";
-import { clearGetRemindersStatus } from "../../store/reducers/serviceReminderReducer";
-import { clearUpdateCustomerStatus } from "../../store/reducers/customerReducer";
 import { clearCreateEstimateStatus, clearSaveEstimateStatus } from "../../store/reducers/estimateReducer";
 
 const { fields, schema, initialValues: _initialValues } = estimateModel;
@@ -48,11 +43,8 @@ export type PartArgs = IPart & {
 };
 
 const GenerateEstimate = () => {
-  const location = useLocation()
-  const [openStart, setOpenStart] = useState(false);
+  const location = useLocation();
   const [openReminder, setOpenReminder] = useState<boolean>(false);
-  const [check, setCheck] = useState(false);
-  const [estimate, setEstimate] = useState<any>();
   const [vinOptions, setvinOptions] = useState<any>([]);
   const [timer, setTimer] = useState<NodeJS.Timer>();
   const [activeId, setactiveId] = useState<number>(0);
@@ -262,7 +254,7 @@ const GenerateEstimate = () => {
       <li {...props} style={{ display: "block" }}>
         <span
           style={{
-            fontSize: "16px",
+            fontSize: "14px",
             textAlign: "left",
             fontWeight: 400,
             display: "block",

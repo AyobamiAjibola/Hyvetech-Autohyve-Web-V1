@@ -33,7 +33,7 @@ const DeletePaymentModal = ({
       invoice: item.invoice
     }))
   }
-  console.log(item, 'item')
+
   useEffect(() => {
     if(transactionReducer.deletePaymentRecievedStatus === 'completed') {
       setItem(null)

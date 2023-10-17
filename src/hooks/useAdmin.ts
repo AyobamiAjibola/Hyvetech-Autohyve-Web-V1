@@ -8,6 +8,7 @@ import settings from '../config/settings';
 import { getUserAction } from '../store/actions/userActions';
 import useAppDispatch from './useAppDispatch';
 import useAppSelector from './useAppSelector';
+import { showMessage } from '../helpers/notification';
 
 export default function useAdmin() {
   const [isSuperAdmin, setIsSuperAdmin] = useState<boolean>(false);
@@ -42,7 +43,7 @@ export default function useAdmin() {
       const payload = jwt_decode(token) as CustomJwtPayload;
 
       dispatch(getUserAction(payload.userId));
-    } else throw new Error('You are not authorized to access this resource');
+    } else {showMessage('Auth', 'You are not authorized to access this resource', 'error')};
   }, [dispatch, token]);
 
   useEffect(() => {

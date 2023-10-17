@@ -26,9 +26,24 @@
 
 import React from "react";
 
-const AppTabBtn = ({ onClick, title, className, icon }: any) => {
+interface IProps {
+  onClick: any; 
+  title: string;
+  className: any;
+  icon: any;
+  type?: any
+}
+
+const AppTabBtn = ({ 
+  onClick, 
+  title, 
+  className, 
+  icon, 
+  type = 'button'
+}: IProps) => {
   return (
     <button
+      type={type}
       className={
         ` btn-secondary flex items-center justify-center gap-3 md:w-[210px] w-[100%] py-4 rounded-[20px]
     ` + className
