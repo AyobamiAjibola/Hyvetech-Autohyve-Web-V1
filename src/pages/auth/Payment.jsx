@@ -35,6 +35,7 @@ import {
 import { Util } from "../../helpers/Util";
 import { IconButton } from "@mui/material";
 import DeletePaymentModal from "../../components/modals/DeletePaymentModal";
+import { resetDeletePaymentRecieveStatus } from "../../store/reducers/transactionReducer";
 
 const Payment = () => {
   const [openCreatCustomer, setOpenCreatCustomer] = useState(false);
@@ -85,6 +86,9 @@ const Payment = () => {
       dispatch(getpaymentRecievedAction());
     }
 
+    return () => {
+      dispatch(resetDeletePaymentRecieveStatus())
+    }
   }, [transactionReducer.deletePaymentRecievedStatus])
 
   useEffect(()=>{

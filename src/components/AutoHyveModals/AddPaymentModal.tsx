@@ -2,7 +2,6 @@ import React, { ChangeEvent, useCallback, useEffect, useMemo, useState } from "r
 import CloseIcon from "../../assets/svgs/close-circle.svg";
 import AppBtn from "../AppBtn/AppBtn";
 import AppInput from "../AppInput/AppInput";
-import AppDropDown from "../AppDropDown/AppDropDown";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import CustomTextArea from "../CustomTextArea/CustomTextArea";
@@ -11,7 +10,6 @@ import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import TabBtn from "../TabBtn/TabBtn";
 import ModalHeaderTitle from "../ModalHeaderTitle/ModalHeaderTitle";
-import CustomDate from "../CustomDate/CustomDate";
 import { useFormik } from "formik";
 import { Autocomplete, Button, CircularProgress, Divider, InputAdornment, TextField, createFilterOptions } from "@mui/material";
 import useItemStock from "../../hooks/useItemStock";
@@ -28,6 +26,8 @@ import useAppDispatch from "../../hooks/useAppDispatch";
 import { getOwnersFilterDataAction, getPartnerAction, getPartnerFilterDataAction } from "../../store/actions/partnerActions";
 import useAdmin from "../../hooks/useAdmin";
 import { Search } from "@mui/icons-material";
+import { getpaymentRecievedAction } from "../../store/actions/transactionActions";
+import AddInvoicePayment from "./AddInvoicePayment";
 
 interface IProps {
   openAddPayment: boolean,
@@ -71,8 +71,6 @@ const AddPaymentModal = ({
   }, [admin.user]);
 
   const tabsItems = ["Item Sold", "Invoice"];
-  const paymentMode = ["Cash", "Transfer", "Check", "Payment link", "POS"];
-  const types = ["label 1", "label 2"];
   const quantityData = [
     {label: "Pcs", value: "pcs"},
     {label: "Kg", value: "kg"},
@@ -170,7 +168,7 @@ const AddPaymentModal = ({
       console.log(response.data);
       // @ts-ignore
       showMessage('Payment', 'Successful', 'success');
-
+      dispatch(getpaymentRecievedAction())
       setOpenAddPayment(false)
     } catch (e: any) {
       showMessage('Payment',
@@ -679,7 +677,7 @@ const AddPaymentModal = ({
                   <div className="flex w-[100%] justify-start md:justify-end mt-8 order-2 md:order-2">
                     <AppBtn
                       title="Generate"
-                      className="font-medium w-full md:w-[30%] h-12"
+                      className="font-medium w-full md:w-[50%] h-12"
                       spinner={loading}
                     />
                   </div>
@@ -702,85 +700,10 @@ const AddPaymentModal = ({
 
           {activeTab === 1 && (
             <>
-              <div className="w-[100%] md:w-[30%] mt-5">
-                <AppDropDown
-                  title="Select Invoice"
-                  data={types}
-                  placeholder="Labels"
-                  className={""} 
-                  dropDownClass={""}
-                />
-              </div>
-              <div className=" w-[100%] md:border-[1px] rounded-3xl  flex mt-3 md:mt-8  px-0 md:px-5 flex-col py-5  md:border-[#CACACA]">
-                <h5 className="font-semibold font-montserrat">
-                  Customer Information
-                </h5>
-                <div className="flex flex-col md:flex-row  mt-3 w-full gap-5">
-                  <div className="w-full">
-                    <AppInput
-                      hasPLaceHolder={true}
-                      placeholderTop="First Name"
-                      placeholder="David"
-                      className="bg-[#F5F5F5] border-[#F5F5F5] h-14"
-                      value={""}
-                    />
-                  </div>
-
-                  <div className="w-full">
-                    <AppInput
-                      hasPLaceHolder={true}
-                      placeholderTop="Last Name"
-                      placeholder="James"
-                      className="bg-[#F5F5F5] border-[#F5F5F5] h-14"
-                      value={""}
-                    />
-                  </div>
-                </div>
-
-                <div className="flex md:flex-row flex-col gap-5 mt-8">
-                  <div className="flex-1">
-                    <InputHeader text="Date of Invoice" />
-                    <CustomDate />
-                  </div>
-
-                  <div className="flex-1">
-                    <AppInput
-                      hasPLaceHolder={true}
-                      placeholderTop="Receipt #"
-                      placeholder="DRC-64845206"
-                      className="bg-[#F5F5F5] border-[#F5F5F5] h-14"
-                      value={""}
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <AppDropDown
-                      title="Mode of payment"
-                      data={paymentMode}
-                      placeholder="Labels"
-                      className={""} 
-                      dropDownClass={""}
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <AppInput
-                      hasPLaceHolder={true}
-                      placeholderTop="Amount Paid (₦)"
-                      placeholder="140,184.00"
-                      className="bg-[#F5F5F5] border-[#F5F5F5] h-14"
-                      value={""}
-                    />
-                  </div>
-                </div>
-              </div>
-              <div className="flex justify-start  md:justify-end mt-8">
-                <AppBtn
-                  title="Generate"
-                  className="font-medium md:w-[15%] w-[100%]"
-                  onClick={() => {
-                    handleClose()
-                  }}
-                />
-              </div>
+              <AddInvoicePayment 
+                setOpenAddPayment={setOpenAddPayment} 
+                activeTab={activeTab}
+              />
             </>
           )}
         </Box>

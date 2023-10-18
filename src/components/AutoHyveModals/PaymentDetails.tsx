@@ -55,6 +55,7 @@ const PaymentDetails = ({
   const partnerAddress = wordBreaker(user?.partner?.contact?.address as string, 5);
   const parts = item?.invoice?.estimate?.parts.map(JSON.parse);
   const labours = item?.invoice?.estimate?.labours.map(JSON.parse);
+  const items = item?.items?.map(JSON.parse);
 
   const amountDue = useMemo(() => {
     let amount;
@@ -157,14 +158,14 @@ const PaymentDetails = ({
           <hr className="mt-5" />
           <div className="flex flex-col md:flex-row gap-10 md:gap-20 py-5 md:items-center">
             <div className="flex gap-20">
-              <div className="flex flex-col gap-1">
+              {item?.invoice && (<div className="flex flex-col gap-1">
                 <span className="text-sm font-medium font-montserrat">
                   Invoice Date
                 </span>
                 <span className="text-sm font-light font-montserrat">
-                  {moment(item?.invoice.updatedAt).format('DD/MM/YYYY')}
+                  {item?.invoice ? moment(item?.invoice.updatedAt).format('DD/MM/YYYY') : ''}
                 </span>
-              </div>
+              </div>)}
 
               <div className="flex flex-col gap-1">
                 <span className="text-sm font-medium font-montserrat">
@@ -236,33 +237,65 @@ const PaymentDetails = ({
                 })
               }
 
-            {labours?.length > 0 &&
-              labours?.map((item: any, index: number) => {
-                return (
-                  <tbody>
-                    <tr
-                      // onClick={() => setOpenItem(true)}
-                      className="cursor-pointer table-hover"
-                    >
-                      <td className="font-montserrat text-xs cursor-pointer">
-                        {index + 1}
-                      </td>
-                      <td className="font-montserrat flex items-center gap-2 text-xs">
-                        <span>{item.title}</span>
-                      </td>
-                      <td className="font-montserrat text-xs" />
-                      <td className="font-montserrat text-xs"/>
-                      <td className="font-montserrat text-xs">{Util.formAmount(+item.cost)}</td>
-                    </tr>
-                  </tbody>
-                );
-              })
-            }
+              {labours?.length > 0 &&
+                labours?.map((item: any, index: number) => {
+                  return (
+                    <tbody>
+                      <tr
+                        // onClick={() => setOpenItem(true)}
+                        className="cursor-pointer table-hover"
+                      >
+                        <td className="font-montserrat text-xs cursor-pointer">
+                          {index + 1}
+                        </td>
+                        <td className="font-montserrat flex items-center gap-2 text-xs">
+                          <span>{item.title}</span>
+                        </td>
+                        <td className="font-montserrat text-xs" />
+                        <td className="font-montserrat text-xs"/>
+                        <td className="font-montserrat text-xs">{Util.formAmount(+item.cost)}</td>
+                      </tr>
+                    </tbody>
+                  );
+                })
+              }
+
+              {items?.length > 0 &&
+                items?.map((item: any, index: number) => {
+                  return (
+                    <tbody>
+                      <tr
+                        // onClick={() => setOpenItem(true)}
+                        className="cursor-pointer table-hover"
+                      >
+                        <td className="font-montserrat text-xs cursor-pointer">
+                          {index + 1}
+                        </td>
+                        <td className="font-montserrat flex items-center gap-2 text-xs">
+                          <span>{item.name}</span>
+                        </td>
+                        <td className="font-montserrat text-xs">{item.quantity.quantity || item.quantity} {item.quantity.unit || item.quantityUnit}</td>
+                        <td className="font-montserrat text-xs">
+                          {Util.formAmount(+item.price)}
+                        </td>
+                        <td className="font-montserrat text-xs">{Util.formAmount(+item.amount || +item.amountPaid)}</td>
+                      </tr>
+                    </tbody>
+                  );
+                })
+              }
             </table>
           </div>
 
           <div className="flex flex-col md:flex-row gap-10 justify-between mt-8">
-            <div className="w-[100%] mt-16 md:w-[50%]">
+            <div className={`w-[100%] ${item?.invoice ? 'mt-16' : 'mt-0'} md:w-[50%]`}>
+              {!item?.invoice && (<textarea
+                className="custom-textarea2 bg-[#f5f5f5] mb-5"
+                placeholder="Note/Remarks"
+                style={{ width: "100%", height: "150px" }}
+                defaultValue={item?.note}
+              ></textarea>)}
+
               <span className="font-montserrat font-medium">
                 Thanks for your patronage
               </span>
@@ -272,7 +305,7 @@ const PaymentDetails = ({
               <div className=" border-[1px] py-4 border-[#CACACA] px-10  rounded-[20px]">
                 <div className="flex justify-between mb-2">
                   <span className="text-sm font-light">Sub-Total:</span>
-                  <span className="text-sm">{Util.formAmount(item?.invoice?.estimate.laboursTotal + item?.invoice?.estimate.partsTotal)}</span>
+                  <span className="text-sm">{item?.invoice ? Util.formAmount(item?.invoice?.estimate.laboursTotal + item?.invoice?.estimate.partsTotal) : Util.formAmount(item?.amount)}</span>
                 </div>
                 <div className="flex justify-between mb-2">
                   <span className="text-sm font-light">VAT:</span>
@@ -283,9 +316,9 @@ const PaymentDetails = ({
                   <span className="text-sm">{Util.formAmount(item?.invoice?.estimate.discount)}</span>
                 </div>
               </div>
-              <p className="text-xs font-light font-montserrat text-right mt-1">
+              {item?.invoice && (<p className="text-xs font-light font-montserrat text-right mt-1">
                 Job Duration: {item?.invoice?.estimate.jobDurationValue} {item?.invoice?.estimate.jobDurationUnit}(s)
-              </p>
+              </p>)}
 
               <div className=" border-[1px] mt-5 py-4 border-[#CACACA] px-10  rounded-[20px]">
                 <div className="flex justify-between mb-2">
@@ -302,7 +335,7 @@ const PaymentDetails = ({
                 </div>
                 <div className="flex justify-between mb-2">
                   <span className="text-sm font-light">Grand Total:</span>
-                  <span className="text-sm">{Util.formAmount(item?.invoice?.grandTotal)}</span>
+                  <span className="text-sm">{item?.invoice ? Util.formAmount(item?.invoice?.grandTotal) : Util.formAmount(item?.amount)}</span>
                 </div>
               </div>
             </div>
