@@ -190,7 +190,6 @@ const HyveUserProfile = () => {
         "Customer detail updated successfully",
         "success"
       )
-      navigate('/customers')
     } else if(customerReducer.updateCustomerStatus === 'failed') {
       showMessage(
         "Customer",

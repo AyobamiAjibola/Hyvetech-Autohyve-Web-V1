@@ -20,10 +20,11 @@ import Pagination from "../../components/Pagination/Pagination";
 import { Util } from "../../helpers/Util";
 import { IconButton } from "@mui/material";
 import { ToggleOff, ToggleOn } from "@mui/icons-material";
-import { updateItemStatusAction } from "../../store/actions/itemStockAction";
+import { getItemsAction, updateItemStatusAction } from "../../store/actions/itemStockAction";
 import useAppDispatch from "../../hooks/useAppDispatch";
 import useAppSelector from "../../hooks/useAppSelector";
 import { showMessage } from "../../helpers/notification";
+import { clearCreateItemStatus, clearDeleteItemStatus, clearItemActiveStatus, clearUpdateItemStatus } from "../../store/reducers/itemStockReducer";
 
 const Inventory = () => {
   const [select, setSelect] = useState("Sort By");
@@ -41,6 +42,7 @@ const Inventory = () => {
   const itemReducer = useAppSelector(state => state.itemStockReducer);
   const [editMode, setEditMode] = useState(false);
   const [itemId, setItemId] = useState(-1);
+  const [active, setActive] = useState(false);
 
   const item = [
     "Name (Ascending)",
@@ -77,8 +79,82 @@ const Inventory = () => {
   };
 
   const handleDisableItem = (item) => {
+    item.active ? setActive(true) : setActive(false)
     dispatch(updateItemStatusAction({ itemId: item.id }));
   };
+
+  useEffect(() => {
+    if(itemReducer.createItemActiveStatus === 'completed') {
+      showMessage(
+        "Item",
+        `${active ? 'Item disabled successfully' : 'Item enabled successfully'}`,
+        "success"
+      )
+      dispatch(getItemsAction());
+    } else if (itemReducer.createItemActiveStatus === 'failed') {
+      showMessage(
+        "Item",
+        itemReducer.createItemActiveError,
+        "error"
+      )
+    }
+
+    return () => {
+      dispatch(clearItemActiveStatus())
+    }
+  },[itemReducer.createItemActiveStatus]);
+
+  useEffect(() => {
+    if (itemReducer.updateItemStatus === 'completed') {
+      showMessage(
+        "Item stock",
+        itemReducer.updateItemSuccess,
+        "success"
+      )
+
+      dispatch(getItemsAction());
+    }
+
+    return () => {
+      dispatch(clearUpdateItemStatus())
+    }
+  }, [itemReducer.updateItemStatus]);
+
+  useEffect(() => {
+    if (itemReducer.createItemStatus === 'completed') {
+      showMessage(
+        "Item stock",
+        itemReducer.createItemSuccess,
+        "success"
+      )
+      dispatch(getItemsAction());
+    }
+
+    return () => {
+      dispatch(clearCreateItemStatus())
+    }
+  }, [itemReducer.createItemStatus]);
+
+  useEffect(() => {
+    if (itemReducer.deleteItemStatus === 'completed') {
+      showMessage(
+        "Item stock",
+        "Item deleted successfully",
+        "success"
+      )
+      dispatch(getItemsAction());
+    } else if (itemReducer.deleteItemStatus === 'failed') {
+        showMessage(
+          "Item stock",
+          itemReducer.deleteItemError,
+          "error"
+        )
+    }
+
+    return () => {
+      dispatch(clearDeleteItemStatus())
+    }
+  }, [itemReducer.deleteItemStatus]);
 
   return (
     <DashboardWrapper>

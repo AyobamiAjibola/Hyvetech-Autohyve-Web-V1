@@ -30,7 +30,7 @@ interface IProps {
   onClick: any; 
   title: string;
   className: any;
-  icon: any;
+  icon?: any;
   type?: any
 }
 

@@ -69,12 +69,13 @@ export default function NewPasswordModal({ setNewPasswordModal, newPasswordModal
                           : `${phone}`.replace("", "234")
 
     const data = { ...retrievedObject, phone: newPhone};
-    dispatch(garageSignUpAction({
-        ...data,
-        email: data.email.toLowerCase(),
-        password: values.password,
-        confirm_password: values.confirmPassword
-      }))
+    console.log(data, 'data')
+    // dispatch(garageSignUpAction({
+    //     ...data,
+    //     email: data.email.toLowerCase(),
+    //     password: values.password,
+    //     confirm_password: values.confirmPassword
+    //   }))
     }
 
     useEffect(() => {
@@ -115,25 +116,25 @@ export default function NewPasswordModal({ setNewPasswordModal, newPasswordModal
               </div>
 
               <Formik
-              enableReinitialize
-              initialValues={{
-                password: "",
-                confirmPassword: ""
-              }}
-              validationSchema={Yup.object({
-                password: Yup.string()
-                  .matches(
-                    /^(?=.*\d)(?=.*[a-z])(?=.*\W)(?=.*[A-Z])(?=.*[a-zA-Z]).{8,20}$/,
-                    'Password does not meet requirement.'
-                  )
-                  .required('Password is required')
-                  .label('Password'),
-                confirmPassword: Yup.string()
-                  .oneOf([Yup.ref('password')], 'Confirm password and password do not match ')
-                  .required('Confirm password is required')
-                  .label('Confirm Password'),
-              })}
-              onSubmit={handleSubmit}
+                enableReinitialize
+                initialValues={{
+                  password: "",
+                  confirmPassword: ""
+                }}
+                validationSchema={Yup.object({
+                  password: Yup.string()
+                    .matches(
+                      /^(?=.*\d)(?=.*[a-z])(?=.*\W)(?=.*[A-Z])(?=.*[a-zA-Z]).{8,20}$/,
+                      'Password does not meet requirement.'
+                    )
+                    .required('Password is required')
+                    .label('Password'),
+                  confirmPassword: Yup.string()
+                    .oneOf([Yup.ref('password')], 'Confirm password and password do not match ')
+                    .required('Confirm password is required')
+                    .label('Confirm Password'),
+                })}
+                onSubmit={handleSubmit}
             >
               {({ setFieldValue, values, handleChange, handleBlur }) => (
                 <Form>

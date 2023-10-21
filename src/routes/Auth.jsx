@@ -11,6 +11,7 @@ const Auth = () => {
   const [show, setShow] = useState(false);
   const [openNav, setOpenNav] = useState(false);
   const [open, setOpen] = useState(false);
+  const [active, setActive] = useState(localStorage?.getItem("active"));
   
   return (
     <div>
@@ -19,6 +20,8 @@ const Auth = () => {
         setShow={setShow}
         openNav={openNav}
         setOpenNav={setOpenNav}
+        setActive={setActive}
+        active={active}
       />
 
       <DashboardHeader
@@ -27,6 +30,7 @@ const Auth = () => {
         setOpen={setOpen}
         setOpenNav={setOpenNav}
         openNav={openNav}
+        setActive={setActive}
       />
       <main className={show ? "large-container " : "content-container"}>
         <MobileHeader />

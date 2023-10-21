@@ -6,7 +6,7 @@ import settings from '../../config/settings';
 
 const GET_CUSTOMER_VEHICLE_SUBS = 'vehicle:GET_CUSTOMER_VEHICLE_SUBS';
 const GET_DRIVER_VEHICLE_SUBS = 'vehicle:GET_DRIVER_VEHICLE_SUBS';
-const GET_VEHICLE_VIN = 'GET_VEHICLE_VIN';
+const GET_VEHICLE_VIN = 'vehicle:GET_VEHICLE_VIN';
 const API_ROOT = settings.api.rest;
 
 export const getDriverVehicleSubscriptionAction = asyncThunkWrapper<

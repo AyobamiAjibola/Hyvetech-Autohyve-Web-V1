@@ -418,8 +418,9 @@ const Customers = () => {
                       <td className="font-montserrat flex items-center gap-2 text-xs">
                         <img
                           src={ item.profileImageUrl ? `${API_ROOT}/${item.profileImageUrl}` : profilePicx }
-                          alt=""
+                          alt="customer"
                           className="w-[20px] h-[20px]"
+                          crossOrigin="anonymous"
                         />
                         <span>{item.title || ''} {item.firstName} {item.lastName || ''}</span>
                       </td>

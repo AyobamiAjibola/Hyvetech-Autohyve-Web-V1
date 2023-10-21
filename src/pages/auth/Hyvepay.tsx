@@ -19,6 +19,7 @@ import ActivateIndividualAccountModal from "../../components/modals/ActivateIndi
 import { getAccountBalanceAction, getAccountTransactionsAction } from "../../store/actions/autoHyveActions";
 import AppTabBtn from "../../components/AppTabBtn/AppTabBtn";
 import TransactionReceiptModal from "../../components/modals/TransactionReceiptModal";
+import NewPinModal from "../../components/modals/NewPinModal";
 
 const Hyvepay = () => {
   const [accountDetails, showAccountDetails] = useState(false);
@@ -141,6 +142,7 @@ const Hyvepay = () => {
   const [selectedRow, setSelectedRow] = useState(null);
   const [successModal, setSuccessModal] = useState(false);
   const [__, setShowModal] = useState(false);
+  const [openResetPin, setOpenResetPin] = useState<boolean>(false);
 
   const closeSuccessModal = () => {
     setSuccessModal(!successModal);
@@ -278,6 +280,16 @@ const Hyvepay = () => {
                         title=" View saved beneficiaries"
                         className="btn-secondary mt-4 "
                       />
+
+                      <div className="flex justify-left w-full mt-4">
+                        <p>
+                          <span className="text-sm mr-2 mb-0 font-montserrat font-bold hover:text-[#faa21b] cursor-pointer"
+                            onClick={() => setOpenResetPin(true)}
+                          >
+                            Reset pin
+                          </span>
+                        </p>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -324,7 +336,8 @@ const Hyvepay = () => {
             }
             color={"#FFEDED"}
 
-            cardName={"Debit"} />
+            cardName={"Debit"}
+          />
 
         </div>
 
@@ -479,6 +492,10 @@ const Hyvepay = () => {
       />
 
       <CustomDatePickerModal openDate={openDate} setOpenDate={setOpenDate} />
+      <NewPinModal 
+        setOpenResetPin={setOpenResetPin}
+        openResetPin={openResetPin}
+      />
     </>
   );
 };

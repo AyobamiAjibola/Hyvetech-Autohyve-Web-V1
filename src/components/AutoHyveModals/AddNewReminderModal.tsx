@@ -16,7 +16,7 @@ import ModalHeaderTitle from "../ModalHeaderTitle/ModalHeaderTitle";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import reminderModel from "../Forms/models/reminderModel";
-import { Autocomplete, Button, CircularProgress, InputAdornment, TextField, Typography, createFilterOptions } from "@mui/material";
+import { Autocomplete, Button, CircularProgress, InputAdornment, TextField, createFilterOptions } from "@mui/material";
 import { IDriversFilterData, IVINDecoderSchema } from "@app-interfaces";
 import useAppSelector from "../../hooks/useAppSelector";
 import useAppDispatch from "../../hooks/useAppDispatch";
@@ -39,6 +39,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { getSingleInvoice } from "../../store/actions/invoiceActions";
 import { clearGetSingleInvoiceStatus } from "../../store/reducers/invoiceReducer";
+import moment from "moment";
 
 const { schema, fields, initialValues: _initialValues } = reminderModel;
 const filterOptions = createFilterOptions({
@@ -379,23 +380,23 @@ const AddNewReminderModal = ({
       setInitialValues(_initialValues)
     }
   }, [editMode]);
-
+console.log(serviceIntervalUnit, values.serviceInterval, 'interval')
   useEffect(() => {
-    if(values.serviceIntervalUnit && values.serviceInterval){
-      const next = nextServiceDate(values.lastServiceDate, values.serviceIntervalUnit, values.serviceInterval)
+    if(serviceIntervalUnit && values.serviceInterval){
+      const next = nextServiceDate(values.lastServiceDate, serviceIntervalUnit, values.serviceInterval)
 
       _setNextServiceDate(next)
       setFieldValue('nextServiceDate', next)
     }
-  }, [values.serviceIntervalUnit, values.serviceInterval])
+  }, [serviceIntervalUnit, values.serviceInterval])
 
   useEffect(() => {
-    if(_nextServiceDate && values.lastServiceDate && values.serviceIntervalUnit){
-      const status: any = reminderStatus(values.lastServiceDate, _nextServiceDate, values.serviceIntervalUnit, values.serviceInterval);
+    if(_nextServiceDate && values.lastServiceDate && serviceIntervalUnit){
+      const status: any = reminderStatus(values.lastServiceDate, _nextServiceDate, serviceIntervalUnit, values.serviceInterval);
       _setReminderStatus(status);
       setFieldValue('reminderStatus', status);
     }
-  }, [_nextServiceDate, values.lastServiceDate, values.serviceIntervalUnit, values.lastServiceDate])
+  }, [_nextServiceDate, values.lastServiceDate, serviceIntervalUnit, values.lastServiceDate])
 
   // useEffect(() => {
   //   if(values.serviceStatus === 'done'){
@@ -805,7 +806,7 @@ const AddNewReminderModal = ({
                   </div>
 
                   <div className="w-full relative mt-3 md:mt-0">
-                    <InputHeader text="Next Service Date" />
+                    {/* <InputHeader text="Next Service Date" />
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
                       <DatePicker
                         className={`bg-[#F5F5F5] border-[#F5F5F5] h-14 w-full 
@@ -844,7 +845,20 @@ const AddNewReminderModal = ({
                           },
                         }}
                       />
-                    </LocalizationProvider>
+                    </LocalizationProvider> */}
+                    <AppInput
+                      hasPLaceHolder={true}
+                      placeholderTop="Next Service Date"
+                      placeholder="Next Service Date"
+                      className="bg-[#F5F5F5] border-[#F5F5F5] h-14"
+                      name={fields.nextServiceDate}
+                      // onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      value={_nextServiceDate && moment(_nextServiceDate).format('DD/MM/YYYY')}
+                    />
+                    {formik.touched.make && formik.errors.make && (
+                      <div>{formik.errors.make}</div>
+                    )}
                   </div>
                 </div>
 

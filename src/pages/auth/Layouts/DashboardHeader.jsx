@@ -8,14 +8,26 @@ import hyvelogobarOrange from "../../../assets/svgs/hyvelogobarOrange.svg";
 import hyvelogobarGrey from "../../../assets/svgs/hyvelogobarGrey.svg";
 import useAdmin from "../../../hooks/useAdmin";
 import capitalize from 'capitalize';
+const { VITE_BASE_URL } = import.meta.env;
 
-const DashboardHeader = ({ show, openNav, setOpenNav, open, setOpen }) => {
+const API_ROOT = VITE_BASE_URL;
+
+const DashboardHeader = ({ show, openNav, setOpenNav, open, setOpen, setActive }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const {user} = useAdmin()
+  const {user} = useAdmin();
+  const [hyveActive, setHyveActive] = useState(false);
 
-  let workshop = "Demo workshop";
   const [path, setPath] = useState("");
+
+  useEffect(() => {
+    if(location.pathname === '/hyvepay') {
+      setHyveActive(true)
+      localStorage.setItem('active', '')
+    } else {
+      setHyveActive(false)
+    }
+  },[location.pathname]);
 
   return (
     <header
@@ -110,28 +122,36 @@ const DashboardHeader = ({ show, openNav, setOpenNav, open, setOpen }) => {
 
       <div className="flex gap-6">
 
-        <Link
+        {user?.email === user?.partner?.email && (<Link
           to='/hyvepay'
           className={`flex gap-2 p-3 rounded-lg hover:bg-[white] 
-          hover:border-[0.5px] hover:border-[#faa21b] font-[600]`}
-          // onClick={() => localStorage.setItem("active", "")}
+          hover:border-[0.5px] hover:border-[#faa21b] font-[600] ${hyveActive ? 'border-[0.5px] border-[#faa21b]' : ''}`}
+          onClick={() => {
+            setActive("")
+            localStorage.setItem("active", "")
+          }}
         >
           <img
             src={location.pathname == "/hyvepay" ? hyvelogobarGrey : hyvelogobarOrange }
-            alt=""
+            alt="hyvepay"
             style={{ height: 34, width: 31 }}
           />
-        </Link>
+        </Link>)}
         
         <button className="" onClick={() => setOpen(!open)}>
           <div className="flex items-center gap-2">
             <span className="font-montserrat">{capitalize.words(user?.companyName || user?.firstName || '')}</span>
 
-            <img src={settings} alt="" className="w-[30px] h-[30px]" />
+            <img
+              src={ user?.partner?.logo ? `${API_ROOT}/${user?.partner?.logo}` : settings }
+              alt="logo" 
+              crossOrigin="anonymous"
+              className="w-[40px] h-[40px] rounded-full" 
+            />
           </div>
         </button>
 
-        {open && <ProfileDropDown setOpen={setOpen} open={open} />}
+        {open && <ProfileDropDown setOpen={setOpen} open={open} setActive={setActive}/>}
       </div>
     </header>
   );

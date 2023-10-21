@@ -25,6 +25,7 @@ import UploadCompanyLogoModal from "../modals/UploadCompanyLogoModal";
 import { getUserAction, getUsersAction } from "../../store/actions/userActions";
 import partnerModel from "../Forms/models/partnerModel";
 import Brands from "./Brands";
+import { wordBreaker } from "../../utils/generic";
 
 const API_ROOT = settings.api.baseURL;
 
@@ -59,15 +60,22 @@ const BusinessProfile = ({user}) => {
     state: "",
     district: "",
     tin: "",
-    nameOfManager: "",
-    cac: ""
+    // nameOfManager: "",
+    cac: "",
+    phone: ""
   });
   const [userData, setUserData] = useState(null);
   const { fields, schema } = partnerModel;
   const dispatch = useAppDispatch()
   const partnerReducer = useAppSelector(state => state.partnerReducer);
 
-  const handleSubmit = (values) => {
+  const handleSubmit = ({phone, ...rest}) => {
+    const newPhone = `${phone}`.startsWith("234")
+                        ? phone
+                        : `${phone}`.startsWith("0")
+                          ? `${phone}`.replace("0", "234")
+                          : `${phone}`.replace("", "234")
+    const values = { ...rest, phone: newPhone }
     dispatch(createPartnerKycAction({ 
       partnerId: user.partner.id, 
       data: values 
@@ -132,8 +140,9 @@ const BusinessProfile = ({user}) => {
       state: user.partner.contact.state || "",
       district: user.partner.contact.district || "",
       tin: user.partner.tin || "",
-      nameOfManager: user.partner.nameOfManager || "",
-      cac: user.partner.cac || ""
+      // nameOfManager: user.partner.nameOfManager || "",
+      cac: user.partner.cac || "",
+      phone: parsePhone(user.partner.phone)
     });
     handleDistrict(String(user?.partner?.contact?.state));
   }, [user]);
@@ -211,6 +220,7 @@ const BusinessProfile = ({user}) => {
         "Profile updated",
         'success'
       )
+
     }
     dispatch(clearCreatePartnerSettingsStatus())
   },[partnerReducer.createPartnerSettingsStatus]);
@@ -230,7 +240,8 @@ const BusinessProfile = ({user}) => {
       const userData = user?.partner;
       setUserData(userData);
   },[]);
-  const brands = user?.partner.brands.map(JSON.parse);
+  // const brands = user?.partner?.brands?.map(JSON.parse) || [];
+  const partnerAddress = wordBreaker(user?.partner.workshopAddress, 4)
 
   return (
     <>
@@ -247,8 +258,12 @@ const BusinessProfile = ({user}) => {
           state: Yup.string(),
           district: Yup.string(),
           tin: Yup.string(),
-          nameOfManager: Yup.string(),
-          cac: Yup.string()
+          // nameOfManager: Yup.string(),
+          cac: Yup.string(),
+          phone: Yup.string()
+            .matches(/^[0-9]+$/, "Phone number should be numbers")
+            .min(11, "Phone number should be 11 digits")
+            .max(11, "Phone number should be 11 digits"),
         })}
       >
         {({ setFieldValue, values, handleChange, handleBlur }) => (
@@ -264,7 +279,7 @@ const BusinessProfile = ({user}) => {
 
                 <AppBtn
                   title="SAVE"
-                  className="font-medium hidden md:block"
+                  className="font-medium hidden md:block w-[200px]"
                   spinner={partnerReducer.createPartnerKycStatus === 'loading'}
                 />
               </div>
@@ -275,7 +290,13 @@ const BusinessProfile = ({user}) => {
                     {user?.partner.name}
                   </h5>
                   <p className="text-[#494949] mb-10 md:mb-0 text-sm font-montserrat">
-                    {user?.partner.workshopAddress}
+                    {partnerAddress}
+                  </p>
+                  <p className="text-[#494949] mb-10 md:mb-0 text-sm font-montserrat">
+                    {user?.partner.contact.district} {user?.partner.contact.state}
+                  </p>
+                  <p className="text-[#494949] mb-10 md:mb-0 text-sm font-montserrat">
+                    {user?.partner.phone}
                   </p>
                 </div>
                 <img
@@ -418,7 +439,7 @@ const BusinessProfile = ({user}) => {
 
               <div className="flex flex-col md:flex-row  mt-8 gap-4 w-full">
                 <div className="w-full">
-                  <MyTextInput
+                  {/* <MyTextInput
                     hasPLaceHolder={true}
                     placeholderTop="Name of Manager"
                     placeholder="Manager Name"
@@ -426,6 +447,18 @@ const BusinessProfile = ({user}) => {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     value={values.nameOfManager}
+                  /> */}
+                  <AppInputWithPhone
+                    placeholderTop="Contact Number"
+                    placeholder="Enter Contact Number"
+                    hasPLaceHolder={true}
+                    type="text"
+                    name="phone"
+                    onChange={(event) => {
+                      setFieldValue("phone", event?.target?.value);
+                    }}
+                    onBlur={handleBlur}
+                    value={values.phone}
                   />
                 </div>
 
@@ -452,7 +485,7 @@ const BusinessProfile = ({user}) => {
         )}
       </Formik>
 
-      <Formik
+      {/* <Formik
         enableReinitialize
         initialValues={{
           phone: parsePhone(user.partner.phone),
@@ -530,12 +563,12 @@ const BusinessProfile = ({user}) => {
             </div>
           </Form>
         )}
-      </Formik>
+      </Formik> */}
 
-      <Brands
+      {/* <Brands
         brands={brands}
         partner={user?.partner}
-      />
+      /> */}
 
       <UploadCompanyLogoModal
         openProfile={openProfile}

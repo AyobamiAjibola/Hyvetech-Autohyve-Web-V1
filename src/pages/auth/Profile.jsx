@@ -235,7 +235,7 @@ const Profile = () => {
   return (
     <>
       <div className="mb-20 mt-24 w-full">
-        {user?.accountType !== "individual" && (
+        {(user?.accountType !== "individual" && user?.email === user?.partner?.email) && (
           <div className="flex justify-between w-[100%] md:w-[47%] items-center mt-10 my-4 setting-tabs">
             <div className="flex items-center flex-col md:flex-row  w-[100%]  mt-3 md:mt-0 gap-4">
               {data.map((item, index) => {
@@ -438,7 +438,7 @@ const Profile = () => {
 
           {view == 1 && (
             <>
-              <BusinessProfile
+             <BusinessProfile
                 user={user}
               />
             </>

@@ -3,7 +3,7 @@ import UserIcon from "../../assets/svgs/user.svg";
 import SettingIcon from "../../assets/svgs/setting-2.svg";
 import { Link, useNavigate } from "react-router-dom";
 
-const ProfileDropDown = ({ setOpen, open }) => {
+const ProfileDropDown = ({ setOpen, open, setActive }) => {
   const navigate = useNavigate();
 
   const dropdownRef = useRef(null);
@@ -31,6 +31,8 @@ const ProfileDropDown = ({ setOpen, open }) => {
         onClick={() => {
           navigate("/profile");
           setOpen(!open);
+          setActive("");
+          localStorage.setItem("active", "");
         }}
       >
         <img src={UserIcon} alt="" style={{ width: 20 }} />
@@ -41,6 +43,8 @@ const ProfileDropDown = ({ setOpen, open }) => {
         onClick={() => {
           navigate("/settings");
           setOpen(!open);
+          setActive("");
+          localStorage.setItem("active", "");
         }}
         to={"/settings"}
         className="flex gap-2 text-sm cursor-pointer"

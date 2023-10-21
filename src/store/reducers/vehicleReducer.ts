@@ -24,6 +24,8 @@ interface IVehicleState {
   driverSubscriptions: IRideShareDriverSubscription[];
   customerSubscriptions: ICustomerSubscription[];
   vehicleVINDetails: Array<IVINDecoderSchema>;
+
+  action: boolean;
 }
 
 const initialState: IVehicleState = {
@@ -38,6 +40,7 @@ const initialState: IVehicleState = {
   getDriverVehicleSubscriptionError: '',
   getDriverVehicleSubscriptionStatus: 'idle',
   getDriverVehicleSubscriptionSuccess: '',
+  action: false
 };
 
 const vehicleSlice = createSlice({
@@ -59,6 +62,10 @@ const vehicleSlice = createSlice({
       state.getVehicleVINError = '';
       state.vehicleVINDetails = [];
     },
+
+    setAction(state: IVehicleState) {
+      state.action = !state.action
+    }
   },
   extraReducers: builder => {
     builder
@@ -106,12 +113,13 @@ const vehicleSlice = createSlice({
           state.getVehicleVINError = action.payload.message;
         } else state.getVehicleVINError = action.error.message;
       });
+
   },
 });
 
 export const {
   clearGetCustomerVehicleSubscriptionStatus,
   clearGetDriverVehicleSubscriptionStatus,
-  clearGetVehicleVINStatus,
+  clearGetVehicleVINStatus, setAction
 } = vehicleSlice.actions;
 export default vehicleSlice.reducer;

@@ -278,9 +278,9 @@ function AddInvoicePayment({setOpenAddPayment, activeTab}: any)  {
                                     disabled={_dueAmt < 0}
                                 />
 
-                                <span
+                                {invoice && (<span
                                     className={`text-[10px] font-montserrat font-bold ${_dueAmt > 0 ? 'text-[green]' : 'text-[red]'}`}
-                                >{_dueAmt > 0 ? `Amount to Record Max: ${Util.formAmount(_dueAmt)}` : `Due balance is ${Util.formAmount(_dueAmt)}`}</span>
+                                >{_dueAmt > 0 ? `Amount to Record Max: ${Util.formAmount(_dueAmt)}` : `Due balance is ${Util.formAmount(_dueAmt)}`}</span>)}
                             </div>
                         </div>
                         

@@ -18,6 +18,8 @@ import * as Yup from "yup";
 import { Form, Formik } from "formik";
 import useAppSelector from "../../hooks/useAppSelector";
 import { showMessage } from "../../helpers/notification";
+import useAppDispatch from "../../hooks/useAppDispatch";
+import { clearCreateItemStatus, clearUpdateItemStatus } from "../../store/reducers/itemStockReducer";
 
 const { fields } = itemModel
 
@@ -61,6 +63,7 @@ const EditInventory = ({
     onEdit, handleUpdateItem
   } = useItemStock();
   const itemReducer = useAppSelector(state => state.itemStockReducer);
+  const dispatch = useAppDispatch();
 
   const style = {
     position: "absolute",
@@ -93,6 +96,34 @@ const EditInventory = ({
       onEdit(itemId)
     }
   },[itemId]);
+
+  useEffect(() => {
+    if (itemReducer.updateItemStatus === 'failed') {
+      showMessage(
+        "Item stock",
+        itemReducer.updateItemError,
+        "error"
+      )
+    }
+
+    return () => {
+      dispatch(clearUpdateItemStatus())
+    }
+  }, [itemReducer.updateItemStatus]);
+
+  useEffect(() => {
+    if (itemReducer.createItemStatus === 'failed') {
+      showMessage(
+        "Item stock",
+        itemReducer.updateItemError,
+        "error"
+      )
+    }
+
+    return () => {
+      dispatch(clearCreateItemStatus())
+    }
+  }, [itemReducer.createItemStatus]);
 
   return (
     <>

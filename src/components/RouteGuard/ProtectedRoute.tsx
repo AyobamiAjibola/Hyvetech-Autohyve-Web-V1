@@ -1,10 +1,13 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import settings from '../../config/settings';
+// import ContextVariables from '../../context/ContextVariables';
+// import { AppContext } from '../../context/AppContext';
 
 // const admin = settings.auth.admin;
 
 function PrivateRoute({ children }: any) {
+  // const contextVal = ContextVariables()
   const isSignedIn = sessionStorage.getItem(settings.auth.admin);
 
   // useEffect(() => {
@@ -18,7 +21,9 @@ function PrivateRoute({ children }: any) {
 
   // },[isSignedIn])
 
-  return isSignedIn ? children : <Navigate to="/" replace />;
+  return isSignedIn 
+    ? children
+    : <Navigate to="/" replace />;
 }
 
 export default PrivateRoute;

@@ -45,7 +45,7 @@ function VinDecoder () {
         <React.Fragment>
             <div className="md:mt-25 w-full flex justify-center align-center flex-col">
                 <div className={`flex flex-col w-full h-screen justify-center mt-[-2rem]
-                    items-center mb-5 bg-[#DFDFDF] border radius-[20px]`}
+                    items-center mb-5`}
                 >
                     <span className='font-montserrat md:text-[2.5rem] text-[2rem] md:my-3 font-bold mt-[-10rem] mb-[1rem] md:mb-[10px]'>VIN Decoder</span>
                     <span className='font-montserrat text-sm mb-1'>Enter your Vehicle Identification Number (VIN)</span>
@@ -54,7 +54,7 @@ function VinDecoder () {
                         <SearchAppInput
                             placeholder={'Enter 17-character VIN number'}
                             hasPLaceHolder
-                            className=''
+                            className='border'
                             onChange={(e: any) => setVin(e.target.value.toUpperCase())}
                         />
                         <SearchAppBtn

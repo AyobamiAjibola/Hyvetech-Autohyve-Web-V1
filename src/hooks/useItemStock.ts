@@ -89,101 +89,101 @@ export default function useItemStock() {
     }
   }, [itemReducer.items, itemReducer.getItemsStatus]);
 
-  useEffect(() => {
-    if (itemReducer.createItemStatus === 'failed') {
-      // if (itemReducer.createItemError) setError({ message: itemReducer.createItemError });
-      showMessage(
-        "Item stock",
-        itemReducer.createItemError,
-        "error"
-      )
-      handleReset();
-    }
-  }, [itemReducer.createItemError, itemReducer.createItemStatus, handleReset]);
+  // useEffect(() => {
+  //   if (itemReducer.createItemStatus === 'failed') {
+  //     // if (itemReducer.createItemError) setError({ message: itemReducer.createItemError });
+  //     showMessage(
+  //       "Item stock",
+  //       itemReducer.createItemError,
+  //       "error"
+  //     )
+  //     handleReset();
+  //   }
+  // }, [itemReducer.createItemError, itemReducer.createItemStatus, handleReset]);
 
-  useEffect(() => {
-    if (itemReducer.createItemStatus === 'completed') {
-      // setSuccess({ message: itemReducer.createItemSuccess });
-      showMessage(
-        "Item stock",
-        itemReducer.createItemSuccess,
-        "success"
-      )
-      dispatch(getItemsAction())
-      handleReset();
-    }
-  }, [itemReducer.createItemStatus, itemReducer.createItemSuccess, handleReset]);
+  // useEffect(() => {
+  //   if (itemReducer.createItemStatus === 'completed') {
+  //     // setSuccess({ message: itemReducer.createItemSuccess });
+  //     showMessage(
+  //       "Item stock",
+  //       itemReducer.createItemSuccess,
+  //       "success"
+  //     )
+  //     dispatch(getItemsAction())
+  //     handleReset();
+  //   }
+  // }, [itemReducer.createItemStatus, itemReducer.createItemSuccess, handleReset]);
 
-  useEffect(() => {
-    if (itemReducer.updateItemStatus === 'failed') {
-      // if (itemReducer.updateItemError) setError({ message: itemReducer.updateItemError });
-      showMessage(
-        "Item stock",
-        itemReducer.updateItemError,
-        "error"
-      )
-      handleReset();
-    }
-  }, [itemReducer.updateItemError, itemReducer.updateItemStatus, handleReset]);
+  // useEffect(() => {
+  //   if (itemReducer.updateItemStatus === 'failed') {
+  //     // if (itemReducer.updateItemError) setError({ message: itemReducer.updateItemError });
+  //     showMessage(
+  //       "Item stock",
+  //       itemReducer.updateItemError,
+  //       "error"
+  //     )
+  //     handleReset();
+  //   }
+  // }, [itemReducer.updateItemError, itemReducer.updateItemStatus, handleReset]);
 
-  useEffect(() => {
-    if(itemReducer.createItemActiveStatus === 'completed') {
-      showMessage(
-        "Item",
-        "Item enabled/disabled successfully",
-        "success"
-      )
-      dispatch(getItemsAction());
-    } else if (itemReducer.createItemActiveStatus === 'failed') {
-      showMessage(
-        "Item",
-        itemReducer.createItemActiveError,
-        "error"
-      )
-    }
+  // useEffect(() => {
+  //   if(itemReducer.createItemActiveStatus === 'completed') {
+  //     showMessage(
+  //       "Item",
+  //       "Item enabled/disabled successfully",
+  //       "success"
+  //     )
+  //     dispatch(getItemsAction());
+  //   } else if (itemReducer.createItemActiveStatus === 'failed') {
+  //     showMessage(
+  //       "Item",
+  //       itemReducer.createItemActiveError,
+  //       "error"
+  //     )
+  //   }
 
-    return () => {
-      dispatch(clearItemActiveStatus())
-    }
-  },[itemReducer.createItemActiveStatus])
+  //   return () => {
+  //     dispatch(clearItemActiveStatus())
+  //   }
+  // },[itemReducer.createItemActiveStatus])
 
-  useEffect(() => {
-    if (itemReducer.updateItemStatus === 'completed') {
-      // setSuccess({ message: itemReducer.updateItemSuccess });
-      showMessage(
-        "Item stock",
-        itemReducer.updateItemSuccess,
-        "success"
-      )
-      handleReset();
-      dispatch(getItemsAction());
-    }
-  }, [itemReducer.updateItemStatus]);
+  // useEffect(() => {
+  //   if (itemReducer.updateItemStatus === 'completed') {
+  //     // setSuccess({ message: itemReducer.updateItemSuccess });
+  //     showMessage(
+  //       "Item stock",
+  //       itemReducer.updateItemSuccess,
+  //       "success"
+  //     )
+  //     handleReset();
+  //     dispatch(getItemsAction());
+  //   }
+  // }, [itemReducer.updateItemStatus]);
 
-  useEffect(() => {
-    if (itemReducer.deleteItemStatus === 'failed') {
-      // setError({ message: itemReducer.deleteItemError });
-      showMessage(
-        "Item stock",
-        itemReducer.deleteItemError,
-        "error"
-      )
-      handleReset();
-    }
-  }, [itemReducer.deleteItemError, itemReducer.deleteItemStatus, handleReset]);
+  // useEffect(() => {
+  //   if (itemReducer.deleteItemStatus === 'failed') {
+  //     // setError({ message: itemReducer.deleteItemError });
+  //     showMessage(
+  //       "Item stock",
+  //       itemReducer.deleteItemError,
+  //       "error"
+  //     )
+  //     handleReset();
+  //   }
+  // }, [itemReducer.deleteItemError, itemReducer.deleteItemStatus, handleReset]);
 
-  useEffect(() => {
-    if (itemReducer.deleteItemStatus === 'completed') {
-      // setSuccess({ message: itemReducer.deleteItemSuccess });
-      showMessage(
-        "Item stock",
-        "Item deleted successfully",
-        "success"
-      )
-      handleReset();
-      dispatch(getItemsAction());
-    }
-  }, [dispatch, itemReducer.deleteItemStatus, itemReducer.deleteItemSuccess, handleReset]);
+  // useEffect(() => {
+  //   if (itemReducer.deleteItemStatus === 'completed') {
+  //     // setSuccess({ message: itemReducer.deleteItemSuccess });
+  //     showMessage(
+  //       "Item stock",
+  //       "Item deleted successfully",
+  //       "success"
+  //     )
+  //     handleReset();
+  //     dispatch(getItemsAction());
+  //   }
+  // }, [dispatch, itemReducer.deleteItemStatus, itemReducer.deleteItemSuccess, handleReset]);
 
   useEffect(() => {
     if (itemReducer.addStockStatus === 'failed') {

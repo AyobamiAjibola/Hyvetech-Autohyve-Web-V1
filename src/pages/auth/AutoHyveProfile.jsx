@@ -9,6 +9,7 @@ import GenerateEstimate from "./GenerateEstimate";
 import { useNavigate, useParams } from "react-router-dom";
 import { getReminderAction } from "../../store/actions/serviceReminderActions";
 import useAppDispatch from "../../hooks/useAppDispatch";
+import { IoIosArrowBack } from "react-icons/io";
 
 const AutoHyveProfile = () => {
   const data = ["Profile", "Vehicles", "Service Reminder"];
@@ -28,6 +29,12 @@ const AutoHyveProfile = () => {
   return (
     <DashboardWrapper>
       <>
+        <span
+          onClick={() => navigate(-1)}
+          className="flex items-center cursor-pointer gap-3 mb-8"
+        >
+          <IoIosArrowBack size={30} /> Back
+        </span>
         <div className="flex  flex-col md:flex-row justify-between">
           <div className="flex flex-col md:flex-row gap-3">
             {data.map((item, index) => {

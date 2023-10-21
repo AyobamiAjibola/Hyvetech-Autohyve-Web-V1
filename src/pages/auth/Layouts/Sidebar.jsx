@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { VscChromeClose } from "react-icons/vsc";
 import "../../../assets/css/layout.css";
 import hyvePay from "../../../assets/images/Hypelogo.png";
@@ -11,18 +11,21 @@ import { BiChevronLeft } from "react-icons/bi";
 import LogoutModal from "../../../components/modals/LogoutModal";
 import { sidebarItemsCooperate, sidebarItemsIndividual, subSidebarItems } from "../../../contsants/sidebar";
 import workshopIcon from "../../../assets/svgs/workshopIcon.svg";
-import { KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
+import { Add, KeyboardArrowDown, KeyboardArrowUp, Remove } from "@mui/icons-material";
 import jwt_decode from "jwt-decode";
 import settings from "../../../config/settings";
+import useAppDispatch from "../../../hooks/useAppDispatch";
+import { setAction } from "../../../store/reducers/vehicleReducer";
 
-const Sidebar = ({ show, setShow, openNav, setOpenNav }) => {
+const Sidebar = ({ show, setShow, openNav, setOpenNav, active, setActive }) => {
   const navigation = useNavigate();
   const [logoutModal, setLogoutModal] = useState(false);
-  const [active, setActive] = useState(localStorage?.getItem("active"));
+  // const [active, setActive] = useState(localStorage?.getItem("active"));
   const [showDropdown, setShowDropdown] = useState(false);
   const location = useLocation();
   const token = useMemo(() => sessionStorage.getItem(settings.auth.admin), []);
   const [accountType, setAccountType] = useState(null);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (active != 0) {
@@ -53,7 +56,6 @@ const Sidebar = ({ show, setShow, openNav, setOpenNav }) => {
       setAccountType(payload.accountType)
     }
   },[token]);
-  console.log(show, 'nav')
 
   return (
     <>
@@ -63,10 +65,10 @@ const Sidebar = ({ show, setShow, openNav, setOpenNav }) => {
         } `}
       >
         <div className="shortcut-links">
-          <Link to="/dashboard" className="flex items-center pl-[10px]">
+          <Link to="/vin-decoder" className="flex items-center pl-[10px]">
             <img
               src={hyvePay}
-              alt=""
+              alt="autohyve-logo"
               className={show ? "small-logo" : "logo-img "}
             />
             <span
@@ -180,9 +182,11 @@ const Sidebar = ({ show, setShow, openNav, setOpenNav }) => {
                 <span
                   className={`ml-4 font-montserrat text-sm text-white`}
                 >
-                  {!show ? 'Workshop' : ''}
+                  {!show
+                    ? 'Workshop' 
+                    : ''} &nbsp; &nbsp;
                 </span>
-                {/* {showDropdown ? <KeyboardArrowUp /> : <KeyboardArrowDown />} */}
+                {showDropdown ? <KeyboardArrowUp sx={{fontSize: '20px'}} /> : <KeyboardArrowDown sx={{fontSize: '20px'}} />}
               </div>
 
               <div className={`${showDropdown && 'bg-[#5B5B5B]'} py-4`}>
