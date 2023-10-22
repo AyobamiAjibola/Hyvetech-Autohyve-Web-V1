@@ -380,7 +380,7 @@ const Reminder = () => {
             />)}
           </div>
         </div>
-
+              
         <DeleteModal
           deletemodal={deletemodal}
           setDeletemodal={setDeletemodal}

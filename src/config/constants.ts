@@ -80,6 +80,21 @@ export const MONTHS = [
   'December',
 ];
 
+export const _MONTHS = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'April',
+  'May',
+  'June',
+  'July',
+  'Aug',
+  'Sept',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
 export const MESSAGES = {
   txn_init: 'Authorization URL created',
   cancelText: `Are you sure you want to carry out this action? 

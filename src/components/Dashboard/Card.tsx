@@ -3,7 +3,7 @@ import React from "react";
 import Eye from "../../assets/images/eye.png";
 import { BsEyeSlash } from "react-icons/bs";
 
-const Card = ({ name, price, qty, color, cardName }: any) => {
+const Card = ({ name, price, qty, color, cardName, showEye }: any) => {
   const [obscure, setObscure] = React.useState(false);
   return (
     <>
@@ -18,13 +18,13 @@ const Card = ({ name, price, qty, color, cardName }: any) => {
             </h2>
           </div>
 
-          <button onClick={() => setObscure(!obscure)}>
+          {showEye && (<button onClick={() => setObscure(!obscure)}>
             {obscure ? (
               <BsEyeSlash color="black" size={18} />
             ) : (
               <img src={Eye} alt="" className="w-[18px] h-[18px]" />
             )}
-          </button>
+          </button>)}
         </div>
         <div className="flex px-6 pb-4 justify-end font-montserrat">
 

@@ -28,6 +28,7 @@ import useAdmin from "../../hooks/useAdmin";
 import { Search } from "@mui/icons-material";
 import { getpaymentRecievedAction } from "../../store/actions/transactionActions";
 import AddInvoicePayment from "./AddInvoicePayment";
+import { setInvoiceCode } from "../../store/reducers/expenseReducer";
 
 interface IProps {
   openAddPayment: boolean,
@@ -382,7 +383,8 @@ const AddPaymentModal = ({
             <button onClick={() => {
               // setFromInvoice(false)
               setOpenAddPayment(false)
-              }}
+              dispatch(setInvoiceCode(''))
+            }}
             >
               <img src={CloseIcon} alt="" />
             </button>

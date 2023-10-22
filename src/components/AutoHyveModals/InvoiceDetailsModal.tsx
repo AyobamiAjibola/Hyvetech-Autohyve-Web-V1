@@ -5,15 +5,11 @@ import CloseIcon from "../../assets/svgs/close-circle.svg";
 import Hypelogo from "../../assets/images/Hypelogo.png";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
-import Sorting from "../Sorting/Sorting";
-// import RoundChat from "../RoundChat/RoundChat";
-import CustomBarChart from "../BarChart/CustomBarChart";
-import RoundChat from "../RoundChat/RoundChat";
 import { BsChevronDown, BsChevronUp } from "react-icons/bs";
 import settings from "../../config/settings";
 import { Util } from "../../helpers/Util";
 import { INVOICE_STATUS } from "../../config/constants";
-import { IBillingInformation, IEstimate, IInvoice } from "@app-models";
+import { IEstimate, IInvoice } from "@app-models";
 import capitalize from "capitalize";
 import { ILabour, IPart } from "../Forms/models/estimateModel";
 import useAppSelector from "../../hooks/useAppSelector";
@@ -48,8 +44,6 @@ const InvoiceDetailsModal = ({
   setOpenInvoiceDetails, 
   invoiceId, 
   setInvoiceId }: any) => {
-  const tableData = Array(3).fill("");
-  const [select, setSelect] = useState("Select Option");
   const [toggleReport, setToggleReport] = useState(true);
 
   const theme = useTheme();
@@ -65,8 +59,8 @@ const InvoiceDetailsModal = ({
   const [billingInformation, setBillingInformation] =
     useState<any>();
   const [selectedValue, setSelectedValue] = useState<string>("");
-  const [showReport, setShowReport] = useState<boolean>(false);
   const [newExpenses, setNewExpenses] = useState<boolean>(false);
+  const [openNewReminder, setOpenNewReminder] = useState<boolean>(false);
 
   const { isTechAdmin } = useAdmin();
   const dispatch = useAppDispatch();
@@ -85,7 +79,6 @@ const InvoiceDetailsModal = ({
     type: "Cash",
   });
   const [fromInvoice, setFromInvoice] = useState<boolean>(false);
-  const [openEditReminder, setOpenEditReminder] = useState(false);
 
   const generateExpense = () => {
     dispatch(setInvoiceCode(invoice?.code));
@@ -450,6 +443,11 @@ const InvoiceDetailsModal = ({
     invoiceId: invoice?.id,
   };
 
+  const generateReminder = () => {
+    // setInvoiceId(invoice?.id)
+    setOpenNewReminder(true)
+  }
+
   const handleChange = (event: any) => {
     const value = event.target.value as string;
     setSelectedValue(value);
@@ -461,6 +459,7 @@ const InvoiceDetailsModal = ({
     if (value === "Record Payment") {
       setShowRecordPayment(true)
       setFromInvoice(true);
+      dispatch(setInvoiceCode(invoice?.code))
     }
     if (value === "Record Expenses") {
       generateExpense();
@@ -472,11 +471,7 @@ const InvoiceDetailsModal = ({
       handleSharePdf();
     }
     if (value === "Add Reminder") {
-      navigate("/service-reminder");
-      Object.entries(data).forEach(([key, value]) => {
-        //@ts-ignore
-        sessionStorage.setItem(key, value);
-      });
+      generateReminder()
     }
     if (value === "Edit Invoice") {
       navigate("/edit-invoice");
@@ -485,12 +480,6 @@ const InvoiceDetailsModal = ({
         sessionStorage.setItem(key, value);
       });
     }
-  };
-
-  const handleToggleShowReport = () => {
-    setShowReport(() => {
-      return !showReport;
-    });
   };
 
   useEffect(() => {
@@ -1104,14 +1093,14 @@ const InvoiceDetailsModal = ({
         setNewExpenses={setNewExpenses}
       />
 
-      {/* <AddNewReminderModal
-        openNewReminder={openEditReminder}
-        setOpenNewReminder={setOpenEditReminder}
-        // reminderId={reminderId}
-        // setReminderId={setReminderId}
-        editMode={editMode}
-        setEditMode={setEditMode}
-      /> */}
+      <AddNewReminderModal
+        openNewReminder={openNewReminder}
+        setOpenNewReminder={setOpenNewReminder}
+        invoiceId={invoiceId}
+        generatePayment={true}
+        editMode={false}
+        setOpenInvoiceDetails={setOpenInvoiceDetails}
+      />
     </>
   );
 };

@@ -1,6 +1,6 @@
 import { IThunkAPIStatus } from '@app-types';
 import { IInvoice } from '@app-models';
-import { createSlice } from '@reduxjs/toolkit';
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { deleteInvoiceAction, getInvoicesAction, getSingleInvoice, saveInvoiceAction, sendInvoiceAction } from '../actions/invoiceActions';
 
 interface IInvoiceState {
@@ -26,6 +26,7 @@ interface IInvoiceState {
 
   invoices: IInvoice[];
   invoice?: IInvoice;
+  invoiceId: string;
 }
 
 const initialState: IInvoiceState = {
@@ -51,6 +52,7 @@ const initialState: IInvoiceState = {
 
   invoice: undefined,
   invoices: [],
+  invoiceId: ''
 };
 
 const invoiceSlice = createSlice({
@@ -86,6 +88,11 @@ const invoiceSlice = createSlice({
       state.getSingleInvoiceSuccess = '';
       state.getSingleInvoiceError = '';
     },
+
+    setInvoiceId(state: IInvoiceState, action: PayloadAction<any>) {
+      state.invoiceId = action.payload;
+    },
+
   },
   extraReducers: builder => {
     builder
@@ -176,7 +183,8 @@ export const {
   clearSaveInvoiceStatus,
   clearSendInvoiceStatus,
   clearDeleteInvoiceStatus,
-  clearGetSingleInvoiceStatus
+  clearGetSingleInvoiceStatus,
+  setInvoiceId
 } = invoiceSlice.actions;
 
 export default invoiceSlice.reducer;

@@ -61,6 +61,8 @@ const DateRangeAppCalender = ({
         ]}
         onChange={handleSelect}
         moveRangeOnFirstSelection={false}
+        showSelectionPreview={false}
+        showMonthAndYearPickers={false}
       />
     </div>
   );

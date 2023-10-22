@@ -792,6 +792,13 @@ IUser
     updatedAt: string;
   }
 
+  interface IInvoiceData {
+    invoice: string;
+    firstName: string;
+    lastName: string;
+    invoiceDate: Date;
+  }
+
   interface IInvoice {
     id: number;
     code: string;

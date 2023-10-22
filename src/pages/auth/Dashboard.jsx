@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import DashboardWrapper from "../../components/DashboardWrapper/DashboardWrapper";
 import Card from "../../components/Dashboard/Card";
 import { LuSettings2 } from "react-icons/lu";
@@ -12,15 +12,15 @@ import useAppDispatch from "../../hooks/useAppDispatch";
 import { Box, Skeleton } from "@mui/material";
 import useAdmin from "../../hooks/useAdmin";
 import { getTechAnalyticsAction } from "../../store/actions/dashboardActions";
-import { DatePicker } from 'antd';
 import DateRangeAppCalender from "../../components/AppCalender/DateRangeAppCalender";
 import { Util } from "../../helpers/Util";
 import { clearGetTechAnalyticsStatus } from "../../store/reducers/dashboardReducer";
 import moment from "moment";
-import { MONTHS } from '../../config/constants';
+import { MONTHS, _MONTHS } from '../../config/constants';
 import YearPicker from "../../components/YearPicker/YearPicker";
-
-const { RangePicker } = DatePicker;
+import AppCalender from "../../components/AppCalender/AppCalender";
+import AppCalenderEnd from "../../components/AppCalender/AppCalenderEnd";
+import { format, addDays } from "date-fns";
 
 const Dashboard = () => {
   const [openStart, setOpenStart] = useState(false);
@@ -35,22 +35,47 @@ const Dashboard = () => {
   const [start_date, setStart_date] = useState(null);
   const [end_date, setEnd_date] = useState(null);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  // const refOne = useRef(null);
+  // const [openEnd, setOpenEnd] = useState(false);
+  // const [range, setRange] = useState([
+  //   {
+  //     startDate: new Date(),
+  //     endDate: addDays(new Date(), 7),
+  //     key: "selection",
+  //   },
+  // ]);
+
+  const hideOnClickOutside = (e) => {
+    if (refOne.current && !refOne.current.contains(e.target)) {
+      setOpenStart(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("click", hideOnClickOutside, true);
+  }, []);
 
   useEffect(()=>{
     if( techDashboardReducerMain.getTechAnalyticsStatus === 'idle' || start_date || end_date || selectedYear) {
       dispatch(getTechAnalyticsAction({
-        start_date: start_date?.toISOString(),
-        end_date: end_date?.toISOString(),
+        start_date: start_date?.toISOString(), // range[0].startDate.toISOString(), //start_date?.toISOString()
+        end_date: end_date?.toISOString(), //range[0].endDate.toISOString(), //end_date?.toISOString(),
         year: selectedYear
       }))
     }
-  }, [start_date, end_date, selectedYear, techDashboardReducerMain.getTechAnalyticsStatus]);
+  }, [
+    start_date, end_date, 
+    // range[0].startDate, 
+    // range[0].endDate,
+    selectedYear, 
+    techDashboardReducerMain.getTechAnalyticsStatus]);
 
   useEffect(() => {
     if(techDashboardReducerMain.getTechAnalyticsStatus === 'completed') {
       setOpenStart(false);
       setStart_date(null);
       setEnd_date(null);
+      // setRange(null)
       setSelectedYear(null);
     }
   },[techDashboardReducerMain.getTechAnalyticsStatus])
@@ -108,8 +133,8 @@ const Dashboard = () => {
       qty: "",
       color: "#F1F3FF"
     }
-  ]
-  
+  ];
+
   return (
     <DashboardWrapper>
       <>
@@ -142,6 +167,49 @@ const Dashboard = () => {
                 />
               </div>
             )}
+
+          {/* <div
+            className="flex items-center mt-5 md:mt-0 mb-5 gap-4"
+            ref={refOne}
+          >
+            <div className="relative flex flex-col">
+              <span>Start Date</span>
+              <button
+                className="btn btn-secondary font-montserrat"
+                onClick={() => setOpenStart(!openStart)}
+              >
+                {format(range[0].startDate, "MM/dd/yyyy")}
+              </button>
+
+              {openStart && (
+                <AppCalender
+                  setOpenStart={setOpenStart}
+                  openStart={openStart}
+                  range={range}
+                  setRange={setRange}
+                />
+              )}
+            </div>
+            <span className="mt-5">-</span>
+
+            <div className="relative flex flex-col">
+              <span>End Date</span>
+              <button
+                className="btn btn-secondary font-montserrat"
+                onClick={() => setOpenStart(!openStart)}
+              >
+                {format(range[0].endDate, "MM/dd/yyyy")}
+              </button>
+              {openEnd && (
+                <AppCalenderEnd
+                  calender={calenderEnd}
+                  setCalender={setCalenderEnd}
+                  setOpenStart={setOpenEnd}
+                  openStart={openEnd}
+                />
+              )}
+            </div>
+          </div> */}
             
           </div>
         </div>
@@ -200,7 +268,7 @@ const Dashboard = () => {
               {techDashboardReducerMain.getTechAnalyticsStatus === 'loading' || 
                 techDashboardReducerMain.getTechAnalyticsStatus === 'idle' && <Skeleton width={'100%'} height={'100%'} />}
               <CustomBarChart
-                categories={MONTHS}
+                categories={_MONTHS}
                 series={techDashboardReducer?.seriesNew || []}
               />
             </div>

@@ -61,7 +61,7 @@ const Payment = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [transaction, setTransaction] = useState(null);
-
+  
   const partnerName = (user?.partner?.name || " ")
 
   const tableData = Array(3).fill("");

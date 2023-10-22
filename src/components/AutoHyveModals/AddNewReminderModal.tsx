@@ -28,7 +28,6 @@ import { Search } from "@mui/icons-material";
 import { useFormik } from "formik";
 import { getVehicleVINAction } from "../../store/actions/vehicleActions";
 import { clearGetVehicleVINStatus } from "../../store/reducers/vehicleReducer";
-// import { getSingleInvoice } from "../../store/actions/invoiceActions";
 import { showMessage } from "../../helpers/notification";
 import Select from "react-select";
 import { customStyles } from "../../contsants/customStyles";
@@ -38,8 +37,9 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { getSingleInvoice } from "../../store/actions/invoiceActions";
-import { clearGetSingleInvoiceStatus } from "../../store/reducers/invoiceReducer";
 import moment from "moment";
+import { clearGetSingleInvoiceStatus } from "../../store/reducers/invoiceReducer";
+import { clearGetCustomerStatus } from "../../store/reducers/customerReducer";
 
 const { schema, fields, initialValues: _initialValues } = reminderModel;
 const filterOptions = createFilterOptions({
@@ -62,10 +62,13 @@ interface IProps {
   openNewReminder: any;
   setOpenNewReminder: any;
   editMode: any;
-  showEdit: any;
-  setEditMode: any;
-  setReminderId?: any
-  reminderId?: any
+  showEdit?: any;
+  setEditMode?: any;
+  setReminderId?: any;
+  reminderId?: any;
+  generatePayment?: boolean;
+  invoiceId?: any;
+  setOpenInvoiceDetails?: any;
 }
 
 const AddNewReminderModal = ({
@@ -75,7 +78,9 @@ const AddNewReminderModal = ({
   showEdit,
   setEditMode,
   setReminderId,
-  reminderId
+  reminderId,
+  generatePayment,
+  invoiceId, setOpenInvoiceDetails
 }: IProps) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.up("sm"));
@@ -225,7 +230,7 @@ const AddNewReminderModal = ({
       dispatch(getPartnerAction(partnerId));
     }
   }, [dispatch, partnerId]);
-
+  console.log(invoiceReducer.getSingleInvoiceStatus, 'status')
   useEffect(() => {
     // @ts-ignore
     if (customerReducer.getCustomerStatus === 'completed' || 
@@ -233,7 +238,7 @@ const AddNewReminderModal = ({
       const _customer: any = invoiceReducer.invoice?.estimate
                               ? invoiceReducer.invoice?.estimate.customer
                               : customerReducer.customer;
-      console.log(_customer, 'customer')
+    
       const inv_vehicle = invoiceReducer.invoice?.estimate.vehicle;
 
       if (_customer != undefined) {
@@ -267,7 +272,12 @@ const AddNewReminderModal = ({
         setFieldValue('modelYear', inv_vehicle?.modelYear);
       }
     }
-  }, [value, customerReducer.getCustomerStatus, invoiceReducer.sendInvoiceStatus]);
+
+    return () => {
+      dispatch(clearGetSingleInvoiceStatus())
+      dispatch(clearGetCustomerStatus())
+    }
+  }, [value, customerReducer.getCustomerStatus, invoiceReducer.getSingleInvoiceStatus]);
 
   const handleChangeVIN: any = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -293,26 +303,10 @@ const AddNewReminderModal = ({
   }, [timer, dispatch]);
 
   useEffect(() => {
-    const _invoiceId = sessionStorage.getItem('invoiceId');
-    const invoiceId = _invoiceId && parseInt(_invoiceId) || -1
-    dispatch(getSingleInvoice(invoiceId))
-
-    return () => {
-      sessionStorage.removeItem("invoiceId")
-      dispatch(clearGetSingleInvoiceStatus())
+    if(invoiceId) {
+      dispatch(getSingleInvoice(invoiceId))
     }
-  }, [dispatch, sessionStorage]);
-
-  const openModal = sessionStorage.getItem("open_modal");
-  useEffect(() => {
-    if(openModal === 'true') {
-      setOpenNewReminder(true)
-    }
-
-    return () => {
-      sessionStorage.removeItem("open_modal")
-    }
-  },[sessionStorage, openModal])
+  },[invoiceId]);
 
   useEffect(() => {
     if (vehicleReducer.getVehicleVINStatus === 'completed') {
@@ -355,8 +349,9 @@ const AddNewReminderModal = ({
       phone: ""
     });
     setOpenNewReminder(false)
-    setReminderId(-1)
-    setEditMode(false)
+    !generatePayment && setReminderId(-1)
+    !generatePayment && setEditMode(false)
+    generatePayment && setOpenInvoiceDetails(false)
     setInputValue('')
     setValue(null)
     setInitialValues(initialValues)
@@ -390,7 +385,7 @@ const AddNewReminderModal = ({
       setInitialValues(_initialValues)
     }
   }, [editMode]);
-console.log(serviceIntervalUnit, values.serviceInterval, 'interval')
+
   useEffect(() => {
     if(serviceIntervalUnit && values.serviceInterval){
       const next = nextServiceDate(values.lastServiceDate, serviceIntervalUnit, values.serviceInterval)
