@@ -7,10 +7,8 @@ import { Form, Formik } from "formik";
 import * as Yup from "yup";
 import axiosClient from "../../config/axiosClient";
 import { showMessage } from "../../helpers/notification";
-import ResetHyveCloudPasswordModal from "./ResetHyveCloudPasswordModal";
 
 const changePinSchema = Yup.object({
-  currentPin: Yup.string().required("Current PIN is required"),
   pin: Yup.string()
     .required("PIN is required")
     .matches(/^[0-9]+$/, "PIN should be numbers")
@@ -26,11 +24,13 @@ const changePinSchema = Yup.object({
 interface IProps {
   setChangePin: any;
   changePin: any;
+  otp: any
 }
 
-export default function NewPinModal({
+export default function NewPinResetModal({
   setChangePin,
   changePin,
+  otp
 }: IProps) {
   if (changePin) {
     document.body.classList.add("active-modal");
@@ -45,14 +45,13 @@ export default function NewPinModal({
   };
 
   const [loading, setLoading] = useState(false);
-  const [resetPin, setResetPin] = useState<boolean>(false);
 
-  const handlePinUpdate = async (values: any) => {
+  const handlePinReset = async (values: any) => {
     try {
       setLoading(true);
       await axiosClient.post(
-        "/api/v1/cba/account/pin/update",
-        { pin: values.pin, currentPin: values.currentPin }
+        "/api/v1/cba/account/pin/reset",
+        { pin: values.pin, resetCode: otp }
       );
       setChangePin(!changePin);
       showMessage(
@@ -77,8 +76,8 @@ export default function NewPinModal({
       <Formik
         enableReinitialize
         validationSchema={changePinSchema}
-        initialValues={{ pin: "", confirmPin: "", currentPin: "" }}
-        onSubmit={(values) => handlePinUpdate(values)}
+        initialValues={{ pin: "", confirmPin: "" }}
+        onSubmit={(values) => handlePinReset(values)}
       >
         <Form>
           {changePin && (
@@ -109,15 +108,6 @@ export default function NewPinModal({
                   </span>
 
                   <div className="flex flex-col md:flex-row  justify-between items-center gap-1 md:gap-5">
-                    <div className="w-full">
-                      <MyTextInput
-                        placeholderTop="Current PIN"
-                        placeholder="PIN"
-                        hasPLaceHolder={true}
-                        type="password"
-                        name="currentPin"
-                      />
-                    </div>
                     <div className="w-full relative">
                       <MyTextInput
                         placeholderTop="New PIN"
@@ -140,15 +130,6 @@ export default function NewPinModal({
 
                   <div className="flex justify-end mt-3 gap-5">
                     <AppBtn
-                      title="Reset HyvePay Pin"
-                      className="btn-secondary text-[#000] w-full md:w-[200px] mt-1 font-medium"
-                      type="button"
-                      onClick={() => {
-                        setChangePin(false)
-                        setResetPin(true)
-                      }}
-                    />
-                    <AppBtn
                       title="SUBMIT"
                       className="text-[#000]  w-full md:w-[200px]  bg-[#FAA21B] mt-1 font-medium"
                       type="submit"
@@ -161,13 +142,6 @@ export default function NewPinModal({
           )}
         </Form>
       </Formik>
-
-      <ResetHyveCloudPasswordModal
-        openResetPassword={resetPin}
-        setOpenResetPassword={setResetPin}
-        pin={true}
-        // setOpenHyveLogin={setOpenHyveLogin}
-      />
     </>
   );
 }

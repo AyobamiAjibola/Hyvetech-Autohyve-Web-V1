@@ -14,7 +14,7 @@ import AppTabBtn from "../AppTabBtn/AppTabBtn";
 import useAdmin from "../../hooks/useAdmin";
 import { FieldArray, Form, Formik } from "formik";
 import AppInputWithPhone from "../AppInputWithPhone/AppInputWithPhone";
-import { createPartnerKycAction, createPartnerSettingsAction } from "../../store/actions/partnerActions";
+import { createPartnerKycAction, createPartnerSettingsAction, getPreferencesActions, updatePreferencesAction } from "../../store/actions/partnerActions";
 import useAppDispatch from "../../hooks/useAppDispatch";
 import useAppSelector from "../../hooks/useAppSelector";
 import { showMessage } from "../../helpers/notification";
@@ -26,6 +26,9 @@ import { getUserAction, getUsersAction } from "../../store/actions/userActions";
 import partnerModel from "../Forms/models/partnerModel";
 import Brands from "./Brands";
 import { wordBreaker } from "../../utils/generic";
+// import { EditorState, ContentState, convertFromHTML, convertToRaw } from 'draft-js';
+// import { Editor } from 'react-draft-wysiwyg';
+// import '../../../node_modules/react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 
 const API_ROOT = settings.api.baseURL;
 
@@ -68,6 +71,7 @@ const BusinessProfile = ({user}) => {
   const { fields, schema } = partnerModel;
   const dispatch = useAppDispatch()
   const partnerReducer = useAppSelector(state => state.partnerReducer);
+  // const [editorState, setEditorState] = useState(EditorState.createEmpty());
 
   const handleSubmit = ({phone, ...rest}) => {
     const newPhone = `${phone}`.startsWith("234")
@@ -100,6 +104,49 @@ const BusinessProfile = ({user}) => {
       }
     }))
   }
+
+  // useEffect(() => {
+  //   // if (partnerReducer.preference) {
+  //   //   setEditorState(EditorState.createWithContent(stateFromHTML(partnerReducer.preference.termsAndCondition || '')));
+  //   // }
+  //   if (partnerReducer.preference) {
+  //     const html = partnerReducer.preference.termsAndCondition || '';
+  //     const blocksFromHTML = convertFromHTML(html);
+  //     const contentState = ContentState.createFromBlockArray(blocksFromHTML.contentBlocks);
+  //     setEditorState(EditorState.createWithContent(contentState));
+  //   }
+  // }, [partnerReducer.preference]);
+
+  // const getPreferences = useCallback(() => {
+  //   dispatch(getPreferencesActions({}));
+  // }, []);
+
+  // useEffect(() => {
+  //   getPreferences();
+  // }, []);
+
+  // useEffect(() => {
+  //   if (partnerReducer.updatePreferenceStatus === 'completed') {
+  //     showMessage('', 'Preferences updated successfully', 'success');
+  //     getPreferences();
+  //     dispatch(clearUpdatePreferenceStatus());
+  //   } else if (partnerReducer.updatePreferenceStatus === 'failed') {
+  //     showMessage('', partnerReducer.updatePreferenceError || '', 'error');
+  //   }
+  // }, [partnerReducer.updatePreferenceStatus]);
+
+  // const onEditorStateChange = (editorState) => {
+  //   setEditorState(editorState);
+  // };
+
+  // const handleUpdatePreference = () => {
+  //   // Convert the current editor content to HTML
+  //   const contentState = editorState.getCurrentContent();
+  //   const html = convertFromHTML(contentState);
+
+  //   // Dispatch your updatePreferencesAction with the HTML content
+  //   dispatch(updatePreferencesAction({ termsAndCondition: html }));
+  // };
 
   useEffect(() => {
     let stateArray = [];
@@ -484,6 +531,22 @@ const BusinessProfile = ({user}) => {
           </Form>
         )}
       </Formik>
+
+      <div className="p-5 md:p-14 mt-10 hyvepay-setting rounded-3xl">
+        {/* <Editor
+          editorState={editorState}
+          // wrapperClassName="demo-wrapper"
+          // editorClassName="demo-editor"
+          onEditorStateChange={onEditorStateChange}
+        /> */}
+
+        <AppBtn
+          title="UPDATE"
+          className="font-medium block md:hidden"
+          spinner={store.updatePreferenceStatus === 'loading'}
+          onClick={handleUpdatePreference}
+        />
+      </div>
 
       {/* <Formik
         enableReinitialize

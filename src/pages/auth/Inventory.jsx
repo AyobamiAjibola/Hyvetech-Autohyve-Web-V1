@@ -24,7 +24,7 @@ import { getItemsAction, updateItemStatusAction } from "../../store/actions/item
 import useAppDispatch from "../../hooks/useAppDispatch";
 import useAppSelector from "../../hooks/useAppSelector";
 import { showMessage } from "../../helpers/notification";
-import { clearCreateItemStatus, clearDeleteItemStatus, clearItemActiveStatus, clearUpdateItemStatus } from "../../store/reducers/itemStockReducer";
+import { clearAddStockStatus, clearCreateItemStatus, clearDeleteItemStatus, clearItemActiveStatus, clearUpdateItemStatus } from "../../store/reducers/itemStockReducer";
 
 const Inventory = () => {
   const [select, setSelect] = useState("Sort By");
@@ -43,8 +43,9 @@ const Inventory = () => {
   const [editMode, setEditMode] = useState(false);
   const [itemId, setItemId] = useState(-1);
   const [active, setActive] = useState(false);
+  const [item, setItem] = useState(null);
 
-  const item = [
+  const _item = [
     "Name (Ascending)",
     "Name (Descending)",
     "Date (Ascending)",
@@ -156,6 +157,27 @@ const Inventory = () => {
     }
   }, [itemReducer.deleteItemStatus]);
 
+  useEffect(() => {
+    if (itemReducer.addStockStatus === 'completed') {
+      showMessage(
+        "Item stock",
+        itemReducer.addStockSuccess,
+        "success"
+      )
+      dispatch(getItemsAction());
+    } else if(itemReducer.addStockStatus === 'failed') {
+      showMessage(
+        "Item stock",
+        itemReducer.addStockError,
+        "error"
+      )
+    }
+
+    return () => {
+      dispatch(clearAddStockStatus())
+    }
+  }, [itemReducer.addStockStatus]);
+
   return (
     <DashboardWrapper>
       <div className="gap-5 mb-5 justify-between md:flex-row flex-col w-full mt-4 flex md:hidden">
@@ -174,7 +196,7 @@ const Inventory = () => {
       </div>
       <div className="flex flex-col md:flex-row justify-between items-center">
         <Sorting
-          items={item}
+          items={_item}
           select={select}
           setSelect={setSelect}
           className="w-[100%]"
@@ -244,7 +266,7 @@ const Inventory = () => {
                     onClick={(e) => {
                       if (!e.target.closest(".toggle")) {
                         setOpenItem(true);
-                        setItemId(item.id)
+                        setItem(item)
                       }
                     }}
                     style={{ zIndex: 10 }}
@@ -367,8 +389,8 @@ const Inventory = () => {
       <ItemDetailsModal
         openItem={openItem}
         setOpenItem={setOpenItem}
-        itemId={itemId}
-        setItemId={setItemId}
+        item={item}
+        setItem={setItem}
       />
     </DashboardWrapper>
   );

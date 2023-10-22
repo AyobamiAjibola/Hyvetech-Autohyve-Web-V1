@@ -185,30 +185,30 @@ export default function useItemStock() {
   //   }
   // }, [dispatch, itemReducer.deleteItemStatus, itemReducer.deleteItemSuccess, handleReset]);
 
-  useEffect(() => {
-    if (itemReducer.addStockStatus === 'failed') {
-      // setError({ message: itemReducer.addStockError });
-      showMessage(
-        "Item stock",
-        itemReducer.addStockError,
-        "error"
-      )
-      handleReset();
-    }
-  }, [itemReducer.addStockError, itemReducer.addStockStatus, handleReset]);
+  // useEffect(() => {
+  //   if (itemReducer.addStockStatus === 'failed') {
+  //     // setError({ message: itemReducer.addStockError });
+  //     showMessage(
+  //       "Item stock",
+  //       itemReducer.addStockError,
+  //       "error"
+  //     )
+  //     handleReset();
+  //   }
+  // }, [itemReducer.addStockError, itemReducer.addStockStatus, handleReset]);
 
-  useEffect(() => {
-    if (itemReducer.addStockStatus === 'completed') {
-      // setSuccess({ message: itemReducer.addStockSuccess });
-      showMessage(
-        "Item stock",
-        itemReducer.addStockSuccess,
-        "success"
-      )
-      handleReset();
-      dispatch(getItemsAction());
-    }
-  }, [dispatch, itemReducer.addStockStatus, itemReducer.addStockSuccess, handleReset]);
+  // useEffect(() => {
+  //   if (itemReducer.addStockStatus === 'completed') {
+  //     // setSuccess({ message: itemReducer.addStockSuccess });
+  //     showMessage(
+  //       "Item stock",
+  //       itemReducer.addStockSuccess,
+  //       "success"
+  //     )
+  //     handleReset();
+  //     dispatch(getItemsAction());
+  //   }
+  // }, [dispatch, itemReducer.addStockStatus, itemReducer.addStockSuccess, handleReset]);
 
   const handleCreateItem = (values: IItemValues, options?: FormikHelpers<IItemValues>) => {
     const sellingPrice = values.sellingPrice !== undefined && values.sellingPrice;
@@ -299,7 +299,7 @@ export default function useItemStock() {
             setShowEdit(true);
         } else setError({ message: 'An Error Occurred. Please try again or contact support' });
     },
-    [dispatch, items],
+    [dispatch, items, itemId],
   );
 
   const onDelete = useCallback((id: number) => {

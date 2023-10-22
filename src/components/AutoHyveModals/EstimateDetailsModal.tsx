@@ -78,7 +78,6 @@ const EstimateDetailsModal = ({
     padding: isSmallScreen ? "30px" : "30px",
     py: 5,
   };
-  console.log(estimate, 'est')
 
   const customerAddress = wordBreaker(estimate?.address, 5)
 
@@ -97,7 +96,7 @@ const EstimateDetailsModal = ({
     if (discountType === 'exact') {
       return discount;
     }
-    console.log('discount>', Math.ceil(total * (discount / 100)));
+
     return Math.ceil(total * (discount / 100));
   };
 
@@ -284,10 +283,10 @@ const EstimateDetailsModal = ({
             <div className="flex justify-between w-full">
               <div className="top-10 relative">
                 <img
-                  src={ estimate?.partner?.profileImageUrl ? `${API_BASEURL}/${estimate?.partner?.profileImageUrl}` : logoEstimate }
+                  src={ estimate?.partner?.logo ? `${API_BASEURL}/${estimate?.partner?.logo}` : logoEstimate }
                   alt="company logo"
                   crossOrigin="anonymous"
-                  className="w-[80px]"
+                  className="w-[80px] rounded-full h-[80px]"
                 />
               </div>
               <button onClick={handleClose}>

@@ -757,7 +757,7 @@ const GenerateEstimate = () => {
         <div>
           <div className="rounded-2xl mt-10  bg-white py-8 px-3">
             <div className="mt-10">
-              <div className="md:w-[70%] w-[100%] flex gap-2 justify-center items-center">
+              <div className="md:w-[70%] w-[100%]">
                 <Autocomplete
                   filterOptions={filterOptions}
                   inputValue={inputValue}
@@ -865,7 +865,7 @@ const GenerateEstimate = () => {
                   options={showDrop ? options : []}
                   forcePopupIcon={false}
                 />
-                <Box onClick={toggleFetch} className="w-[30%]">
+                {/* <Box onClick={toggleFetch} className="w-[30%]">
                   {fetch ? (
                     <Box
                       sx={{
@@ -903,7 +903,7 @@ const GenerateEstimate = () => {
                       </span>
                     </Box>
                   )}
-                </Box>
+                </Box> */}
               </div>
 
               <div className=" w-[100%] border-[1px] rounded-3xl  flex mt-8  px-3 md:px-5 flex-col py-5  border-[#CACACA]">
@@ -1586,7 +1586,7 @@ const GenerateEstimate = () => {
                       </div>
                       <div className="flex justify-between my-5">
                         <InputHeader text="Discount" />
-                        <InputHeader text={Util.formAmount(discount)} />
+                        <InputHeader text={Util.formAmount(calculateDiscount(subTotal))}/>
                       </div>
                       <div className="flex justify-between my-5">
                         <InputHeader text="Due Balance" />

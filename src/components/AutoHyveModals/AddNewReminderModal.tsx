@@ -58,6 +58,16 @@ const dropdownData2 = [
   { value: 'miles', label: 'miles' }
 ]
 
+interface IProps {
+  openNewReminder: any;
+  setOpenNewReminder: any;
+  editMode: any;
+  showEdit: any;
+  setEditMode: any;
+  setReminderId?: any
+  reminderId?: any
+}
+
 const AddNewReminderModal = ({
   openNewReminder,
   setOpenNewReminder,
@@ -66,7 +76,7 @@ const AddNewReminderModal = ({
   setEditMode,
   setReminderId,
   reminderId
-}: any) => {
+}: IProps) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.up("sm"));
   const [inputValue, setInputValue] = useState('');

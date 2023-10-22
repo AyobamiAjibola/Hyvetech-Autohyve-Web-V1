@@ -128,7 +128,7 @@ const Customers = () => {
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
+  const endIndex = Math.min(startIndex + itemsPerPage, filteredData.length); //startIndex + itemsPerPage;
   const currentData = filteredData.slice(startIndex, endIndex);
 
   const handlePageChange = (newPage) => {
@@ -362,8 +362,7 @@ const Customers = () => {
           </div>
 
           <TableCountTitile
-            title={`Showing ${itemsPerPage} 
-            results out of ${rows.length}`}
+            title={`Showing ${startIndex + 1} - ${endIndex} of ${filteredData.length} results`}
           />
         </div>
 
@@ -384,7 +383,7 @@ const Customers = () => {
               </th>
               <th className="font-montserrat text-xs text-left">Email</th>
               <th className="font-montserrat text-xs text-left">Address</th>
-              <th className="font-montserrat text-xs text-left">Action</th>
+              {/* <th className="font-montserrat text-xs text-left">Action</th> */}
             </thead>
 
             {filteredData.length === 0 ? (
@@ -435,13 +434,13 @@ const Customers = () => {
                         {item.contacts[0].address}
                       </td>
 
-                      <td className="flex gap-3 items-center justify-center ">
+                      {/* <td className="flex gap-3 items-center justify-center ">
                         <HiOutlineTrash
                           size={15}
                           className="text-center cursor-pointer"
                           onClick={(event, id) => closeDeleteModal(event, item.id)}
                         />
-                      </td>
+                      </td> */}
                     </tr>
                   </tbody>
                 );

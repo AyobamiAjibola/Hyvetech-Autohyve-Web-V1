@@ -248,6 +248,13 @@ const AddNewExpensesModal = ({ newExpenses, setNewExpenses }: any) => {
     dispatch(createExpenseCategoryAction({ name }));
   };
 
+  useEffect(() => {
+    if(expenseReducer.invoiceCode) {
+      const invoiceCode = invoiceStore.invoices.find((inv: IInvoice) => inv.code === expenseReducer.invoiceCode)
+      setInvoice(invoiceCode as IInvoice)
+    }
+  },[expenseReducer.invoiceCode]);
+
   return (
     <>
       <Modal
@@ -268,7 +275,7 @@ const AddNewExpensesModal = ({ newExpenses, setNewExpenses }: any) => {
                 <div className="flex justify-between w-full">
                   <ModalHeaderTitle title="Add New Expenses" />
 
-                  <button onClick={() => setNewExpenses(!newExpenses)}>
+                  <button onClick={() => {setNewExpenses(!newExpenses), dispatch(setInvoiceCode(''))}}>
                     <img src={CloseIcon} alt="" />
                   </button>
                 </div>
@@ -575,7 +582,7 @@ const AddNewExpensesModal = ({ newExpenses, setNewExpenses }: any) => {
                     <InputHeader text="Invoice" />
                     <Autocomplete
                       //@ts-ignore
-                      getOptionLabel={option => option.code.split('_')[0]}
+                      getOptionLabel={option => option?.code?.split('_')[0]}
                       disabled={category?.name === "Others" || category?.name === "Overhead"}
                       sx={{
                         "& .MuiOutlinedInput-notchedOutline": {
@@ -623,8 +630,9 @@ const AddNewExpensesModal = ({ newExpenses, setNewExpenses }: any) => {
                         />
                       )}
                       //@ts-ignore
-                      defaultValue={expenseReducer.invoiceCode !== '' ? expenseReducer.invoiceCode : invoice}
+                      // defaultValue={expenseReducer?.invoiceCode !== '' ? expenseReducer?.invoiceCode?.split('_')[0] : invoice}
                       onChange={(_: any, newValue: any) => setInvoice(newValue)}
+                      value={invoice}
                       //@ts-ignore
                       options={invoiceStore.invoices}
                     />

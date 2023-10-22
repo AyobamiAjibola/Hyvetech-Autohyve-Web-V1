@@ -15,13 +15,13 @@ import useItemStock from "../../hooks/useItemStock";
 
 const ItemDetailsModal = ({ 
   openItem, setOpenItem,
-  itemId,
-  setItemId
+  item,
+  setItem
 }) => {
   const [addNewQuantity, setAddNewQuantity] = useState(false);
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.up("sm"));
-  const { onEdit, initialValues } = useItemStock()
+
   const data = [
     "Independent Technician",
     "Single workshop",
@@ -46,17 +46,12 @@ const ItemDetailsModal = ({
   };
 
   const handleClose = () => setOpenItem(false);
-  useEffect(() => {
-    if(itemId) {
-      onEdit(itemId)
-    }
-  },[itemId]);
 
   return (
     <>
       <Modal
         open={openItem}
-        onClose={() => {handleClose(), setItemId(-1)}}
+        onClose={() => {handleClose(), setItem(null)}}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
@@ -65,7 +60,7 @@ const ItemDetailsModal = ({
             <div className="flex justify-between w-full">
               <ModalHeaderTitle title=" Item Detail" />
 
-              <button onClick={() => {setOpenItem(false), setItemId(-1)}}>
+              <button onClick={() => {setOpenItem(false), setItem(null)}}>
                 <img src={CloseIcon} alt="" />
               </button>
             </div>
@@ -78,7 +73,7 @@ const ItemDetailsModal = ({
                     placeholderTop="Name"
                     placeholder="Name"
                     className="bg-[#F5F5F5] border-[#F5F5F5] h-14"
-                    value={initialValues.name}
+                    value={item?.name}
                     disabled
                   />
                 </div>
@@ -89,7 +84,7 @@ const ItemDetailsModal = ({
                     placeholderTop="Selling Rate/Price"
                     placeholder="Selling Rage/Price"
                     className="bg-[#F5F5F5] border-[#F5F5F5] h-14"
-                    value={initialValues.sellingPrice}
+                    value={item?.sellingPrice}
                     disabled
                   />
                 </div>
@@ -102,7 +97,7 @@ const ItemDetailsModal = ({
                     placeholderTop="Type"
                     placeholder="Type"
                     className="bg-[#F5F5F5] border-[#F5F5F5] h-14"
-                    value={initialValues.type}
+                    value={item?.type}
                     disabled
                   />
                 </div>
@@ -113,7 +108,7 @@ const ItemDetailsModal = ({
                     placeholderTop="Buy Rate/Price"
                     placeholder="Buy Rate/Price"
                     className="bg-[#F5F5F5] border-[#F5F5F5] h-14"
-                    value={initialValues.buyingPrice}
+                    value={item?.buyingPrice}
                     disabled
                   />
                 </div>
@@ -126,7 +121,7 @@ const ItemDetailsModal = ({
                     placeholderTop="Item Unit"
                     placeholder="Unit"
                     className="bg-[#F5F5F5] border-[#F5F5F5] h-14"
-                    value={initialValues.unit}
+                    value={item?.unit}
                     disabled
                   />
                 </div>
@@ -137,7 +132,7 @@ const ItemDetailsModal = ({
                     placeholderTop="Qty in Stock"
                     placeholder="Quantity"
                     className="bg-[#F5F5F5] border-[#F5F5F5] h-14"
-                    value={initialValues.quantity}
+                    value={item?.quantity}
                     disabled
                   />
                 </div>
@@ -149,7 +144,7 @@ const ItemDetailsModal = ({
                 placeholderTop="Part Number"
                 placeholder="Part number"
                 className="bg-[#F5F5F5] border-[#F5F5F5] h-14"
-                value={initialValues.partNumber}
+                value={item?.partNumber}
                 disabled
               />
             </div>
@@ -170,7 +165,7 @@ const ItemDetailsModal = ({
               <CustomTextArea
                 topTitle="Note/Remark"
                 placeholder="Note/Remark"
-                value={initialValues.description}
+                value={item?.description}
                 disabled
               />
             </div>
@@ -179,8 +174,7 @@ const ItemDetailsModal = ({
       </Modal>
 
       <AddNewQuantityModal
-        setItemId
-        itemId={itemId}
+        item={item}
         addNewQuantity={addNewQuantity}
         setAddNewQuantity={setAddNewQuantity}
         setOpenItem={setOpenItem}

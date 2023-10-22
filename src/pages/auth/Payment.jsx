@@ -286,7 +286,7 @@ const Payment = () => {
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   
     const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, filteredData.length);
     const currentData = filteredData.slice(startIndex, endIndex);
   
     const handlePageChange = (newPage) => {
@@ -326,7 +326,9 @@ const Payment = () => {
             />
           </div>
 
-          <TableCountTitile />
+          <TableCountTitile 
+            title={`Showing ${startIndex + 1} - ${endIndex} of ${filteredData.length} results`}
+          />
         </div>
 
         <div className="mt-4" style={{ overflowX: "scroll" }}>
@@ -417,12 +419,15 @@ const Payment = () => {
           </table>
         </div>
 
-        <div className="md:block gap-3 flex flex-col">
-          {filteredData.length !== 0 && (<Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />)}
+        <div className="md:block gap-3 flex justify-right items-right">
+          <div className="flex justify-end">
+            {filteredData.length !== 0 && (<Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />)}
+          </div>
+          
         </div>
 
         <DeletePaymentModal

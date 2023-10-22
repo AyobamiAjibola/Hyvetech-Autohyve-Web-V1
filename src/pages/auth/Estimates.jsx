@@ -113,7 +113,7 @@ const Estimates = () => {
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   
     const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, filteredData.length);
     const currentData = filteredData.slice(startIndex, endIndex);
   
     const handlePageChange = (newPage) => {
@@ -210,7 +210,9 @@ const Estimates = () => {
             />
           </div>
 
-          <TableCountTitile />
+          <TableCountTitile
+            title={`Showing ${startIndex + 1} - ${endIndex} of ${filteredData.length} results`}
+          />
         </div>
 
         <div className="mt-4" style={{ overflowX: "scroll" }}>

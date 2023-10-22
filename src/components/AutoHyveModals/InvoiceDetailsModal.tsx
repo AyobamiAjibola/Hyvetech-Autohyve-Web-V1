@@ -9,7 +9,7 @@ import Sorting from "../Sorting/Sorting";
 // import RoundChat from "../RoundChat/RoundChat";
 import CustomBarChart from "../BarChart/CustomBarChart";
 import RoundChat from "../RoundChat/RoundChat";
-import { BsChevronDown } from "react-icons/bs";
+import { BsChevronDown, BsChevronUp } from "react-icons/bs";
 import settings from "../../config/settings";
 import { Util } from "../../helpers/Util";
 import { INVOICE_STATUS } from "../../config/constants";
@@ -29,6 +29,8 @@ import { getInvoicesAction, getSingleInvoice } from "../../store/actions/invoice
 import { wordBreaker } from "../../utils/generic";
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import AddPaymentModal from "./AddPaymentModal";
+import AddNewExpensesModal from "./AddNewExpensesModal";
+import AddNewReminderModal from "./AddNewReminderModal";
 
 const useStyles = makeStyles({
   select: {
@@ -39,6 +41,7 @@ const useStyles = makeStyles({
 });
 
 const API_ROOT = settings.api.rest;
+const BASE_URL = settings.api.baseURL;
 
 const InvoiceDetailsModal = ({ 
   openInvoiceDetails, 
@@ -63,6 +66,7 @@ const InvoiceDetailsModal = ({
     useState<any>();
   const [selectedValue, setSelectedValue] = useState<string>("");
   const [showReport, setShowReport] = useState<boolean>(false);
+  const [newExpenses, setNewExpenses] = useState<boolean>(false);
 
   const { isTechAdmin } = useAdmin();
   const dispatch = useAppDispatch();
@@ -81,10 +85,11 @@ const InvoiceDetailsModal = ({
     type: "Cash",
   });
   const [fromInvoice, setFromInvoice] = useState<boolean>(false);
+  const [openEditReminder, setOpenEditReminder] = useState(false);
 
   const generateExpense = () => {
     dispatch(setInvoiceCode(invoice?.code));
-    navigate("/expense/create");
+    setNewExpenses(true)
   };
 
   // @ts-ignore
@@ -234,7 +239,7 @@ const InvoiceDetailsModal = ({
       setErrorMessage("");
     };
   }, []);
-  console.log(recordData.amount, "record data amount");
+
   const handlePaymentRecord = async () => {
     setRecording(true);
     try {
@@ -586,7 +591,14 @@ const InvoiceDetailsModal = ({
           <div className="modal-header pt-0 px-8">
             <div className="flex justify-between w-full">
               <div className="top-10 relative">
-                <img src={Hypelogo} alt="" className="w-[60px]" />
+                <img
+                  src={ invoice?.estimate?.partner?.logo 
+                          ? `${BASE_URL}/${invoice?.estimate?.partner?.logo}` 
+                          : Hypelogo }
+                  crossOrigin="anonymous"
+                  alt="logo" 
+                  className="w-[80px] rounded-full h-[80px]" 
+                />
               </div>
               <button onClick={() => {setInvoiceId(-1), setOpenInvoiceDetails(false)}}>
                 <img src={CloseIcon} alt="" />
@@ -695,7 +707,7 @@ const InvoiceDetailsModal = ({
           <div>
             <div className="flex-1">
               <div className="flex flex-col">
-                <h5 className="text-base pb-1  font-montserrat font-semibold">
+                <h5 className="text-base pb-1 font-montserrat font-semibold">
                   Invoice
                 </h5>
                 <span className="text-sm font-montserrat font-light">
@@ -772,7 +784,7 @@ const InvoiceDetailsModal = ({
                 {toggleReport ? " Hide Report" : "Show Report"}
               </span>
 
-              <BsChevronDown />
+              {toggleReport ? <BsChevronUp /> : <BsChevronDown />}
             </div>
           </div>
 
@@ -1086,6 +1098,20 @@ const InvoiceDetailsModal = ({
         fromInvoice={fromInvoice}
         setFromInvoice={setFromInvoice}
       />
+
+      <AddNewExpensesModal
+        newExpenses={newExpenses}
+        setNewExpenses={setNewExpenses}
+      />
+
+      {/* <AddNewReminderModal
+        openNewReminder={openEditReminder}
+        setOpenNewReminder={setOpenEditReminder}
+        // reminderId={reminderId}
+        // setReminderId={setReminderId}
+        editMode={editMode}
+        setEditMode={setEditMode}
+      /> */}
     </>
   );
 };

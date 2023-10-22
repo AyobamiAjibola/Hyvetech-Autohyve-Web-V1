@@ -14,13 +14,16 @@ import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import useItemStock from "../../hooks/useItemStock";
 import useAppSelector from "../../hooks/useAppSelector";
+import useAppDispatch from "../../hooks/useAppDispatch";
+import { getItemsAction } from "../../store/actions/itemStockAction";
 
-const AddNewQuantityModal = ({ addNewQuantity, setAddNewQuantity, itemId, setOpenItem }) => {
+const AddNewQuantityModal = ({ addNewQuantity, setAddNewQuantity, item, setOpenItem }) => {
   const handleClose = () => setAddNewQuantity(false);
 
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.up("sm"));
   const { handleAddStock } = useItemStock();
+  const dispatch = useAppDispatch()
   const [data, setData] = useState({
     id: -1,
     quantity: 0
@@ -45,13 +48,16 @@ const AddNewQuantityModal = ({ addNewQuantity, setAddNewQuantity, itemId, setOpe
   };
 
   useEffect(() => {
-    setData({...data, id: itemId})
-  },[itemId]);
+    setData({...data, id: item?.id})
+  },[item]);
 
   useEffect(() => {
     if(itemReducer.addStockStatus === 'completed') {
+      setAddNewQuantity(false)
       setOpenItem(false)
     }
+
+    dispatch(getItemsAction())
   },[itemReducer.addStockStatus])
 
   return (
@@ -106,7 +112,7 @@ const AddNewQuantityModal = ({ addNewQuantity, setAddNewQuantity, itemId, setOpe
             <AppBtn
               title="SAVE"
               className="font-medium w-[90%] md:w-[300px] mt-5"
-              onClick={() => {handleAddStock(data), setAddNewQuantity(false)}}
+              onClick={() => {handleAddStock(data)}}
               spinner={itemReducer.addStockStatus === 'loading'}
             />
           </div>

@@ -142,7 +142,7 @@ const Hyvepay = () => {
   const [selectedRow, setSelectedRow] = useState(null);
   const [successModal, setSuccessModal] = useState(false);
   const [__, setShowModal] = useState(false);
-  const [openResetPin, setOpenResetPin] = useState<boolean>(false);
+  const [changePin, setChangePin] = useState<boolean>(false);
 
   const closeSuccessModal = () => {
     setSuccessModal(!successModal);
@@ -281,15 +281,21 @@ const Hyvepay = () => {
                         className="btn-secondary mt-4 "
                       />
 
-                      <div className="flex justify-left w-full mt-4">
+                      <AppBtn
+                        onClick={() => setChangePin(true)}
+                        title="Change/Reset HyvePay Pin"
+                        className="mt-4 "
+                      />
+
+                      {/* <div className="flex justify-left w-full mt-4">
                         <p>
                           <span className="text-sm mr-2 mb-0 font-montserrat font-bold hover:text-[#faa21b] cursor-pointer"
-                            onClick={() => setOpenResetPin(true)}
+                            onClick={() => setChangePin(true)}
                           >
                             Reset pin
                           </span>
                         </p>
-                      </div>
+                      </div> */}
                     </div>
                   )}
                 </div>
@@ -493,8 +499,8 @@ const Hyvepay = () => {
 
       <CustomDatePickerModal openDate={openDate} setOpenDate={setOpenDate} />
       <NewPinModal 
-        setOpenResetPin={setOpenResetPin}
-        openResetPin={openResetPin}
+        setChangePin={setChangePin}
+        changePin={changePin}
       />
     </>
   );

@@ -184,7 +184,7 @@ const Expenses = () => {
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
+  const endIndex = Math.min(startIndex + itemsPerPage, filteredData.length);
   const currentData = filteredData.slice(startIndex, endIndex);
 
   const handlePageChange = (newPage) => {
@@ -210,7 +210,7 @@ const Expenses = () => {
           <div className="flex gap-3">
             <AppTabBtn
               icon={<AiOutlinePlus />}
-              title="Add New Payment"
+              title="Add New Expenses"
               className="w-[200px] text-[#000] btn-secondary hidden md:flex"
               onClick={() => setNewExpenses(true)}
             />
@@ -225,7 +225,9 @@ const Expenses = () => {
             />
           </div>
 
-          <TableCountTitile />
+          <TableCountTitile 
+            title={`Showing ${startIndex + 1} - ${endIndex} of ${filteredData.length} results`}
+          />
         </div>
 
         <div className="mt-4" style={{ overflowX: "scroll" }}>
@@ -314,12 +316,14 @@ const Expenses = () => {
             })}
           </table>
         </div>
-        <div className="md:block gap-3 flex flex-col">
-          {filteredData.length !== 0 && (<Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />)}
+        <div className="md:block gap-3 flex flex-col mt-6">
+          <div className="flex justify-end">
+            {filteredData.length !== 0 && (<Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />)}
+          </div>
         </div>
         {/* <div className="flex justify-between flex-col md:flex-row md:gap-0 gap-5 w-[99%] mt-10">
           <AppTabBtn

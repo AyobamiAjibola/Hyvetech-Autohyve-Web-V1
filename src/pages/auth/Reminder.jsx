@@ -120,7 +120,7 @@ const Reminder = () => {
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
+  const endIndex = Math.min(startIndex + itemsPerPage, filteredData.length);
   const currentData = filteredData.slice(startIndex, endIndex);
 
   const handlePageChange = (newPage) => {
@@ -224,17 +224,20 @@ const Reminder = () => {
           </div>
 
           <div className="flex w-full md:w-[50%] items-start md:items-center font-montserrat md:flex-row flex-col  text-[11px] gap-4 text-gray-500">
-            <TableCountTitile className="items-start" />
+
             <div className="flex items-center border-[1px] md:w-[65%] w-[100%] border-[#CACACA] px-3 py-3 rounded-[15px]">
               <BsFillExclamationCircleFill
                 color="#FAA21B"
                 className="mr-2 text-[25px]"
               />
-              <span className="text-[#3E3E3E] text-xs md:text-[7px]  md:font-semibold font-normal">
+              <span className="text-[#3E3E3E] text-xs md:text-[9px]  md:font-semibold font-normal">
                 {overDue.length} services overdue, {dueWeek.length} services due this week, {dueMonth.length} services due
                 this month
               </span>
             </div>
+            <TableCountTitile
+              title={`Showing ${startIndex + 1} - ${endIndex} of ${filteredData.length} results`}
+            />
           </div>
         </div>
 

@@ -11,7 +11,7 @@ import ModalHeaderTitle from "../ModalHeaderTitle/ModalHeaderTitle";
 import SearchInput from "../SearchInput/SearchInput";
 import AppTabBtn from "../AppTabBtn/AppTabBtn";
 import { AiOutlinePlus } from "react-icons/ai";
-import AddNewBeneficiaryModal from "./AddNewBeneficiaryModal";
+import AddNewBeneficiaryModal from "../modals/AddNewBeneficiaryModal";
 
 const AddnewExpnesesType = ({ newExpensesType, setNewExpensesType }) => {
   const node = useRef();

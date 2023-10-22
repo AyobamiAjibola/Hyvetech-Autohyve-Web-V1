@@ -42,7 +42,7 @@ const Invoices = () => {
 
   const transactionReducer = useAppSelector((state) => state.transactionReducer);
   const invoiceReducer = useAppSelector(state => state.invoiceReducer)
-  console.log(invoiceReducer.sendInvoiceStatus, 'status in invoices')
+
   const routerQuery = useRouterQuery();
   const dispatch = useAppDispatch();
 
@@ -88,7 +88,7 @@ const Invoices = () => {
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
+  const endIndex = Math.min(startIndex + itemsPerPage, filteredData.length);
   const currentData = filteredData.slice(startIndex, endIndex);
 
   const handlePageChange = (newPage: any) => {
@@ -226,8 +226,7 @@ const Invoices = () => {
           </div>
 
           <TableCountTitile 
-            title={`Showing ${itemsPerPage} 
-            results out of ${invoices.length}`}
+            title={`Showing ${startIndex + 1} - ${endIndex} of ${filteredData.length} results`}
             className=''
           />
         </div>

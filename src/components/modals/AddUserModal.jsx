@@ -12,7 +12,10 @@ import { showMessage } from "../../helpers/notification";
 import { clearCreatePartnerUserStatus, clearCreateUserStatus, clearUpdateUserPartnerStatus } from "../../store/reducers/userReducer";
 import * as Yup from "yup";
 import AppInputWithPhone from "../AppInputWithPhone/AppInputWithPhone";
-import { Select } from "antd";
+// import { Select } from "antd";
+import { customStyles } from "../../contsants/customStyles";
+import InputHeader from "../InputHeader/InputHeader";
+import Select from "react-select";
 
 const createUserSchema = Yup.object().shape({
   firstName: Yup.string(),
@@ -171,6 +174,7 @@ const handleCreateUser = ({phone, ...rest }) => {
                           ? `${phone}`.replace("0", "234")
                           : `${phone}`.replace("", "234")
     const values = { ...rest, phone: newPhone };
+    console.log(values, 'val')
 
     dispatch(createPartnerUserAction(values));
 };
@@ -302,23 +306,38 @@ const handleCreateUser = ({phone, ...rest }) => {
                         </div>
 
                         <div className="w-full">
-                          <span 
+                          <InputHeader text="Role" />
+                          <Select
+                            options={store.roles.map(option => ({ value: option.name, label: option.name }))}
+                            onChange={(item) => {
+                              setFieldValue("role", String(item?.value));
+                            }}
+                            styles={customStyles}
+                            placeholder="Role"
+                            name={"role"}
+                            onBlur={handleBlur}
+                            value={{
+                              value: values.role,
+                              label: values.role,
+                            }}
+                          />
+                          {/* <span 
                               className='font-montserrat '
                           >Role</span>
                           <select 
                               className={`w-full h-[3.5rem] mt-0.4 
                               rounded-[20px] p-2 bg-[#f5f5f5] color: #000000;
                               transition: all 300ms ease-out;`}
-                              onChange={handleChange}
+                              onChange={(e) => console.log(e.target.value, 'values')}
                               name="role"
-                              value={values.role }
+                              value={values.role}
                           >
                               {store.roles.map((role, index) => {
                                   return (
-                                      <option key={role.id}>{role.name}</option>
+                                    <option key={role.id}>{role.name}</option>
                                   )
                               })}
-                          </select>
+                          </select> */}
                         </div>
                       </div>
                     </div>

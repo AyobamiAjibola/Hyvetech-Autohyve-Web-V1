@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import CloseIcon from "../../assets/svgs/close-circle.svg";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
@@ -13,11 +13,18 @@ import { clearSendPasswordResetTokenStatus } from "../../store/reducers/authenti
 import { showMessage } from "../../helpers/notification";
 import { sendPasswordResetTokenAction } from "../../store/actions/authenicationActions";
 
+interface IProps {
+  openResetPassword: any;
+  setOpenResetPassword: any;
+  setOpenHyveLogin?: any;
+  pin?: boolean;
+}
+
 const ResetHyveCloudPasswordModal = ({
   openResetPassword,
   setOpenResetPassword,
-  setOpenHyveLogin,
-}) => {
+  setOpenHyveLogin, pin
+}: IProps) => {
   const handleClose = () => setOpenResetPassword(false);
 
   const theme = useTheme();
@@ -52,7 +59,7 @@ const ResetHyveCloudPasswordModal = ({
     if(state.sendPasswordResetTokenStatus === "completed") {
       setOpenOtp(true);
       setOpenResetPassword(false);
-      setOpenHyveLogin(false);
+      !pin && setOpenHyveLogin(false);
       showMessage(
         "Reset password",
         state.sendPasswordResetTokenSuccess,
@@ -92,8 +99,8 @@ const ResetHyveCloudPasswordModal = ({
               Reset your password
             </h2>
             <span className="text-xs mt-2 font-montserrat text-center mb-5 w-[300px]">
-              Enter your email address below and we will send you an OTP to
-              reset your password
+              {`Enter your email address below and we will send you an OTP to
+                reset your ${pin ? 'pin' : 'password'}`}
             </span>
 
             <div className="w-full">
@@ -102,24 +109,23 @@ const ResetHyveCloudPasswordModal = ({
                 placeholder="Enter your email"
                 className="h-14"
                 hasPLaceHolder={true}
-                title="Email"
-                onChange={(e) => {
+                onChange={(e: any) => {
                   setEmail(e.target.value)
                 }}
+                value={email}
               />
             </div>
 
             <AppBtn
               title="GET RESET OTP"
-              className="text-[#000] w-full bg-[#FAA21B]  mt-10"
-              titleClassName="font-semibold"
+              className="text-[#000] w-full bg-[#FAA21B] font-semibold mt-10"
               onClick={handleResetPassword}
               spinner={state.sendPasswordResetTokenStatus === 'loading'}
             />
           </div>
         </Box>
       </Modal>
-      <OtpModal openOtp={openOtp} setOpenOtp={setOpenOtp} email={email} />
+      <OtpModal openOtp={openOtp} setOpenOtp={setOpenOtp} email={email} pin={true}/>
     </>
   );
 };
