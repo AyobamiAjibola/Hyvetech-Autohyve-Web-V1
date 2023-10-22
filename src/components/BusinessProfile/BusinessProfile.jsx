@@ -532,21 +532,12 @@ const BusinessProfile = ({user}) => {
         )}
       </Formik>
 
-      <div className="p-5 md:p-14 mt-10 hyvepay-setting rounded-3xl">
         {/* <Editor
           editorState={editorState}
           // wrapperClassName="demo-wrapper"
           // editorClassName="demo-editor"
           onEditorStateChange={onEditorStateChange}
         /> */}
-
-        <AppBtn
-          title="UPDATE"
-          className="font-medium block md:hidden"
-          spinner={store.updatePreferenceStatus === 'loading'}
-          onClick={handleUpdatePreference}
-        />
-      </div>
 
       {/* <Formik
         enableReinitialize
