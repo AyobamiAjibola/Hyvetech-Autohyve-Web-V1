@@ -183,6 +183,23 @@ const Reminder = () => {
   const dueWeek = reminders.filter(reminder => reminder.reminderStatus === "Due in [1] week(s)");
   const dueMonth = reminders.filter(reminder => reminder.reminderStatus === "Due in [1] month(s)");
 
+  useEffect(() => {
+    if (reminderReducer.deleteReminderStatus === 'completed') {
+      showMessage(
+          "Reminder",
+          "Reminder deleted successfully",
+          "success"
+      )
+      dispatch(getReminderAction());
+    } else if(reminderReducer.deleteReminderStatus === 'failed') {
+      showMessage(
+        "Reminder",
+        reminderReducer.deleteReminderError,
+        "error"
+      )
+    }
+  }, [reminderReducer.deleteReminderStatus]);
+
   return (
     <DashboardWrapper>
       <>

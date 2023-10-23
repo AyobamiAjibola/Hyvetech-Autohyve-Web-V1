@@ -40,6 +40,8 @@ import { getSingleInvoice } from "../../store/actions/invoiceActions";
 import moment from "moment";
 import { clearGetSingleInvoiceStatus } from "../../store/reducers/invoiceReducer";
 import { clearGetCustomerStatus } from "../../store/reducers/customerReducer";
+import { getReminderAction } from "../../store/actions/serviceReminderActions";
+import { clearCreateReminderStatus, clearUpdateReminderStatus } from "../../store/reducers/serviceReminderReducer";
 
 const { schema, fields, initialValues: _initialValues } = reminderModel;
 const filterOptions = createFilterOptions({
@@ -124,6 +126,7 @@ const AddNewReminderModal = ({
     // enableReinitialize,
     initialValues: initialValues,
     onSubmit: (values: any) => {
+      console.log(values, 'values')
       const data = {
         email: values.email,
         reminderTypes: values.reminderType,
@@ -151,12 +154,14 @@ const AddNewReminderModal = ({
       if(!editMode) {
         handleCreateReminder(data)
       };
+      console.log(data, 'data')
       if(editMode) {
         handleUpdateReminder(data)
       };
     },
     validationSchema: schema
   });
+
   const setFieldValue = formik.setFieldValue;
   const values = formik.values;
 
@@ -230,7 +235,7 @@ const AddNewReminderModal = ({
       dispatch(getPartnerAction(partnerId));
     }
   }, [dispatch, partnerId]);
-  console.log(invoiceReducer.getSingleInvoiceStatus, 'status')
+
   useEffect(() => {
     // @ts-ignore
     if (customerReducer.getCustomerStatus === 'completed' || 
@@ -393,7 +398,7 @@ const AddNewReminderModal = ({
       _setNextServiceDate(next)
       setFieldValue('nextServiceDate', next)
     }
-  }, [serviceIntervalUnit, values.serviceInterval])
+  }, [serviceIntervalUnit, values.serviceInterval, values.lastServiceDate])
 
   useEffect(() => {
     if(_nextServiceDate && values.lastServiceDate && serviceIntervalUnit){
@@ -410,10 +415,51 @@ const AddNewReminderModal = ({
   // }, [values.serviceStatus]);
 
   useEffect(() => {
-    if(reminderReducer.createReminderStatus === 'completed' || reminderReducer.updateReminderStatus === 'completed') {
+    if(reminderReducer.createReminderStatus === 'completed') {
       handleCloseModal()
+      showMessage(
+        "Reminder",
+        "Reminder created successfully",
+        "success"
+      )
+      dispatch(getReminderAction())
+
+    } else if(reminderReducer.createReminderStatus === 'failed') {
+      showMessage(
+        "Reminder",
+        reminderReducer.createReminderError,
+        "error"
+      )
     }
-  },[reminderReducer.createReminderStatus, reminderReducer.updateReminderStatus]);
+
+    return () => {
+      dispatch(clearCreateReminderStatus())
+    }
+  },[reminderReducer.createReminderStatus]);
+
+  useEffect(() => {
+    if(reminderReducer.updateReminderStatus === 'completed') {
+      handleCloseModal()
+      showMessage(
+        "Reminder",
+        "Updated reminder successfully",
+        "success"
+      )
+      
+      dispatch(getReminderAction())
+      
+    } else if(reminderReducer.updateReminderStatus === 'failed') {
+      showMessage(
+        "Reminder",
+        reminderReducer.updateReminderError,
+        "error"
+      )
+    }
+
+    return () => {
+      dispatch(clearUpdateReminderStatus())
+    }
+  },[reminderReducer.updateReminderStatus]);
 
   return (
     <>
@@ -880,6 +926,7 @@ const AddNewReminderModal = ({
 
                 <div className="mt-10">
                   <AppBtn
+                    type='submit'
                     title={editMode ? "SAVE" : "ADD REMINDER"}
                     className={`font-semibold md:w-[300px] w-[100%]`}
                     spinner={reminderReducer.updateReminderStatus === 'loading' || reminderReducer.createReminderStatus === 'loading'}

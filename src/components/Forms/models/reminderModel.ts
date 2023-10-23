@@ -249,10 +249,10 @@ const schema = Yup.object().shape({
     serviceIntervalUnit: Yup.string().nullable().label(fields.serviceIntervalUnit.label),
     note: Yup.string().nullable().label(fields.note.label),
     recurring: Yup.string().label(fields.recurring.label),
-    lastServiceMileage: Yup.number().label(fields.lastServiceMileage.label),
-    lastServiceMileageUnit: Yup.string().label(fields.lastServiceMileageUnit.label),
-    nextServiceMileage: Yup.number().label(fields.nextServiceMileage.label),
-    nextServiceMileageUnit: Yup.string().label(fields.nextServiceMileageUnit.label),
+    lastServiceMileage: Yup.number().nullable().label(fields.lastServiceMileage.label),
+    lastServiceMileageUnit: Yup.string().nullable().label(fields.lastServiceMileageUnit.label),
+    nextServiceMileage: Yup.number().nullable().label(fields.nextServiceMileage.label),
+    nextServiceMileageUnit: Yup.string().nullable().label(fields.nextServiceMileageUnit.label),
 });
 
 const schemaReminderType = Yup.object().shape({

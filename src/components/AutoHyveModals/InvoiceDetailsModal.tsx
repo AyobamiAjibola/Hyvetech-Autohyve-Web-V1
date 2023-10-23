@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import CloseIcon from "../../assets/svgs/close-circle.svg";
@@ -27,6 +27,7 @@ import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import AddPaymentModal from "./AddPaymentModal";
 import AddNewExpensesModal from "./AddNewExpensesModal";
 import AddNewReminderModal from "./AddNewReminderModal";
+import { getPreferencesActions } from "../../store/actions/partnerActions";
 
 const useStyles = makeStyles({
   select: {
@@ -61,6 +62,7 @@ const InvoiceDetailsModal = ({
   const [selectedValue, setSelectedValue] = useState<string>("");
   const [newExpenses, setNewExpenses] = useState<boolean>(false);
   const [openNewReminder, setOpenNewReminder] = useState<boolean>(false);
+  const [preference, setPreference] = useState('');
 
   const { isTechAdmin } = useAdmin();
   const dispatch = useAppDispatch();
@@ -68,6 +70,7 @@ const InvoiceDetailsModal = ({
 
   const store = useAppSelector((state) => state.invoiceReducer);
   const expenseReducer = useAppSelector((state) => state.expenseReducer);
+  const partnerReducer = useAppSelector(state => state.partnerReducer);
 
   const [showRecordPayment, setShowRecordPayment] = useState<boolean>(false);
   const [recording, setRecording] = useState<any>(false);
@@ -567,6 +570,20 @@ const InvoiceDetailsModal = ({
   };
   const partnerAddress = wordBreaker(estimate?.partner?.contact?.address as string, 5)
   const customerAddress = wordBreaker(billingInformation?.address as string, 5)
+
+  useEffect(() => {
+    if (partnerReducer.preference) {
+      setPreference(partnerReducer.preference.termsAndCondition);
+    }
+  }, [partnerReducer.preference]);
+
+  const getPreferences = useCallback(() => {
+    dispatch(getPreferencesActions({}));
+  }, []);
+
+  useEffect(() => {
+    getPreferences();
+  }, []);
 
   return (
     <>
@@ -1076,6 +1093,18 @@ const InvoiceDetailsModal = ({
                   <span className="text-sm">{Util.formAmount(grandTotal)}</span>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <hr className="mt-10" />
+          <div className="flex flex-col mt-10">
+            <span className="text-lg font-bold font-montserrat mb-2">
+              Terms and Conditions
+            </span>
+            <div
+              dangerouslySetInnerHTML={{ __html: preference }}
+            >
+            
             </div>
           </div>
         </Box>

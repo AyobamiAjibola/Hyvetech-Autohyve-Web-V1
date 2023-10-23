@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import CloseIcon from "../../assets/svgs/close-circle.svg";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
@@ -9,7 +9,7 @@ import mdi_share from "../../assets/images/mdi_share.png";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import moment from "moment";
-import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from "@mui/material";
+import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 import settings from "../../config/settings";
 import { Util } from "../../helpers/Util";
@@ -21,6 +21,7 @@ import useAppSelector from "../../hooks/useAppSelector";
 import useAppDispatch from "../../hooks/useAppDispatch";
 import { getInvoicesAction } from "../../store/actions/invoiceActions";
 import DownloadEstimateModal from "../modals/DownloadEstimateModal";
+import { getPreferencesActions } from "../../store/actions/partnerActions";
 
 const useStyles = makeStyles({
   select: {
@@ -45,8 +46,10 @@ const EstimateDetailsModal = ({
   const [downloading, setDownloading] = useState<any>(false);
   const [generating, setGenerating] = useState<any>(false);
   const [downloadEstimateModal, setDownloadEstimateModal] = useState<boolean>(false);
+  const [preference, setPreference] = useState('');
 
   const invoiceReducer = useAppSelector(state => state.invoiceReducer);
+  const partnerReducer = useAppSelector(state => state.partnerReducer);
   const dispatch = useAppDispatch();
 
   const closeDownloadEstimateModal = (e: any) => {
@@ -269,6 +272,20 @@ const EstimateDetailsModal = ({
   },[invoice])
 
   const refundable = estimate?.grandTotal - amountPaid;
+  
+  useEffect(() => {
+    if (partnerReducer.preference) {
+      setPreference(partnerReducer.preference.termsAndCondition);
+    }
+  }, [partnerReducer.preference]);
+
+  const getPreferences = useCallback(() => {
+    dispatch(getPreferencesActions({}));
+  }, []);
+
+  useEffect(() => {
+    getPreferences();
+  }, []);
 
   return (
     <>
@@ -666,20 +683,14 @@ const EstimateDetailsModal = ({
 
           <hr className="mt-10" />
           <div className="flex flex-col mt-10">
-            <span className="text-sm font-medium font-montserrat">
+            <span className="text-lg font-bold font-montserrat mb-2">
               Terms and Conditions
             </span>
-            <p className="text-xs font-light font-montserrat">
-              Lorem ipsum dolor sit amet consectetur. Imperdiet malesuada ipsum
-              vehicula dui vel. At ultrices eu felis ultricies quis mattis a
-              quis. Duis commodo venenatis eget est pellentesque. Quis dui magna
-              posuere sem. Enim adipiscing vel nisi senectus varius lectus
-              molestie purus. Diam erat porttitor egestas potenti. Auctor
-              commodo dolor duis enim sed congue congue vel. Aliquet cras et
-              blandit sit molestie nulla. Convallis cras odio interdum dolor nam
-              in volutpat tincidunt. Faucibus ultrices nec cursus quam ornare
-              enim sit quam.
-            </p>
+            <div
+              dangerouslySetInnerHTML={{ __html: preference }}
+            >
+            
+            </div>
           </div>
         </Box>
       </Modal>

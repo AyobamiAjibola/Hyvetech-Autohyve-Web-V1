@@ -4,6 +4,8 @@ import "../../../assets/css/layout.css";
 import hyvePay from "../../../assets/images/Hypelogo.png";
 import HyveIcon from "../../../assets/images/hyvBlackLogo.png";
 import logoutLogo from "../../../assets/images/logoutLogo.png";
+import support from "../../../assets/svgs/support.svg";
+import feedback from "../../../assets/svgs/feedback.svg";
 import ArrowCircleLeft from "../../../assets/svgs/arrowcircleleft.svg";
 import ArrowCircleRight from "../../../assets/svgs/arrowcircleRight.svg";
 import { Link, NavLink, useLocation, useMatch, useNavigate } from "react-router-dom";
@@ -39,6 +41,12 @@ const Sidebar = ({ show, setShow, openNav, setOpenNav, active, setActive }) => {
   //     localStorage.setItem("active", "Dashboard");
   //   }
   // }, []);
+
+  const openWhatsAppChat = () => {
+    const phoneNumber = "2349167934817"
+    const whatsappURL = `https://api.whatsapp.com/send?phone=${phoneNumber}`;
+    window.open(whatsappURL);
+  };
 
   useEffect(() => {
     if(location.pathname === '/vin-decoder') {
@@ -170,7 +178,7 @@ const Sidebar = ({ show, setShow, openNav, setOpenNav, active, setActive }) => {
 
             {accountType === "cooperate" || accountType === null ? (<div>
               <div
-                className={`flex items-center font-montserrat text-white cursor-pointer ${showDropdown && 'mb-4'}`}
+                className={`flex items-center font-montserrat text-white cursor-pointer ${showDropdown ? 'mb-4' : 'mb-[-20px]'}`}
                 onClick={toggleDropdown}
               >
                 <img
@@ -223,6 +231,45 @@ const Sidebar = ({ show, setShow, openNav, setOpenNav, active, setActive }) => {
                 )}
               </div>
             </div>) : <div></div>}
+
+            <div
+              onClick={openWhatsAppChat}
+              className="flex items-center font-montserrat mb-2 text-white pl-[10px] cursor-pointer"
+            >
+              <img
+                src={support}
+                alt="contact support"
+                style={{ height: 27, width: 30 }}
+                className="ml-2"
+              />
+
+              <span
+                className={` ml-5 font-montserrat text-sm text-white ${
+                  show ? "item-text" : null
+                } `}
+              >
+                Support
+              </span>
+            </div>
+            <div
+              onClick={openWhatsAppChat}
+              className="flex items-center font-montserrat mb-2 text-white pl-[10px] cursor-pointer"
+            >
+              <img
+                src={feedback}
+                alt="feedback"
+                style={{ height: 27, width: 30 }}
+                className="ml-2"
+              />
+
+              <span
+                className={` ml-5 font-montserrat text-sm text-white ${
+                  show ? "item-text" : null
+                } `}
+              >
+                Feedback
+              </span>
+            </div>
 
             <hr />
             <div

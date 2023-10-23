@@ -313,7 +313,7 @@ const Payment = () => {
 
           <AppTabBtn
             icon={<AiOutlinePlus />}
-            title="Add New Payment"
+            title="Record Payment"
             className="md:w-[250px] w-[100%] mt-3 text-[#000] btn-secondary  flex"
             onClick={() => setOpenAddPayment(true)}
           />

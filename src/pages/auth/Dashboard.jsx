@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import DashboardWrapper from "../../components/DashboardWrapper/DashboardWrapper";
 import Card from "../../components/Dashboard/Card";
 import { LuSettings2 } from "react-icons/lu";
@@ -21,6 +21,7 @@ import YearPicker from "../../components/YearPicker/YearPicker";
 import AppCalender from "../../components/AppCalender/AppCalender";
 import AppCalenderEnd from "../../components/AppCalender/AppCalenderEnd";
 import { format, addDays } from "date-fns";
+import DateRangeSelector from "../../helpers/date_range/DateRangeSelector";
 
 const Dashboard = () => {
   const [openStart, setOpenStart] = useState(false);
@@ -35,44 +36,30 @@ const Dashboard = () => {
   const [start_date, setStart_date] = useState(null);
   const [end_date, setEnd_date] = useState(null);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  // const refOne = useRef(null);
-  // const [openEnd, setOpenEnd] = useState(false);
-  // const [range, setRange] = useState([
-  //   {
-  //     startDate: new Date(),
-  //     endDate: addDays(new Date(), 7),
-  //     key: "selection",
-  //   },
-  // ]);
-
-  const hideOnClickOutside = (e) => {
-    if (refOne.current && !refOne.current.contains(e.target)) {
-      setOpenStart(false);
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener("click", hideOnClickOutside, true);
-  }, []);
+  const [reload, setReload] = useState(false);
 
   useEffect(()=>{
-    if( techDashboardReducerMain.getTechAnalyticsStatus === 'idle' || start_date || end_date || selectedYear) {
+    if( techDashboardReducerMain.getTechAnalyticsStatus === 'idle' 
+      || start_date || end_date || selectedYear || reload) {
       dispatch(getTechAnalyticsAction({
-        start_date: start_date?.toISOString(), // range[0].startDate.toISOString(), //start_date?.toISOString()
-        end_date: end_date?.toISOString(), //range[0].endDate.toISOString(), //end_date?.toISOString(),
+        start_date: start_date?.toISOString(),
+        end_date: end_date?.toISOString(),
         year: selectedYear
       }))
     }
+
+    return () => {
+      setReload(false)
+    }
   }, [
-    start_date, end_date, 
-    // range[0].startDate, 
-    // range[0].endDate,
+    start_date, end_date,
+    reload,
     selectedYear, 
     techDashboardReducerMain.getTechAnalyticsStatus]);
 
   useEffect(() => {
     if(techDashboardReducerMain.getTechAnalyticsStatus === 'completed') {
-      setOpenStart(false);
+      // setOpenStart(false);
       setStart_date(null);
       setEnd_date(null);
       // setRange(null)
@@ -155,7 +142,8 @@ const Dashboard = () => {
 
             {openStart && (
               <div className="absolute right-[60px]">
-                <DateRangeAppCalender
+
+                <DateRangeSelector
                   setCalenderStart={setCalenderStart}
                   setCalenderEnd={setCalenderEnd}
                   setOpenStart={setOpenStart}
@@ -164,6 +152,7 @@ const Dashboard = () => {
                   endDate={end_date}
                   setStartDate={setStart_date}
                   setEndDate={setEnd_date}
+                  setReload={setReload}
                 />
               </div>
             )}

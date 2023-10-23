@@ -57,6 +57,10 @@ interface IUserState {
   deleteUserSuccess: string;
   deleteUserError?: string;
 
+  updateStatusUserStatus: IThunkAPIStatus;
+  updateStatusUserSuccess: string;
+  updateStatusUserError?: string;
+
   users: IUser[];
   user: IUser | null;
 
@@ -105,6 +109,10 @@ const initialState: IUserState = {
   deleteUserError: '',
   deleteUserStatus: 'idle',
   deleteUserSuccess: '',
+
+  updateStatusUserError: '',
+  updateStatusUserStatus: 'idle',
+  updateStatusUserSuccess: '',
 
   user: null,
   users: [],
@@ -158,6 +166,12 @@ const userSlice = createSlice({
       state.deleteUserStatus = 'idle';
       state.deleteUserSuccess = '';
       state.deleteUserError = '';
+    },
+
+    clearUpdateStatusUserStatus(state: IUserState) {
+      state.updateStatusUserStatus = 'idle';
+      state.updateStatusUserSuccess = '';
+      state.updateStatusUserError = '';
     },
   },
   extraReducers: builder => {
@@ -315,19 +329,19 @@ const userSlice = createSlice({
 
     builder
       .addCase(updateUserStatusAction.pending, state => {
-        state.createUserStatus = 'loading';
+        state.updateStatusUserStatus = 'loading';
       })
       .addCase(updateUserStatusAction.fulfilled, (state, action) => {
-        state.createUserStatus = 'completed';
-        state.createUserSuccess = action.payload.message;
+        state.updateStatusUserStatus = 'completed';
+        state.updateStatusUserSuccess = action.payload.message;
         state.user = action.payload.result as IUser;
       })
       .addCase(updateUserStatusAction.rejected, (state, action) => {
-        state.createUserStatus = 'failed';
+        state.updateStatusUserStatus = 'failed';
 
         if (action.payload) {
-          state.createUserError = action.payload.message;
-        } else state.createUserError = action.error.message;
+          state.updateStatusUserError = action.payload.message;
+        } else state.updateStatusUserError = action.error.message;
       });
 
     builder
@@ -371,7 +385,8 @@ export const {
   clearCreateUserStatus,
   clearCreatePartnerUserStatus,
   clearUpdateUserPartnerStatus,
-  clearDeleteUserStatus
+  clearDeleteUserStatus,
+  clearUpdateStatusUserStatus
 } =
   userSlice.actions;
 export default userSlice.reducer;

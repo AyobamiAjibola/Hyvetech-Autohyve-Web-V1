@@ -21,9 +21,11 @@ import useAppDispatch from "../../hooks/useAppDispatch";
 import useAppSelector from "../../hooks/useAppSelector";
 import AddUserModall from "../../components/modals/AddUserModalOld";
 import UserAppSwitch from "../../components/AppSwitch/UserAppSwitch";
-import { ToggleOff, ToggleOn } from "@mui/icons-material";
+import { Edit, ToggleOff, ToggleOn } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
-import { clearCreateUserStatus } from "../../store/reducers/userReducer";
+import { clearCreateUserStatus, clearUpdateStatusUserStatus } from "../../store/reducers/userReducer";
+import useAdmin from "../../hooks/useAdmin";
+import { showMessage } from "../../helpers/notification";
 
 const Settings = () => {
   const [deletemodal, setDeletemodal] = useState(false);
@@ -115,14 +117,20 @@ const Settings = () => {
   };
 
   useEffect(() => {
-    if(store.createUserStatus === 'completed') {
+    if(store.updateStatusUserStatus === 'completed') {
       dispatch(getUsersAction())
+    } else if (store.updateStatusUserStatus === 'failed') {
+      showMessage(
+        "",
+        store.updateStatusUserError,
+        "error"
+      )
     }
 
     return () => {
-      dispatch(clearCreateUserStatus());
+      dispatch(clearUpdateStatusUserStatus());
     }
-  },[store.createUserStatus])
+  },[store.updateStatusUserStatus]);
 
   return (
     <>
@@ -312,32 +320,32 @@ const Settings = () => {
                         </span>
                       </td>
                       <td className="font-montserrat">{parsePhone(user.phone)}</td>
-                      <td className="flex items-center gap-2 justify-center">
+                      <td className="flex items-center gap-1 justify-center">
                         <GrEdit
-                          size={20}
+                          size={15}
                           onClick={() => {
                             setAddusermodal(!addusermodal)
                             handleOnEditUser(user)
                           }}
                           className="cursor-pointer"
                         />
-                          <IconButton
-                            onClick={() => handleDisableUser(user)}
-                          >
-                            {user.active 
-                              ? <ToggleOn
-                                  color="success" 
-                                  sx={{fontSize: '26px', color: "#FAA21B"}} 
-                                /> 
-                              : <ToggleOff
-                                  color="warning" 
-                                  sx={{fontSize: '26px', color: "#424242"}} 
-                                />}
-                          </IconButton>
+                        <IconButton
+                          onClick={() => handleDisableUser(user)}
+                        >
+                          {user.active 
+                            ? <ToggleOn
+                                color="success" 
+                                sx={{fontSize: '24px', color: "#FAA21B"}} 
+                              /> 
+                            : <ToggleOff
+                                color="warning" 
+                                sx={{fontSize: '24px', color: "#424242"}} 
+                              />}
+                        </IconButton>
 
-                        <button onClick={() => {setDeletemodal(true), setDelId(user.id)}}>
-                          <img src={TrashIcon} alt="" className="w-[20px]" />
-                        </button>
+                        {/* <button onClick={() => {setDeletemodal(true), setDelId(user.id)}}>
+                          <img src={TrashIcon} alt="" className={`w-[20px] `} />
+                        </button> */}
                       </td>
                     </tr>
                   )

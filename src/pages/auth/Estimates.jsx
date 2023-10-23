@@ -210,6 +210,14 @@ const Estimates = () => {
             />
           </div>
 
+          <div className="w-[100%] block md:hidden mt-4">
+            <AppBtn
+              title="Generate Estimate"
+              className='w-full'
+              onClick={() => navigate("/generate-estimate")}
+            />
+          </div>
+
           <TableCountTitile
             title={`Showing ${startIndex + 1} - ${endIndex} of ${filteredData.length} results`}
           />

@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import CloseIcon from "../../assets/svgs/close-circle.svg";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
@@ -13,6 +13,12 @@ import useAdmin from "../../hooks/useAdmin";
 import { wordBreaker } from "../../utils/generic";
 import moment from "moment";
 import { Util } from "../../helpers/Util";
+import settings from "../../config/settings";
+import useAppSelector from "../../hooks/useAppSelector";
+import useAppDispatch from "../../hooks/useAppDispatch";
+import { getPreferencesActions } from "../../store/actions/partnerActions";
+
+const API_ROOT = settings.api.baseURL;
 
 const PaymentDetails = ({ 
   openPaymentDetails, 
@@ -32,9 +38,12 @@ const PaymentDetails = ({
   const { user } = useAdmin();
 
   const partnerName = (user?.partner?.name || " ")
+  const [preference, setPreference] = useState('');
 
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.up("sm"));
+  const partnerReducer = useAppSelector(state => state.partnerReducer);
+  const dispatch = useAppDispatch();
 
   const style = {
     position: "absolute",
@@ -68,6 +77,21 @@ const PaymentDetails = ({
     }
     return amount;
   },[item?.invoice?.grandTotal, item?.amount]);
+  
+  
+  useEffect(() => {
+    if (partnerReducer.preference) {
+      setPreference(partnerReducer.preference.termsAndCondition);
+    }
+  }, [partnerReducer.preference]);
+
+  const getPreferences = useCallback(() => {
+    dispatch(getPreferencesActions({}));
+  }, []);
+
+  useEffect(() => {
+    getPreferences();
+  }, []);
 
   return (
     <>
@@ -81,7 +105,12 @@ const PaymentDetails = ({
           <div className="modal-header pt-0">
             <div className="flex justify-between w-full">
               <div className="top-10 relative">
-                <img src={logoEstimate} alt="" className="w-[80px]" />
+                <img 
+                  src={ user?.partner?.logo ? `${API_ROOT}/${user?.partner?.logo}` : logoEstimate }
+                  crossOrigin="anonymous"
+                  alt="logo" 
+                  className="w-[80px] rounded-full h-[80px]"
+                />
               </div>
               <button onClick={handleClose}>
                 <img src={CloseIcon} alt="" />
@@ -373,6 +402,18 @@ const PaymentDetails = ({
               <span className="text-[11px] font-montserrat font-semibold">
                 Share PDF
               </span>
+            </div>
+          </div>
+
+          <hr className="mt-10" />
+          <div className="flex flex-col mt-10">
+            <span className="text-lg font-bold font-montserrat mb-2">
+              Terms and Conditions
+            </span>
+            <div
+              dangerouslySetInnerHTML={{ __html: preference }}
+            >
+            
             </div>
           </div>
         </Box>

@@ -52,7 +52,7 @@ export const updateReminderAction = asyncThunkWrapper<ApiResponseSuccess<IServic
 export const resetLastDateAction = asyncThunkWrapper<ApiResponseSuccess<IServiceReminder>, any>(
     RESET_LAST_SERVICE_DATE,
     async args => {
-        const response = await axiosClient.patch(`${API_ROOT}/reminder/reset/${args.id}`, args);
+        const response = await axiosClient.patch(`${API_ROOT}/reminder/reset/${args.reminderId}`, args);
         return response.data;
 });
 

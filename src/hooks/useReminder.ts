@@ -64,32 +64,7 @@ export default function useReminder() {
     }, [params]);
 
     useEffect(() => {
-        if (reminderReducer.createReminderTypeStatus === 'failed') {
-            showMessage(
-                "Reminder",
-                reminderReducer.createReminderTypeError,
-                "error"
-            )
-            handleReset();
-        }
-    }, [reminderReducer.createReminderTypeError, reminderReducer.createReminderTypeStatus, handleReset]);
-
-    useEffect(() => {
-        if (reminderReducer.createReminderTypeStatus === 'completed') {
-            // setSuccess({ message: reminderReducer.createReminderTypeSuccess });
-            showMessage(
-                "Reminder",
-                "Reminder type created successfully",
-                "success"
-            )
-            handleReset();
-            dispatch(getReminderTypesAction())
-        }
-    }, [reminderReducer.createReminderTypeStatus, reminderReducer.createReminderTypeSuccess, handleReset]);
-
-    useEffect(() => {
         if (reminderReducer.updateReminderTypeStatus === 'failed') {
-            // if (reminderReducer.updateReminderTypeError) setError({ message: reminderReducer.updateReminderTypeError });
             showMessage(
                 "Reminder",
                 reminderReducer.updateReminderTypeError,
@@ -101,7 +76,6 @@ export default function useReminder() {
 
     useEffect(() => {
         if (reminderReducer.updateReminderTypeStatus === 'completed') {
-            // setSuccess({ message: reminderReducer.updateReminderTypeSuccess });
             showMessage(
                 "Reminder",
                 "Reminder type updated successfully",
@@ -125,7 +99,6 @@ export default function useReminder() {
                 reminderReducer.getReminderTypesError,
                 "error"
             )
-            // if (reminderReducer.getReminderTypesError) setError({ message: reminderReducer.getReminderTypesError });
         }
     }, [reminderReducer.getReminderTypesError, reminderReducer.getReminderTypesStatus]);
 
@@ -143,7 +116,6 @@ export default function useReminder() {
 
     useEffect(() => {
         if (reminderReducer.getRemindersStatus === 'failed') {
-            // if (reminderReducer.getRemindersError) setError({ message: reminderReducer.getRemindersError });
             showMessage(
                 "Reminder",
                 reminderReducer.getRemindersError,
@@ -157,79 +129,6 @@ export default function useReminder() {
             setReminders(reminderReducer.reminders);
         }
     }, [reminderReducer.reminders, reminderReducer.getRemindersStatus]);
-
-    useEffect(() => {
-        if (reminderReducer.createReminderStatus === 'failed') {
-            // if (reminderReducer.createReminderError) setError({ message: reminderReducer.createReminderError });
-            showMessage(
-                "Reminder",
-                reminderReducer.createReminderError,
-                "error"
-            )
-            handleReset();
-    }
-    }, [reminderReducer.createReminderError, reminderReducer.createReminderStatus, handleReset]);
-
-    useEffect(() => {
-        if (reminderReducer.createReminderStatus === 'completed') {
-            showMessage(
-                "Reminder",
-                "Reminder created successfully",
-                "success"
-            )
-            dispatch(getReminderAction())
-            handleReset();
-        }
-    }, [reminderReducer.createReminderStatus, handleReset]);
-
-    useEffect(() => {
-        if (reminderReducer.updateReminderStatus === 'failed') {
-            showMessage(
-                "Reminder",
-                reminderReducer.updateReminderError,
-                "error"
-            )
-            handleReset();
-        }
-    }, [reminderReducer.updateReminderError, handleReset]);
-
-    useEffect(() => {
-        if (reminderReducer.updateReminderStatus === 'completed') {
-            showMessage(
-                "Reminder",
-                "Updated reminder successfully",
-                "success"
-            )
-            
-            dispatch(getReminderAction())
-            handleReset();
-        }
-    }, [dispatch, reminderReducer.updateReminderStatus, reminderReducer.updateReminderSuccess, handleReset]);
-
-    useEffect(() => {
-        if (reminderReducer.deleteReminderStatus === 'failed') {
-            // setError({ message: reminderReducer.deleteReminderError });
-            showMessage(
-                "Reminder",
-                reminderReducer.deleteReminderError,
-                "error"
-            )
-            handleReset();
-        }
-    }, [reminderReducer.deleteReminderError, reminderReducer.deleteReminderStatus, handleReset]);
-
-    useEffect(() => {
-        if (reminderReducer.deleteReminderStatus === 'completed') {
-            // setSuccess({ message: reminderReducer.deleteReminderSuccess });
-            showMessage(
-                "Reminder",
-                "Reminder deleted successfully",
-                "success"
-            )
-            handleReset();
-            dispatch(getReminderAction());
-        }
-    }, [dispatch, reminderReducer.deleteReminderStatus, reminderReducer.deleteReminderSuccess, handleReset]);
 
     const handleCreateReminderType = (values: IReminderTypeValues) => {
         const data = {

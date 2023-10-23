@@ -378,7 +378,7 @@ const AddPaymentModal = ({
       >
         <Box sx={style}>
           <div className="flex justify-between w-full">
-            <ModalHeaderTitle title=" Generate Payment" />
+            <ModalHeaderTitle title=" New Payment" />
 
             <button onClick={() => {
               // setFromInvoice(false)

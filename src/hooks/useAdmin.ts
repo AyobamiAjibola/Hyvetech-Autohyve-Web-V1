@@ -44,13 +44,13 @@ export default function useAdmin() {
 
       dispatch(getUserAction(payload.userId));
     } else {showMessage('Auth', 'You are not authorized to access this resource', 'error')};
-  }, [dispatch, token]);
+  }, [token]);
 
   useEffect(() => {
     if (userReducer.getUserStatus === 'completed') {
       setUser(userReducer.user);
     }
-  }, [userReducer.getUserStatus, userReducer.user]);
+  }, [userReducer.getUserStatus]);
 
   return {
     isSuperAdmin,

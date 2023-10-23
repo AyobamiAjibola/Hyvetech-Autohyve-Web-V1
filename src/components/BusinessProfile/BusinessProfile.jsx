@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import logoImg from "../../assets/images/logoImg.png";
 import { HiOutlineTrash } from "react-icons/hi";
@@ -18,7 +18,7 @@ import { createPartnerKycAction, createPartnerSettingsAction, getPreferencesActi
 import useAppDispatch from "../../hooks/useAppDispatch";
 import useAppSelector from "../../hooks/useAppSelector";
 import { showMessage } from "../../helpers/notification";
-import { clearCreatePartnerKycStatus, clearCreatePartnerSettingsStatus } from "../../store/reducers/partnerReducer";
+import { clearCreatePartnerKycStatus, clearCreatePartnerSettingsStatus, clearUpdatePreferenceStatus } from "../../store/reducers/partnerReducer";
 import settings from "../../config/settings";
 import UploadPictureModal from "../modals/UploadPictureModal";
 import UploadCompanyLogoModal from "../modals/UploadCompanyLogoModal";
@@ -26,6 +26,7 @@ import { getUserAction, getUsersAction } from "../../store/actions/userActions";
 import partnerModel from "../Forms/models/partnerModel";
 import Brands from "./Brands";
 import { wordBreaker } from "../../utils/generic";
+import TextEditor from "./TextEditor";
 // import { EditorState, ContentState, convertFromHTML, convertToRaw } from 'draft-js';
 // import { Editor } from 'react-draft-wysiwyg';
 // import '../../../node_modules/react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
@@ -71,7 +72,7 @@ const BusinessProfile = ({user}) => {
   const { fields, schema } = partnerModel;
   const dispatch = useAppDispatch()
   const partnerReducer = useAppSelector(state => state.partnerReducer);
-  // const [editorState, setEditorState] = useState(EditorState.createEmpty());
+  const [preference, setPreference] = useState("");
 
   const handleSubmit = ({phone, ...rest}) => {
     const newPhone = `${phone}`.startsWith("234")
@@ -105,48 +106,41 @@ const BusinessProfile = ({user}) => {
     }))
   }
 
-  // useEffect(() => {
-  //   // if (partnerReducer.preference) {
-  //   //   setEditorState(EditorState.createWithContent(stateFromHTML(partnerReducer.preference.termsAndCondition || '')));
-  //   // }
-  //   if (partnerReducer.preference) {
-  //     const html = partnerReducer.preference.termsAndCondition || '';
-  //     const blocksFromHTML = convertFromHTML(html);
-  //     const contentState = ContentState.createFromBlockArray(blocksFromHTML.contentBlocks);
-  //     setEditorState(EditorState.createWithContent(contentState));
-  //   }
-  // }, [partnerReducer.preference]);
+  useEffect(() => {
+    if (partnerReducer.preference) {
+      setPreference(partnerReducer.preference.termsAndCondition);
+    }
+  }, [partnerReducer.preference]);
 
-  // const getPreferences = useCallback(() => {
-  //   dispatch(getPreferencesActions({}));
-  // }, []);
+  const getPreferences = useCallback(() => {
+    dispatch(getPreferencesActions({}));
+  }, []);
 
-  // useEffect(() => {
-  //   getPreferences();
-  // }, []);
+  useEffect(() => {
+    getPreferences();
+  }, []);
 
-  // useEffect(() => {
-  //   if (partnerReducer.updatePreferenceStatus === 'completed') {
-  //     showMessage('', 'Preferences updated successfully', 'success');
-  //     getPreferences();
-  //     dispatch(clearUpdatePreferenceStatus());
-  //   } else if (partnerReducer.updatePreferenceStatus === 'failed') {
-  //     showMessage('', partnerReducer.updatePreferenceError || '', 'error');
-  //   }
-  // }, [partnerReducer.updatePreferenceStatus]);
+  useEffect(() => {
+    if (partnerReducer.updatePreferenceStatus === 'completed') {
+      showMessage('', 'Preferences updated successfully', 'success');
+      getPreferences();
+      
+    } else if (partnerReducer.updatePreferenceStatus === 'failed') {
+      showMessage('', partnerReducer.updatePreferenceError || '', 'error');
+    }
 
-  // const onEditorStateChange = (editorState) => {
-  //   setEditorState(editorState);
-  // };
+    return () => {
+      dispatch(clearUpdatePreferenceStatus());
+    }
+  }, [partnerReducer.updatePreferenceStatus]);
 
-  // const handleUpdatePreference = () => {
-  //   // Convert the current editor content to HTML
-  //   const contentState = editorState.getCurrentContent();
-  //   const html = convertFromHTML(contentState);
+  const onPreferenceChange = (preference) => {
+    setPreference(preference);
+  };
 
-  //   // Dispatch your updatePreferencesAction with the HTML content
-  //   dispatch(updatePreferencesAction({ termsAndCondition: html }));
-  // };
+  const handleUpdatePreference = () => {
+    dispatch(updatePreferencesAction({ termsAndCondition: preference }));
+  };
 
   useEffect(() => {
     let stateArray = [];
@@ -319,9 +313,11 @@ const BusinessProfile = ({user}) => {
               <div className="flex flex-col md:flex-row items-start md:items-center justify-between">
                 <h5 className="font-bold font-montserrat">Business Profile</h5>
                 <img
-                  src={settings}
-                  alt=""
-                  className="w-[50px] h-[50px] block md:hidden mt-5"
+                  onClick={() => setOpenProfile(!openProfile)}
+                  src={ user?.partner.logo ? `${API_ROOT}/${user?.partner.logo}` : logoImg }
+                  crossOrigin="anonymous"
+                  alt="workshop-logo"
+                  className="w-[50px] h-[50px] block md:hidden mt-5 rounded-full"
                 />
 
                 <AppBtn
@@ -532,12 +528,20 @@ const BusinessProfile = ({user}) => {
         )}
       </Formik>
 
-        {/* <Editor
-          editorState={editorState}
-          // wrapperClassName="demo-wrapper"
-          // editorClassName="demo-editor"
-          onEditorStateChange={onEditorStateChange}
-        /> */}
+        <div className="p-5 md:p-14  hyvepay-setting rounded-3xl mt-6">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between">
+            <h5 className="font-bold font-montserrat">Preference</h5>
+
+            <AppBtn
+              title="SAVE"
+              className="font-medium hidden md:block w-[200px]"
+              onClick={handleUpdatePreference}
+              spinner={partnerReducer.updatePreferenceStatus === 'loading'}
+            />
+          </div>
+
+          <TextEditor preference={preference} setPreference={setPreference}/>
+        </div>
 
       {/* <Formik
         enableReinitialize

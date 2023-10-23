@@ -41,6 +41,19 @@ const AddReminderTypeModal = ({ openReminderType, setOpenReminderType }) => {
   useEffect(() => {
     if(reminderReducer.createReminderTypeStatus === 'completed') {
       setOpenReminderType(false)
+      showMessage(
+        "Reminder",
+        "Reminder type created successfully",
+        "success"
+      )
+      dispatch(getReminderTypesAction())
+      
+    } else if(reminderReducer.createReminderTypeStatus === 'failed') {
+      showMessage(
+        "Reminder",
+        reminderReducer.createReminderTypeError,
+        "error"
+      )
     }
 
     return () => {
