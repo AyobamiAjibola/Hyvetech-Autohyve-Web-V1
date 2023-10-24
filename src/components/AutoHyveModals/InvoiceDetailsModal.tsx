@@ -596,7 +596,7 @@ const InvoiceDetailsModal = ({
         <Box sx={style}>
           <div className="modal-header pt-0 px-8">
             <div className="flex justify-between w-full">
-              <div className="top-10 relative">
+              <div className="top-10 relative md:block hidden">
                 <img
                   src={ invoice?.estimate?.partner?.logo 
                           ? `${BASE_URL}/${invoice?.estimate?.partner?.logo}` 
@@ -612,18 +612,18 @@ const InvoiceDetailsModal = ({
             </div>
           </div>
 
-          <div className="md:flex  w-[100%] md:items-end md:justify-end top-20 md:mt-0 mt-20 md:relative">
+          <div className="mb-5 md:mb-0 md:flex item-center justify-center md:items-end md:justify-end top-20 md:mt-0 mt-10 md:relative">
             {/* <Sorting items={items} select={select} setSelect={setSelect} className={""} /> */}
-            <FormControl>
+            <FormControl className="md:w-[23%] w-[100%]">
               <InputLabel
                 id="demo-simple-select-helper-label"
-                focused={true} // To style the label as focused initially
+                focused={true}
                 sx={{
                   color: 'black', 
                   fontSize: '14px', 
                   fontFamily: 'montserrat',
                   '&.Mui-focused': {
-                    color: 'black', // Change the label color when focused
+                    color: 'black',
                   },
                 }}
               >Select an action</InputLabel>
@@ -708,6 +708,17 @@ const InvoiceDetailsModal = ({
                 </MenuItem>
               </Select>
             </FormControl>
+          </div>
+
+          <div className="mb-3 relative md:hidden">
+            <img
+              src={ invoice?.estimate?.partner?.logo 
+                      ? `${BASE_URL}/${invoice?.estimate?.partner?.logo}` 
+                      : Hypelogo }
+              crossOrigin="anonymous"
+              alt="logo" 
+              className="w-[80px] rounded-full h-[80px]" 
+            />
           </div>
 
           <div>

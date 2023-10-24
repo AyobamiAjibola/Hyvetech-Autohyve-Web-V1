@@ -1,6 +1,6 @@
 import React from 'react';
 import DashboardWrapper from '../../components/DashboardWrapper/DashboardWrapper';
-import loading from '../../assets/images/loading-coming-soon.png';
+import loading from '../../assets/images/loading.jpeg';
 
 function Insurance () {
     return (
@@ -13,7 +13,7 @@ function Insurance () {
                 <img
                     src={ loading }
                     alt="loading"
-                    className="w-[100px] h-[100px] rounded-full mt-10" 
+                    className="w-[400px] h-[400px] rounded-full" 
                 />
             </div>
             

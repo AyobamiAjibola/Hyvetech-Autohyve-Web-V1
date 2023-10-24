@@ -211,7 +211,10 @@ const Reminder = () => {
               icon={<AiOutlinePlus />}
               title="New Reminder"
               className="w-full text-[#000] btn-secondary block md:hidden"
-              onClick={() => setOpenNewReminder(true)}
+              onClick={() => {
+                setEditMode(false)
+                setOpenEditReminder(true)
+              }}
             />
           </div>
           <Sorting

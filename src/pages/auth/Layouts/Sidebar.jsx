@@ -18,6 +18,7 @@ import jwt_decode from "jwt-decode";
 import settings from "../../../config/settings";
 import useAppDispatch from "../../../hooks/useAppDispatch";
 import { setAction } from "../../../store/reducers/vehicleReducer";
+import { Divider } from "@mui/material";
 
 const Sidebar = ({ show, setShow, openNav, setOpenNav, active, setActive }) => {
   const navigation = useNavigate();
@@ -232,6 +233,7 @@ const Sidebar = ({ show, setShow, openNav, setOpenNav, active, setActive }) => {
               </div>
             </div>) : <div></div>}
 
+            <Divider sx={{backgroundColor: '#808080'}} />
             <div
               onClick={openWhatsAppChat}
               className="flex items-center font-montserrat mb-2 text-white pl-[10px] cursor-pointer"
@@ -244,7 +246,7 @@ const Sidebar = ({ show, setShow, openNav, setOpenNav, active, setActive }) => {
               />
 
               <span
-                className={` ml-5 font-montserrat text-sm text-white ${
+                className={` ml-5 font-montserrat text-xs text-white ${
                   show ? "item-text" : null
                 } `}
               >
@@ -263,7 +265,7 @@ const Sidebar = ({ show, setShow, openNav, setOpenNav, active, setActive }) => {
               />
 
               <span
-                className={` ml-5 font-montserrat text-sm text-white ${
+                className={` ml-5 font-montserrat text-xs text-white ${
                   show ? "item-text" : null
                 } `}
               >
@@ -271,7 +273,7 @@ const Sidebar = ({ show, setShow, openNav, setOpenNav, active, setActive }) => {
               </span>
             </div>
 
-            <hr />
+            <Divider sx={{backgroundColor: '#808080'}} />
             <div
               onClick={() => setLogoutModal(!logoutModal)}
               className="flex items-center font-montserrat mb-10 text-white pl-[10px] cursor-pointer"
