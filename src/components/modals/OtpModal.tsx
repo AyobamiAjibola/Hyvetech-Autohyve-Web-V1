@@ -150,6 +150,7 @@ export default function OtpModal({
                 otp && setChangePin(!changePin);
               }}
               className="text-[#000] font-medium bg-[#FAA21B] mt-1"
+              spinner={state.sendPasswordResetTokenStatus === 'loading'}
             />
           </div>
         </Box>

@@ -30,18 +30,6 @@ const Login = ({ setModal, setShowCurrent }) => {
     },1000)
   },[state.resetPasswordWithTokenStatus]);
 
-  useEffect(() => {
-    if(state.garageSignUpStatus === 'completed') {
-      showMessage(
-        "Sign up",
-        state.garageSignUpSuccess,
-        "success"
-      )
-      localStorage.removeItem('user_data')
-    }
-    dispatch(clearGarageSignUpStatus())
-  },[state.garageSignUpStatus]);
-
   return (
     <>
       <div className="w-full flex flex-col justify-center mt-10  px-10 md:px-28   items-center h-[100%]">

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./modal.css";
 import AppInput, { MyChangePassInput, MyTextInput } from "../AppInput/AppInput";
 import CloseIcon from "../../assets/svgs/close-circle.svg";
@@ -19,6 +19,7 @@ export default function NewPasswordModal({ setNewPasswordModal, newPasswordModal
   const dispatch = useAppDispatch();
   const authReducer = useAppSelector(state => state.authenticationReducer);
   const navigate = useNavigate();
+  const node = useRef(null);
   
   if (newPasswordModal) {
     document.body.classList.add("active-modal");
@@ -69,17 +70,22 @@ export default function NewPasswordModal({ setNewPasswordModal, newPasswordModal
                           : `${phone}`.replace("", "234")
 
     const data = { ...retrievedObject, phone: newPhone};
-    console.log(data, 'data')
-    // dispatch(garageSignUpAction({
-    //     ...data,
-    //     email: data.email.toLowerCase(),
-    //     password: values.password,
-    //     confirm_password: values.confirmPassword
-    //   }))
+
+    dispatch(garageSignUpAction({
+        ...data,
+        email: data.email.toLowerCase(),
+        password: values.password,
+        confirm_password: values.confirmPassword
+      }))
     }
 
     useEffect(() => {
       if(authReducer.garageSignUpStatus === 'completed') {
+        showMessage(
+          "Sign up",
+          authReducer.garageSignUpSuccess,
+          "success"
+        )
         navigate('/')
         localStorage.removeItem('user_data')
       } else if (authReducer.garageSignUpStatus === 'failed') {
@@ -88,6 +94,9 @@ export default function NewPasswordModal({ setNewPasswordModal, newPasswordModal
           authReducer.garageSignUpError,
           "error"
         )
+      }
+
+      return () => {
         dispatch(clearGarageSignUpStatus())
       }
     },[authReducer.garageSignUpStatus]);

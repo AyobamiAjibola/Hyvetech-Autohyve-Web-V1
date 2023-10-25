@@ -27,6 +27,7 @@ import partnerModel from "../Forms/models/partnerModel";
 import Brands from "./Brands";
 import { wordBreaker } from "../../utils/generic";
 import TextEditor from "./TextEditor";
+import Payment from "./Payment";
 // import { EditorState, ContentState, convertFromHTML, convertToRaw } from 'draft-js';
 // import { Editor } from 'react-draft-wysiwyg';
 // import '../../../node_modules/react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
@@ -283,7 +284,7 @@ const BusinessProfile = ({user}) => {
   },[]);
   // const brands = user?.partner?.brands?.map(JSON.parse) || [];
   const partnerAddress = wordBreaker(user?.partner.workshopAddress, 4)
-
+console.log(user?.partner?.isAccountProvisioned)
   return (
     <>
       <Formik
@@ -528,7 +529,7 @@ const BusinessProfile = ({user}) => {
         )}
       </Formik>
 
-        <div className="p-5 md:p-14  hyvepay-setting rounded-3xl mt-6">
+        <div className="p-5 md:p-14 hyvepay-setting rounded-3xl mt-6">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between">
             <h5 className="font-bold font-montserrat">Preference</h5>
 
@@ -541,6 +542,32 @@ const BusinessProfile = ({user}) => {
           </div>
 
           <TextEditor preference={preference} setPreference={setPreference}/>
+          <span
+            className="font-montserrat text-[10px] font-bold"
+          ><span className="text-[red]">Please Note:</span> {" "}Your terms and conditions appears under every estimate and invoices</span>
+
+          <AppBtn
+            title="SAVE"
+            className="font-medium md:hidden flex w-[100%] mt-6"
+            onClick={handleUpdatePreference}
+            spinner={partnerReducer.updatePreferenceStatus === 'loading'}
+          />
+        </div>
+
+        <div className="p-5 md:p-14 hyvepay-setting rounded-3xl mt-6">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-10">
+            <h5 className="font-bold font-montserrat">Payments</h5>
+
+            {/* <AppBtn
+              title="SAVE"
+              className="font-medium hidden md:block w-[200px]"
+              onClick={handleUpdatePreference}
+              spinner={partnerReducer.updatePreferenceStatus === 'loading'}
+            /> */}
+          </div>
+
+          <Payment data={user}/>
+
         </div>
 
       {/* <Formik

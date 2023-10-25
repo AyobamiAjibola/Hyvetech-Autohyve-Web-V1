@@ -664,19 +664,28 @@ const EstimateDetailsModal = ({
             <div className="flex flex-col">
               <span className="text-sm">Account Name</span>
               <span className="text-sm font-light font-montserrat">
-                {estimate?.partner?.accountName}
+                {estimate?.partner?.isAccountProvisioned === 'true'
+                  ? estimate?.partner?.accountName 
+                  : estimate?.partner?.secondaryAccountName
+                }
               </span>
             </div>
             <div className="flex flex-col">
               <span className="text-sm">Bank Name</span>
               <span className="text-sm font-light font-montserrat">
-                {estimate?.partner?.bankName}
+                {estimate?.partner?.isAccountProvisioned === 'true'
+                  ? estimate?.partner?.bankName
+                  : estimate?.partner?.secondaryBankName
+                }
               </span>
             </div>
             <div className="flex flex-col">
               <span className="text-sm">Account Number</span>
               <span className="text-sm font-light font-montserrat">
-                {estimate?.partner?.accountNumber}
+                {estimate?.partner?.isAccountProvisioned === 'true'
+                  ? estimate?.partner?.accountNumber
+                  : estimate?.partner?.secondaryAccountNumber
+                }
               </span>
             </div>
           </div>

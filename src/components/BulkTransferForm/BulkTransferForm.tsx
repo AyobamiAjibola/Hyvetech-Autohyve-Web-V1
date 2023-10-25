@@ -8,6 +8,7 @@ import useAppSelector from "../../hooks/useAppSelector";
 import Select from "react-select";
 import { getAllBankAction, performNameEnquiryAction } from "../../store/actions/autoHyveActions";
 import { clearAccountHolderDetail } from "../../store/reducers/autoHyveReducer";
+import { customStyles } from "../../contsants/customStyles";
 
 const BulkTransferForm = ({
   activeTab,
@@ -118,7 +119,7 @@ const BulkTransferForm = ({
                     label: item.bankName,
                     value: item.bankCode,
                   }))}
-                className="bg-[#F5F5F5] border-[#F5F5F5]"
+                styles={customStyles}
                 name="bank"
                 value={inputValues[activeTab].bank}
                 onChange={handleInputChangeSelect}

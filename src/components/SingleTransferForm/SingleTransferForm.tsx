@@ -8,6 +8,7 @@ import useAppDispatch from "../../hooks/useAppDispatch";
 import useAppSelector from "../../hooks/useAppSelector";
 import { clearAccountHolderDetail } from '../../store/reducers/autoHyveReducer';
 import { getAllBankAction, performNameEnquiryAction } from '../../store/actions/autoHyveActions';
+import { customStyles } from '../../contsants/customStyles';
 
 const SingleTransferForm = () => {
   const { values, setFieldValue } =
@@ -60,7 +61,7 @@ const SingleTransferForm = () => {
                 label: item.bankName,
                 value: item.bankCode,
               }))}
-              className="bg-[#F5F5F5] border-[#F5F5F5]"
+              styles={customStyles}
               name="bank"
               label="Recipient’s Bank Name"
             />

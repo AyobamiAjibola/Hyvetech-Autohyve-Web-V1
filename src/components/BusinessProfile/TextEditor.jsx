@@ -45,7 +45,7 @@ const TextEditor = ({ preference, setPreference }) => {
           formats={formats}
           placeholder="terms and condition...."
           onChange={handleProcedureContentChange}
-          style={{ height: "220px", width: '100%'}}
+          style={{ height: "100%", width: '100%'}}
           value={preference}
         >
         </ReactQuill>

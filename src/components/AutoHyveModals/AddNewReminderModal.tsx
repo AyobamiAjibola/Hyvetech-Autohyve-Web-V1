@@ -126,7 +126,7 @@ const AddNewReminderModal = ({
     // enableReinitialize,
     initialValues: initialValues,
     onSubmit: (values: any) => {
-      console.log(values, 'values')
+
       const data = {
         email: values.email,
         reminderTypes: values.reminderType,

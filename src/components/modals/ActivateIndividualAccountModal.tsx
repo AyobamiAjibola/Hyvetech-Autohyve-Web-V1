@@ -49,15 +49,19 @@ const ActivateIndividualAccountModal: FC<IProps> = ({
         "Please wait while we review your request",
         "success"
       );
-      dispatch(clearAccountActivationStatus());
+      
       onOk && onOk();
     } else if (state.requestAccountActivationStatus === "failed") {
       showMessage(state.requestAccountActivationError, "", "error");
+    }
+
+    return () => {
       dispatch(clearAccountActivationStatus());
     }
   }, [state.requestAccountActivationStatus]);
 
   const handleOnSubmit = async (values: any) => {
+
     try {
       if (!values.validIdFront)
         return showMessage(
@@ -93,7 +97,7 @@ const ActivateIndividualAccountModal: FC<IProps> = ({
       }
 
       setLoading(false);
-
+      
       dispatch(
         requestActivationAction({
           businessName: values.accountName,

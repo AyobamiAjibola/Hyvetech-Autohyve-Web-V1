@@ -107,7 +107,6 @@ export const createPartnerSettingsAction = asyncThunkWrapper<ApiResponseSuccess<
 export const companyLogoAction = asyncThunkWrapper<ApiResponseSuccess<IPartner>, ICreateSettingsArgs>(
   UPLOAD_COMPANY_LOGO,
   async args => {
-    console.log(args, 'args')
     const formData = new FormData();
     //@ts-ignore
     formData.set('logo', args.data.logo);
