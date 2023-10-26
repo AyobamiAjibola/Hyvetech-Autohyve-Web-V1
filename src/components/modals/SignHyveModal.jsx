@@ -196,6 +196,7 @@ const SignHyveModal = ({
         openResetPassword={openResetPassword}
         setOpenResetPassword={setOpenResetPassword}
         setOpenHyveLogin={setOpenHyveLogin}
+        pin={false}
       />
     </>
   );

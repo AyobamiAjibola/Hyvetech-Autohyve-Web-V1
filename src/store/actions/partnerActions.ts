@@ -24,6 +24,7 @@ const GET_PREFERENCES = 'partner:GET_PREFERENCES';
 const UPDATE_PREFENCES = 'partner:UPDATE_PREFENCES';
 const GET_PARTNER_FILTER_DATA = 'partner:GET_PARTNER_FILTER_DATA';
 const UPLOAD_COMPANY_LOGO = 'partner:UPLOAD_COMPANY_LOGO';
+const GET_PARTNER_ACCOUNT = 'part:GET_PARTNER_ACCOUNT';
 const API_ROOT = settings.api.rest;
 
 export const createPartnerAction = asyncThunkWrapper<any, ICreatePartnerModel>(
@@ -214,6 +215,14 @@ export const deletePaymentPlanAction = asyncThunkWrapper<ApiResponseSuccess<IPay
   DELETE_PAYMENT_PLAN,
   async paymentPlanId => {
     const response = await axiosClient.delete(`${API_ROOT}/partners?paymentPlanId=${paymentPlanId}`);
+    return response.data;
+  },
+);
+
+export const getPartnerAccountAction = asyncThunkWrapper<ApiResponseSuccess<any>, number>(
+  GET_PARTNER_ACCOUNT,
+  async (partnerId: number) => {
+    const response = await axiosClient.get(`${API_ROOT}/partner-account/${partnerId}`);
     return response.data;
   },
 );

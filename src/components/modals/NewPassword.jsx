@@ -168,7 +168,7 @@ export default function NewPassword({ setNewPasswordModal, newPasswordModal, otp
                       <AppBtn
                         title="SUBMIT"
                         spinner={state.resetPasswordWithTokenStatus === 'loading'}
-                        className="text-[#000]  w-full md:w-[100px]  bg-[#FAA21B] mt-1 font-medium"
+                        className="text-[#000]  w-full md:w-[200px]  bg-[#FAA21B] mt-1 font-medium"
                       />
                     </div>
                   </Form>

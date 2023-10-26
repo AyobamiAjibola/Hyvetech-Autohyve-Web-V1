@@ -21,7 +21,7 @@ import useAppSelector from "../../hooks/useAppSelector";
 import useAppDispatch from "../../hooks/useAppDispatch";
 import { getInvoicesAction } from "../../store/actions/invoiceActions";
 import DownloadEstimateModal from "../modals/DownloadEstimateModal";
-import { getPreferencesActions } from "../../store/actions/partnerActions";
+import { getPartnerAccountAction, getPreferencesActions } from "../../store/actions/partnerActions";
 
 const useStyles = makeStyles({
   select: {
@@ -286,6 +286,14 @@ const EstimateDetailsModal = ({
   useEffect(() => {
     getPreferences();
   }, []);
+
+  const getPartnerAccount = useCallback(() => {
+    dispatch(getPartnerAccountAction(estimate?.partner?.id));
+  }, [estimate?.partner]);
+
+  useEffect(() => {
+    getPartnerAccount();
+  }, [estimate?.partner]);
 
   return (
     <>
@@ -665,8 +673,8 @@ const EstimateDetailsModal = ({
               <span className="text-sm">Account Name</span>
               <span className="text-sm font-light font-montserrat">
                 {estimate?.partner?.isAccountProvisioned === 'true'
-                  ? estimate?.partner?.accountName 
-                  : estimate?.partner?.secondaryAccountName
+                  ? partnerReducer.partnerAccount?.businessName 
+                  : estimate?.partner?.accountName
                 }
               </span>
             </div>
@@ -674,8 +682,8 @@ const EstimateDetailsModal = ({
               <span className="text-sm">Bank Name</span>
               <span className="text-sm font-light font-montserrat">
                 {estimate?.partner?.isAccountProvisioned === 'true'
-                  ? estimate?.partner?.bankName
-                  : estimate?.partner?.secondaryBankName
+                  ? partnerReducer.partnerAccount?.accountProvider
+                  : estimate?.partner?.bankName
                 }
               </span>
             </div>
@@ -683,8 +691,8 @@ const EstimateDetailsModal = ({
               <span className="text-sm">Account Number</span>
               <span className="text-sm font-light font-montserrat">
                 {estimate?.partner?.isAccountProvisioned === 'true'
-                  ? estimate?.partner?.accountNumber
-                  : estimate?.partner?.secondaryAccountNumber
+                  ? partnerReducer.partnerAccount?.accountNumber
+                  : estimate?.partner?.accountNumber
                 }
               </span>
             </div>

@@ -40,9 +40,9 @@ const Payment = ({data}: IProps) => {
 
   useEffect(() => {
     setFormState({
-        bank: {label: data?.partner?.secondaryBankName, value: data?.partner?.secondaryBankName },
-        accountName: data?.partner?.secondaryAccountName,
-        accountNumber: data?.partner?.secondaryAccountNumber
+        bank: {label: data?.partner?.bankName, value: data?.partner?.bankName },
+        accountName: data?.partner?.accountName,
+        accountNumber: data?.partner?.accountNumber
     })
   },[data])
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import "./modal.css";
 import CloseIcon from "../../assets/svgs/close-circle.svg";
 import AppBtn from "../AppBtn/AppBtn";
@@ -11,9 +11,6 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { sendPasswordResetTokenAction } from "../../store/actions/authenicationActions";
 import useAppDispatch from "../../hooks/useAppDispatch";
 import useAppSelector from "../../hooks/useAppSelector";
-import { showMessage } from "../../helpers/notification";
-import { clearSendPasswordResetTokenStatus } from "../../store/reducers/authenticationReducer";
-import NewPinModal from "./NewPinModal";
 import NewPinResetModal from "./NewPinResetModal";
 
 // const style = {
@@ -147,7 +144,7 @@ export default function OtpModal({
               onClick={() => {
                 !otp && setNewPasswordModal(!newPasswordModal);
                 setOpenOtp(!openOtp);
-                otp && setChangePin(!changePin);
+                pin ? setChangePin(!changePin) : setNewPasswordModal(!newPasswordModal);
               }}
               className="text-[#000] font-medium bg-[#FAA21B] mt-1"
               spinner={state.sendPasswordResetTokenStatus === 'loading'}

@@ -125,7 +125,7 @@ const ResetHyveCloudPasswordModal = ({
           </div>
         </Box>
       </Modal>
-      <OtpModal openOtp={openOtp} setOpenOtp={setOpenOtp} email={email} pin={true}/>
+      <OtpModal openOtp={openOtp} setOpenOtp={setOpenOtp} email={email} pin={false}/>
     </>
   );
 };

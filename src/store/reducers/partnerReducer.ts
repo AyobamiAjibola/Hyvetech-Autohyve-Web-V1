@@ -12,6 +12,7 @@ import {
   deletePlanAction,
   getDriversFilterDataAction,
   getOwnersFilterDataAction,
+  getPartnerAccountAction,
   getPartnerAction,
   getPartnerFilterDataAction,
   getPartnersAction,
@@ -101,6 +102,10 @@ interface IPartnerState {
   companyLogoUploadSuccess: string;
   companyLogoUploadError?: string;
 
+  getPartnerAccountStatus: IThunkAPIStatus;
+  getPartnerAccountSuccess: string;
+  getPartnerAccountError?: string;
+
   partner: IPartner | null;
   partners: IPartner[];
   plan: IPlan | null;
@@ -112,6 +117,7 @@ interface IPartnerState {
   partnerFilterData: IDriversFilterData[];
 
   preference: IPreference | null;
+  partnerAccount: any;
 }
 
 const initialState: IPartnerState = {
@@ -191,6 +197,10 @@ const initialState: IPartnerState = {
   companyLogoUploadStatus: 'idle',
   companyLogoUploadSuccess: '',
 
+  getPartnerAccountStatus: 'idle',
+  getPartnerAccountSuccess: '',
+  getPartnerAccountError: '',
+
   partner: null,
   partners: [],
   plan: null,
@@ -200,6 +210,7 @@ const initialState: IPartnerState = {
   driversFilterData: [],
   ownersFilterData: [],
   partnerFilterData: [],
+  partnerAccount: null,
 
   preference: null,
 };
@@ -212,6 +223,12 @@ const partnerSlice = createSlice({
       state.createPartnerStatus = 'idle';
       state.createPartnerSuccess = '';
       state.createPartnerError = '';
+    },
+
+    clearGetPartnerActionStatus(state: IPartnerState) {
+      state.getPartnerAccountStatus = 'idle';
+      state.getPartnerAccountSuccess = '';
+      state.getPartnerAccountError = '';
     },
 
     clearDeletePartnerStatus(state: IPartnerState) {
@@ -411,6 +428,21 @@ const partnerSlice = createSlice({
         if (action.payload) {
           state.getPartnerError = action.payload.message;
         } else state.getPartnerError = action.error.message;
+      });
+
+    builder
+      .addCase(getPartnerAccountAction.pending, state => {
+        state.getPartnerAccountStatus = 'loading';
+      })
+      .addCase(getPartnerAccountAction.fulfilled, (state, action) => {
+        state.getPartnerAccountStatus = 'completed';
+        state.partnerAccount = action.payload.result as IPartner;
+      })
+      .addCase(getPartnerAccountAction.rejected, (state, action) => {
+        state.getPartnerAccountStatus = 'failed';
+        if (action.payload) {
+          state.getPartnerAccountError = action.payload.message;
+        } else state.getPartnerAccountError = action.error.message;
       });
 
     builder
@@ -623,6 +655,7 @@ const partnerSlice = createSlice({
 });
 
 export const {
+  clearGetPartnerActionStatus,
   clearCreatePartnerStatus,
   clearGetPartnersStatus,
   clearGetPartnerStatus,

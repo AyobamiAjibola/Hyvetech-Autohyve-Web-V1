@@ -174,17 +174,17 @@ const BusinessProfile = ({user}) => {
 
   useEffect(() => {
     setFormState({
-      name: user.partner.name || "",
-      nameOfDirector: user.partner.nameOfDirector || "",
-      businessCategory: user.partner.businessCategory || "",
-      businessRegStatus: user.partner.businessRegStatus || "",
-      workshopAddress: user.partner.workshopAddress || "",
-      state: user.partner.contact.state || "",
-      district: user.partner.contact.district || "",
-      tin: user.partner.tin || "",
-      // nameOfManager: user.partner.nameOfManager || "",
-      cac: user.partner.cac || "",
-      phone: parsePhone(user.partner.phone)
+      name: user?.partner?.name || "",
+      nameOfDirector: user?.partner?.nameOfDirector || "",
+      businessCategory: user?.partner?.businessCategory || "",
+      businessRegStatus: user?.partner?.businessRegStatus || "",
+      workshopAddress: user?.partner?.workshopAddress || "",
+      state: user?.partner?.contact.state || "",
+      district: user?.partner?.contact.district || "",
+      tin: user?.partner?.tin || "",
+      // nameOfManager: user?.partner?.nameOfManager || "",
+      cac: user?.partner?.cac || "",
+      phone: parsePhone(user?.partner?.phone)
     });
     handleDistrict(String(user?.partner?.contact?.state));
   }, [user]);
@@ -531,7 +531,7 @@ console.log(user?.partner?.isAccountProvisioned)
 
         <div className="p-5 md:p-14 hyvepay-setting rounded-3xl mt-6">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between">
-            <h5 className="font-bold font-montserrat">Preference</h5>
+            <h5 className="font-bold font-montserrat">Terms and Condition</h5>
 
             <AppBtn
               title="SAVE"
