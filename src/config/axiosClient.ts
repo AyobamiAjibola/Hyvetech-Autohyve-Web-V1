@@ -1,6 +1,5 @@
-// import axios from 'axios';
-
-// import settings from './settings';
+import axios from 'axios';
+import settings from './settings';
 
 // axios.defaults.headers.get['Accept'] = 'application/json';
 // axios.defaults.headers.post['Content-Type'] = 'application/json';
@@ -8,42 +7,24 @@
 // axios.defaults.headers.put['Content-Type'] = 'application/json';
 // axios.defaults.headers.delete['Accept'] = 'application/json';
 
-// // axios.defaults.withCredentials = true;
-// axios.defaults.baseURL = settings.api.baseURL;
-
-// export default (() => {
-//   const token = sessionStorage.getItem(settings.auth.admin);
-
-//   // alert((token))
-//   axios.defaults.headers.get['Authorization'] = `Bearer ${token}`;
-//   axios.defaults.headers.post['Authorization'] = `Bearer ${token}`;
-//   axios.defaults.headers.patch['Authorization'] = `Bearer ${token}`;
-//   axios.defaults.headers.put['Authorization'] = `Bearer ${token}`;
-//   axios.defaults.headers.delete['Authorization'] = `Bearer ${token}`;
-
-//   return axios;
-// })();
-
-import axios from 'axios';
-import settings from './settings';
-
-axios.defaults.headers.get['Accept'] = 'application/json';
-axios.defaults.headers.post['Content-Type'] = 'application/json';
-axios.defaults.headers.patch['Content-Type'] = 'application/json';
-axios.defaults.headers.put['Content-Type'] = 'application/json';
-axios.defaults.headers.delete['Accept'] = 'application/json';
-
 axios.defaults.baseURL = settings.api.baseURL;
 
 // Create an axios instance
-const instance = axios.create();
+// const instance = axios.create();
 
 // Add an interceptor to set the Authorization header before each request
-instance.interceptors.request.use((config) => {
+axios.interceptors.request.use((config: any) => {
   const token = sessionStorage.getItem(settings.auth.admin);
-  config.headers.Authorization = `Bearer ${token}`;
+  // config.headers.Authorization = `Bearer ${token}`;
 
-  return config;
+  // return config;
+  return {
+    ...config,
+    headers: {
+      ...config.headers,
+      Authorization: `Bearer ${token}`,
+    },
+  }
 });
 
-export default instance;
+export default axios;

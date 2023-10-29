@@ -10,7 +10,7 @@ import { Uploader } from "../../helpers/Uploader";
 import useAppSelector from "../../hooks/useAppSelector";
 import useAppDispatch from "../../hooks/useAppDispatch";
 import { clearAccountActivationStatus } from "../../store/reducers/autoHyveReducer";
-import { requestActivationAction } from "../../store/actions/autoHyveActions";
+import { requestActivationAction, uploadFile } from "../../store/actions/autoHyveActions";
 
 interface IProps {
   isVisible: boolean;
@@ -79,9 +79,7 @@ const ActivateIndividualAccountModal: FC<IProps> = ({
       setLoading(true);
 
       const formData1 = new FormData();
-
       formData1.append("file", values.validIdFront);
-
       const validIDFrontResult = await Uploader.uploadFile(formData1);
 
       const formData2 = new FormData();

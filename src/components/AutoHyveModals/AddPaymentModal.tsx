@@ -29,6 +29,8 @@ import { Search } from "@mui/icons-material";
 import { getpaymentRecievedAction } from "../../store/actions/transactionActions";
 import AddInvoicePayment from "./AddInvoicePayment";
 import { setInvoiceCode } from "../../store/reducers/expenseReducer";
+import Select from "react-select";
+import { customStyles } from "../../contsants/customStyles";
 
 interface IProps {
   openAddPayment: boolean,
@@ -37,6 +39,8 @@ interface IProps {
   setFromInvoice?: any,
   // partnerId?: number
 }
+
+const paymentMode = ["Cash", "Transfer", "Check", "Payment link", "POS"];
 
 const API_ROOT = settings.api.rest;
 
@@ -107,7 +111,8 @@ const AddPaymentModal = ({
       quantity: 0,
       quantityUnit: "",
       amountPaid: 0}],
-      note: ""
+      note: "",
+      type: ""
     },
     onSubmit: (values) => {
       handlePaymentRecord(values)
@@ -158,7 +163,7 @@ const AddPaymentModal = ({
         partnerId: _partnerId,
         customerId: value?.id,
         items: values.items,
-        type: "cash",
+        type: values.type,
         note: values.note
       };
 
@@ -676,13 +681,33 @@ const AddPaymentModal = ({
                 </div> 
 
                 <div className="flex md:flex-row justify-between flex-col">
-                  <div className="flex w-[100%] justify-start md:justify-end mt-8 order-2 md:order-2">
+                  <div className="flex w-[50%] justify-start md:justify-end mt-8 order-2 md:order-2">
                     <AppBtn
                       title="Generate"
-                      className="font-medium w-full md:w-[50%] h-12"
+                      className="font-medium w-full md:w-[80%] h-12"
                       spinner={loading}
                     />
                   </div>
+
+                  <div className="flex gap-4 w-[100%] md:flex-row flex-col">
+                    <div className="flex w-[100%] md:w-[80%] relative mt-7 order-1 md:order-1 flex-col">
+                      <InputHeader text={"Mode of payment"} />
+                      <Select
+                        options={paymentMode.map(option => ({ value: option, label: option }))}
+                        onChange={(item) => {
+                        setFieldValue("type", String(item?.value));
+                        }}
+                        styles={customStyles}
+                        placeholder={"Mode of payment"}
+                        name={"type"}
+                        onBlur={formik.handleBlur}
+                        value={{
+                        value: values.type,
+                        label: values.type,
+                        }}
+                        className="w-full"
+                      />
+                    </div>
 
                   <div className="flex w-full relative mt-5 order-1 md:order-1">
                     <div className="mt-2 w-[100%] md:w-[80%]">
@@ -694,6 +719,7 @@ const AddPaymentModal = ({
                         onChange={formik.handleChange}
                       />
                     </div>
+                  </div>
                   </div>
                 </div>
               </form>

@@ -38,6 +38,7 @@ const PERFORM_BULK_NAME_ENQUIRY = "autoHyve:PERFORM_BULK_NAME_ENQUIRY";
 const PERFORM_BULK_ACCOUNT_TRANSFER = "autoHyve:PERFORM_BULK_ACCOUNT_TRANSFER";
 
 export const uploadFile = async (payload: FormData) => {
+  axiosClient.defaults.headers.post['Content-Type'] = 'multipart/form-data';
   const response = await axiosClient.post(`${API_ROOT}/upload/file`, payload);
 
   return response.data as UploadResult;

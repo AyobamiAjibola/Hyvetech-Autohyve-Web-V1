@@ -349,6 +349,7 @@ IUser
     createdAt: Date;
     updatedAt: Date;
     accountProvisionStatus: 'NOT_REQUESTED' | 'PENDING' | 'APPROVED' | 'DECLINED';
+    upVote?: string;
   }
 
   interface AccountActivateRequest {

@@ -57,7 +57,7 @@ export const togglePartnerAction = asyncThunkWrapper<ApiResponseSuccess<void>, n
   TOGGLE_PARTNER,
   async partnerId => {
     const response = await axiosClient.post(`${API_ROOT}/partners-toggle/${partnerId}`);
-    console.log(response)
+
     return response.data;
   },
 );
@@ -97,8 +97,6 @@ export const createPartnerSettingsAction = asyncThunkWrapper<ApiResponseSuccess<
     formData.set('accountNumber', args.data.accountNumber);
     formData.set('accountName', args.data.accountName);
 
-    axiosClient.defaults.headers.patch['Content-Type'] = 'multipart/form-data';
-
     const response = await axiosClient.patch(`${API_ROOT}/partners/${args.partnerId}/settings`, formData);
 
     return response.data;
@@ -111,8 +109,6 @@ export const companyLogoAction = asyncThunkWrapper<ApiResponseSuccess<IPartner>,
     const formData = new FormData();
     //@ts-ignore
     formData.set('logo', args.data.logo);
-
-    axiosClient.defaults.headers.patch['Content-Type'] = 'multipart/form-data';
 
     const response = await axiosClient.patch(`${API_ROOT}/partner-logo/${args.partnerId}`, formData);
 
