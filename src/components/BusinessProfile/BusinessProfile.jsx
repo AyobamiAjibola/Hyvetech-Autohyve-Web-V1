@@ -284,7 +284,7 @@ const BusinessProfile = ({user}) => {
   },[]);
   // const brands = user?.partner?.brands?.map(JSON.parse) || [];
   const partnerAddress = wordBreaker(user?.partner.workshopAddress, 4)
-console.log(user?.partner?.isAccountProvisioned)
+
   return (
     <>
       <Formik
@@ -529,7 +529,7 @@ console.log(user?.partner?.isAccountProvisioned)
         )}
       </Formik>
 
-        <div className="p-5 md:p-14 hyvepay-setting rounded-3xl mt-6">
+        <div className="p-5 md:p-14 hyvepay-setting rounded-3xl mt-6 h-[500px] md:h-[600px]">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between">
             <h5 className="font-bold font-montserrat">Terms and Condition</h5>
 
@@ -541,7 +541,12 @@ console.log(user?.partner?.isAccountProvisioned)
             />
           </div>
 
-          <TextEditor preference={preference} setPreference={setPreference}/>
+          <div className="min-h-[300px] max-h-[300px] overflow-y: auto md:min-h-[400px] md:max-h-[400px]">
+            <TextEditor
+              preference={preference}
+              setPreference={setPreference}
+            />
+          </div>
           <span
             className="font-montserrat text-[10px] font-bold"
           ><span className="text-[red]">Please Note:</span> {" "}Your terms and conditions appears under every estimate and invoices</span>

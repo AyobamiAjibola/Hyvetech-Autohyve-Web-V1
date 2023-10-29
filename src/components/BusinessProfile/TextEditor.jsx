@@ -35,17 +35,21 @@ const TextEditor = ({ preference, setPreference }) => {
   return (
     <div >
       {/* <h1 style={{ textAlign: "left" }}>Text Editor In React JS</h1> */}
-      <div style={{ 
+      <div 
+        style={{ 
           display: "flex", 
           justifyContent: "center",
-          marginTop: '40px'}}>
+          marginTop: '40px'
+        }}
+      >
         <ReactQuill
           theme="snow"
           modules={modules}
           formats={formats}
           placeholder="terms and condition...."
           onChange={handleProcedureContentChange}
-          style={{ height: "100%", width: '100%'}}
+          className="md:min-h-[350px] min-h-[200px] max-h-[200px] md:max-h-[350px] overflow-y: auto"
+          style={{width: '100%'}}
           value={preference}
         >
         </ReactQuill>
