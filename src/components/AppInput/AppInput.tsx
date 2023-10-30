@@ -327,7 +327,7 @@ export const MyEmailTextInput = ({
       </div>
 
       {meta.touched && meta.error ? (
-        <div className="error-input-field ">{meta.error}</div>
+        <div className="error-input-field text-[red] text-[13px]">{meta.error}</div>
       ) : null}
     </div>
   );
