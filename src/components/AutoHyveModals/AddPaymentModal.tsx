@@ -38,6 +38,7 @@ interface IProps {
   fromInvoice?: boolean,
   setFromInvoice?: any,
   // partnerId?: number
+  invoiceId?: any
 }
 
 const paymentMode = ["Cash", "Transfer", "Check", "Payment link", "POS"];
@@ -53,6 +54,7 @@ const AddPaymentModal = ({
   openAddPayment, 
   setOpenAddPayment,  
   fromInvoice,
+  invoiceId
   // partnerId
 }: IProps) => {
   const [activeTab, setActiveTab] = useState(0);
@@ -173,7 +175,7 @@ const AddPaymentModal = ({
       );
       console.log(response.data);
       // @ts-ignore
-      showMessage('Payment', 'Successful', 'success');
+      showMessage('Payment', 'Successful!', 'success');
       dispatch(getpaymentRecievedAction())
       setOpenAddPayment(false)
     } catch (e: any) {
@@ -731,6 +733,7 @@ const AddPaymentModal = ({
               <AddInvoicePayment 
                 setOpenAddPayment={setOpenAddPayment} 
                 activeTab={activeTab}
+                invoiceId={invoiceId}
               />
             </>
           )}

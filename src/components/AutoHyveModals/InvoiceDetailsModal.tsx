@@ -1126,6 +1126,7 @@ const InvoiceDetailsModal = ({
         setOpenAddPayment={setShowRecordPayment}
         fromInvoice={fromInvoice}
         setFromInvoice={setFromInvoice}
+        invoiceId={invoiceId}
       />
 
       <AddNewExpensesModal

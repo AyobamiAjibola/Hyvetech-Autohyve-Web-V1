@@ -6,7 +6,7 @@ import InputHeader from '../InputHeader/InputHeader';
 import AppBtn from '../AppBtn/AppBtn';
 import useAppSelector from '../../hooks/useAppSelector';
 import useAppDispatch from '../../hooks/useAppDispatch';
-import { getInvoicesAction } from '../../store/actions/invoiceActions';
+import { getInvoicesAction, getSingleInvoice } from '../../store/actions/invoiceActions';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -22,7 +22,13 @@ import { setInvoiceCode } from '../../store/reducers/expenseReducer';
 
 const API_ROOT = settings.api.rest;
 
-function AddInvoicePayment({setOpenAddPayment, activeTab}: any)  {
+interface IProp {
+  invoiceId?: any,
+  setOpenAddPayment: any,
+  activeTab: any
+}
+
+function AddInvoicePayment({setOpenAddPayment, activeTab, invoiceId}: IProp)  {
     const [invoice, setInvoice] = useState<any>('');
     const paymentMode = ["Cash", "Transfer", "Check", "Payment link", "POS"];
     const invoiceStore = useAppSelector(state => state.invoiceReducer);
@@ -78,6 +84,7 @@ function AddInvoicePayment({setOpenAddPayment, activeTab}: any)  {
       showMessage('Payment', 'Successful', 'success');
       dispatch(getpaymentRecievedAction())
       setOpenAddPayment(false);
+      dispatch(getSingleInvoice(invoiceId))
 
       } catch (e: any) {
           showMessage('Payment',

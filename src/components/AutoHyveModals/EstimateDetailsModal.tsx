@@ -82,6 +82,7 @@ const EstimateDetailsModal = ({
     py: 5,
   };
 
+  const partnerAddress = wordBreaker(estimate?.partner?.contact?.address, 5)
   const customerAddress = wordBreaker(estimate?.address, 5)
 
   const calculateDiscount = ({
@@ -368,7 +369,9 @@ const EstimateDetailsModal = ({
                 label="Select an action"
                 onChange={handleChange}>
                 <MenuItem value="">...</MenuItem>
-                <MenuItem value={'Generate Invoice'} className={classes.select}
+                <MenuItem value={'Generate Invoice'} 
+                  disabled={estimate?.status === "Invoiced"}
+                  className={classes.select}
                   sx={{fontSize: "14px",
                   fontFamily: "montserrat"}}
                 >
@@ -421,16 +424,24 @@ const EstimateDetailsModal = ({
 
               <div className="flex flex-col mt-5 text-left w-[100%] ">
                 <h5 className="text-base pb-1  font-montserrat font-semibold">
-                  Demo Workshop
+                  {estimate?.partner?.name}
                 </h5>
-                <span className="text-sm pb-1 font-montserrat font-light w-[50%]">
-                  {estimate?.partner?.contact?.address}
+                <span className="text-sm pb-1 font-montserrat font-light w-[50%] flex flex-col">
+                  {partnerAddress.length > 0 &&
+                    partnerAddress?.map((sentence, index) => {
+                      return (
+                        <span key={index} className="text-sm pb-1 font-montserrat font-light">
+                          {sentence}
+                        </span>
+                      )
+                    })
+                }
                 </span>
                 <span className="text-sm pb-1 font-montserrat font-light">
                 {estimate?.partner?.contact?.district} {estimate?.partner?.contact?.state}, Nigeria
                 </span>
                 <span className="text-sm pb-1 font-montserrat font-light">
-                  +{estimate?.partner?.phone}
+                  {estimate?.partner?.phone}
                 </span>
                 <span className="text-sm pb-1 font-montserrat font-light">
                   {estimate?.partner?.email}
@@ -443,17 +454,19 @@ const EstimateDetailsModal = ({
                 <h5 className="text-base pb-1  font-montserrat font-semibold">
                   Billing Information
                 </h5>
-                {customerAddress.length > 0 &&
-                  customerAddress?.map((sentence, index) => {
-                    return (
-                      <span key={index} className="text-sm pb-1 font-montserrat font-light">
-                        {sentence}
-                      </span>
-                    )
-                  })
-                }
+                <span className="text-sm pb-1 font-montserrat font-light flex flex-col justify-end items-end">
+                  {customerAddress.length > 0 &&
+                    customerAddress?.map((sentence, index) => {
+                      return (
+                        <span key={index} className="text-sm pb-1 font-montserrat font-light">
+                          {sentence}
+                        </span>
+                      )
+                    })
+                  }
+                </span>
                 <span className="text-sm pb-1  font-montserrat font-light">
-                  {estimate?.email}
+                  {estimate?.customer?.email}
                 </span>
                 <span className="text-sm pb-1  font-montserrat font-light">
                   {estimate?.customer?.phone

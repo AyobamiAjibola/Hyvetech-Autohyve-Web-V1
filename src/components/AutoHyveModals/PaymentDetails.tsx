@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import CloseIcon from "../../assets/svgs/close-circle.svg";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
@@ -14,7 +14,6 @@ import { wordBreaker } from "../../utils/generic";
 import moment from "moment";
 import { Util } from "../../helpers/Util";
 import settings from "../../config/settings";
-import useAppSelector from "../../hooks/useAppSelector";
 import useAppDispatch from "../../hooks/useAppDispatch";
 import { getPreferencesActions } from "../../store/actions/partnerActions";
 
@@ -38,11 +37,11 @@ const PaymentDetails = ({
   const { user } = useAdmin();
 
   const partnerName = (user?.partner?.name || " ")
-  const [preference, setPreference] = useState('');
+  // const [preference, setPreference] = useState('');
 
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.up("sm"));
-  const partnerReducer = useAppSelector(state => state.partnerReducer);
+  // const partnerReducer = useAppSelector(state => state.partnerReducer);
   const dispatch = useAppDispatch();
 
   const style = {
@@ -79,11 +78,11 @@ const PaymentDetails = ({
   },[item?.invoice?.grandTotal, item?.amount]);
   
   
-  useEffect(() => {
-    if (partnerReducer.preference) {
-      setPreference(partnerReducer.preference.termsAndCondition);
-    }
-  }, [partnerReducer.preference]);
+  // useEffect(() => {
+  //   if (partnerReducer.preference) {
+  //     setPreference(partnerReducer.preference.termsAndCondition);
+  //   }
+  // }, [partnerReducer.preference]);
 
   const getPreferences = useCallback(() => {
     dispatch(getPreferencesActions({}));
@@ -405,8 +404,8 @@ const PaymentDetails = ({
             </div>
           </div>
 
-          <hr className="mt-10" />
-          <div className="flex flex-col mt-10">
+          {/*<hr className="mt-10" />
+           <div className="flex flex-col mt-10">
             <span className="text-lg font-bold font-montserrat mb-2">
               Terms and Conditions
             </span>
@@ -415,7 +414,7 @@ const PaymentDetails = ({
             >
             
             </div>
-          </div>
+          </div> */}
         </Box>
       </Modal>
     </>
