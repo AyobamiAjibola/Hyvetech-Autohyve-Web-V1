@@ -324,8 +324,8 @@ const EstimateDetailsModal = ({
             </div>
           </div>
 
-          <div className="md:flex w-[100%] md:items-end md:justify-end top-20 md:mt-0 mt-20 md:relative">
-            <FormControl>
+          <div className="md:flex w-[100%] md:items-end md:justify-end top-20 md:mt-0 mt-20 md:relative pr-10">
+            <FormControl className="md:w-[23%] w-[100%]">
               <InputLabel
                 id="demo-simple-select-helper-label"
                 focused={true} // To style the label as focused initially
