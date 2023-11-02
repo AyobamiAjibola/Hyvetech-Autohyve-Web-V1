@@ -8,7 +8,7 @@ import Select from "react-select";
 import { EyeOutlined } from "@ant-design/icons";
 
 interface IAppInputProps {
-  rightImg?: any;
+  // rightImg?: any;
   leftImg?: any;
   placeholderTop: string;
   hasPLaceHolder: boolean;
@@ -24,7 +24,7 @@ interface IAppInputProps {
 }
 
 const AppInput = ({
-  rightImg,
+  // rightImg,
   leftImg,
   placeholderTop,
   hasPLaceHolder,
@@ -36,13 +36,13 @@ const AppInput = ({
   disabled = false,
   name, onBlur, min
 }: IAppInputProps) => {
-  const [pwdfield, setPwdfield] = React.useState(false);
+  // const [pwdfield, setPwdfield] = React.useState(false);
 
-  const togglePassword = (e: any, val: any) => {
-    e.preventDefault();
+  // const togglePassword = (e: any, val: any) => {
+  //   e.preventDefault();
 
-    setPwdfield(val);
-  };
+  //   setPwdfield(val);
+  // };
 
   return (
     <>
@@ -55,7 +55,8 @@ const AppInput = ({
           onBlur={onBlur}
           name={name}
           disabled={disabled}
-          type={pwdfield ? "password" : type}
+          // type={pwdfield ? "password" : type}
+          type={type}
           className={
             `w-full placeholder-[#A5A5A5] placeholderText h-[55px] font-montserrat
           } ` + className
@@ -64,13 +65,13 @@ const AppInput = ({
           value={value}
           placeholder={placeholder}
         />
-        <button onClick={(e) => togglePassword(e, !pwdfield)}>
+        {/* <button onClick={(e) => togglePassword(e, !pwdfield)}>
           {pwdfield ? (
             <BsEyeSlash color="black" size={25} />
           ) : (
             <img src={rightImg} alt="" />
           )}
-        </button>
+        </button> */}
       </div>
     </>
   );

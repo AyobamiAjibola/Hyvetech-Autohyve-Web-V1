@@ -146,7 +146,7 @@ const EstimateDetailsModal = ({
       const response = await axiosClient.post(`${API_ROOT}/request-pdf`, payload);
       console.log(response.data);
       // window.open(`${settings.api.baseURL}/uploads/pdf/${response.data.name}`)
-    } catch (e) {
+    } catch (e: any) {
       console.log(e);
     }
 

@@ -73,6 +73,9 @@ const DropDownHalfParts = ({
                 onChange={onChangeUnit}
                 name={nameUnit}
               >
+                <option value="" disabled selected>
+                  select unit
+                </option>
                 {data.map((item: any) => (
                   <option value={item.value} key={item.value}
                     className="mt-50"
