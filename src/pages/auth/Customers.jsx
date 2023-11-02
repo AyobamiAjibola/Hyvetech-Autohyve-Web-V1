@@ -120,7 +120,7 @@ const Customers = () => {
   // Function to filter data based on the search query
   const filteredData = rows.filter((item) =>
     item.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.companyName.toLowerCase().includes(searchQuery.toLowerCase())
+    item.companyName?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const itemsPerPage = filteredData.length === rows.length ? 10 : filteredData.length;
@@ -431,7 +431,7 @@ const Customers = () => {
                         {item.email}
                       </td>
                       <td className="font-montserrat text-xs">
-                        {item.contacts[0].address}
+                        {item.contacts[0]?.address ? item.contacts[0]?.address : ''}
                       </td>
 
                       {/* <td className="flex gap-3 items-center justify-center ">

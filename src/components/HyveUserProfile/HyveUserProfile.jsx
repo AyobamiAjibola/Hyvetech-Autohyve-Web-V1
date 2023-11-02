@@ -178,7 +178,7 @@ const HyveUserProfile = () => {
       phone: parsePhone(customer?.phone),
       state: customer?.contacts[0]?.state || "",
       district: customer?.contacts[0]?.district || "",
-      address: customer?.contacts[0].address || "",
+      address: customer?.contacts[0]?.address || "",
     });
     handleDistrict(String(customer?.contacts[0]?.state));
   }, [customer]);
@@ -211,7 +211,7 @@ const HyveUserProfile = () => {
         onSubmit={handleSubmit}
         validationSchema={updateCustomerSchema}
       >
-        {({ setFieldValue, values, handleChange, handleBlur }) => (
+        {({ setFieldValue, values, handleChange, handleBlur, touched, errors }) => (
           <Form>
             <div className="mb-20 mt-0 h-screen px-0 md:px-0">
               <div className=" w-[100%] md:border-[1px] rounded-3xl relative flex mt-20 md:mt-32  px-0 md:px-20 flex-col pb-20  md:border-[#CACACA]">
@@ -281,6 +281,9 @@ const HyveUserProfile = () => {
                           label: values.customerType,
                         }}
                       />
+                      {touched.customerType && errors.customerType ? (
+                        <div className="error-input-field text-[red] text-[13px] mt-1 ml-2">{errors.customerType}</div>
+                      ) : null}
                     </div>
                   </div>
 
@@ -361,6 +364,9 @@ const HyveUserProfile = () => {
                           label: values.state,
                         }}
                       />
+                      {touched.state && errors.state ? (
+                        <div className="error-input-field text-[red] text-[13px] mt-1 ml-2">{errors.state}</div>
+                      ) : null}
                     </div>
                     <div className="mt-5 md:mt-5 w-full">
                       <InputHeader text="District" />
@@ -377,6 +383,9 @@ const HyveUserProfile = () => {
                           label: values.district,
                         }}
                       />
+                      {touched.district && errors.district ? (
+                        <div className="error-input-field text-[red] text-[13px] mt-1 ml-2">{errors.district}</div>
+                      ) : null}
                     </div>
                   </div>
                 </div>

@@ -115,6 +115,7 @@ export default function useEstimate() {
         estimateReducer.createEstimateSuccess,
         "success"
       )
+      dispatch(getEstimatesAction());
       handleReset();
     }
   }, [estimateReducer.createEstimateStatus, estimateReducer.createEstimateSuccess, handleReset]);
