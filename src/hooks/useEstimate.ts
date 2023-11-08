@@ -336,7 +336,7 @@ export default function useEstimate() {
       model: values.model,
       plateNumber: values.plateNumber,
       modelYear: values.modelYear,
-      mileageValue: values.mileage.count,
+      mileageValue: values.mileage.count.toString(),
       mileageUnit: values.mileage.unit,
       partsTotal: partTotal.toFixed(2),
       laboursTotal: labourTotal.toFixed(2),
@@ -395,7 +395,7 @@ export default function useEstimate() {
       model: values.model,
       plateNumber: values.plateNumber,
       modelYear: values.modelYear,
-      mileageValue: values.mileage.count,
+      mileageValue: values.mileage.count.toString(),
       mileageUnit: values.mileage.unit,
       partsTotal: partTotal.toFixed(2),
       laboursTotal: labourTotal.toFixed(2),
@@ -408,7 +408,6 @@ export default function useEstimate() {
       note: values.note,
       internalNote: values.internalNote,
     };
-
     void dispatch(sendDraftEstimateAction(data));
   };
 
