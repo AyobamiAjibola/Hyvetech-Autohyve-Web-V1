@@ -190,7 +190,15 @@ const EditEstimate = () => {
     setFetch(!fetch);
   };
 
-  function handleSearch() {
+  function handleSearch(e: any) {
+    e.preventDefault()
+    setFieldValue('vin', '')
+    setFieldValue('make', '')
+    setFieldValue('model', '')
+    setFieldValue('modelYear', '')
+    setFieldValue('plateNumber', '')
+    setFieldValue('mileage', '')
+    setMileageUnit('')
     if ((inputValue || "").length == 0) {
       setShowDrop(false);
     } else {
@@ -745,7 +753,6 @@ const EditEstimate = () => {
                   }}
                   noOptionsText={noOptionsText}
                   className="w-[70%]"
-                  disabled
                   sx={{
                     "& .MuiOutlinedInput-notchedOutline": {
                       borderColor: "transparent", // Remove border color
@@ -777,12 +784,12 @@ const EditEstimate = () => {
                       onChange={(e) => {
                         filterData(e.target.value);
                       }}
-                      onClick={() => {
-                        handleSearch();
+                      onClick={(e) => {
+                        handleSearch(e);
                       }}
                       onKeyDown={(e: any) => {
                         if (e.key === "Enter") {
-                          handleSearch();
+                          handleSearch(e);
                         } else {
                           setShowDrop(false);
                         }
@@ -805,6 +812,7 @@ const EditEstimate = () => {
                               <CircularProgress color="inherit" size={20} sx={{color: '#FAA21B'}}/>
                             ) : (
                               <Button
+                                type='button'
                                 sx={{
                                   zIndex: 1,
                                   cursor: "pointer",
@@ -872,7 +880,7 @@ const EditEstimate = () => {
 
               <div className=" w-[100%] border-[1px] rounded-3xl  flex mt-8  px-3 md:px-5 flex-col py-5  border-[#CACACA]">
                 <h5 className="font-semibold font-montserrat">
-                  Customer Informationsss
+                  Customer Information
                 </h5>
                 <div className="flex flex-col md:flex-row  mt-3 w-full gap-5">
                   <div className="w-full">
@@ -957,7 +965,6 @@ const EditEstimate = () => {
                       }}
                       value={values.vin}
                       fullWidth
-                      disabled
                       sx={{
                         "& .MuiOutlinedInput-notchedOutline": {
                           borderColor: "transparent", // Remove border color
@@ -1077,8 +1084,6 @@ const EditEstimate = () => {
                       data={milesData}
                       setUnit={setMileageUnit}
                       unit={mileageUnit}
-                      unitDisable={true}
-                      disabled={true}
                     />
                   </div>
                 </div>
