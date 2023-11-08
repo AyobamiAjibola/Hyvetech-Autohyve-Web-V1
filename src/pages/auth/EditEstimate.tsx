@@ -104,11 +104,12 @@ const EditEstimate = () => {
 
   const params = useParams();
   const admin = useAdmin();
-  
+
   const formik = useFormik({
     validationSchema: schema,
     initialValues: initialValues,
     onSubmit: (values) => {
+      console.log(values, 'values')
       save ? handleUpdateEstimate(values) : handleSendDraftEstimate(values)
     },
     validateOnBlur: true,
@@ -197,8 +198,8 @@ const EditEstimate = () => {
     setFieldValue('model', '')
     setFieldValue('modelYear', '')
     setFieldValue('plateNumber', '')
-    setFieldValue('mileage', '')
-    setMileageUnit('')
+    setFieldValue('mileage.count', '')
+    setFieldValue('mileage.unit', '')
     if ((inputValue || "").length == 0) {
       setShowDrop(false);
     } else {
@@ -538,7 +539,6 @@ const EditEstimate = () => {
     setFieldValue('modelYear', initialValues.modelYear)
     setFieldValue('plateNumber', initialValues.plateNumber)
     setFieldValue('mileage', initialValues.mileage)
-    setMileageUnit(initialValues.mileage.unit)
     setFieldValue('parts', initialValues.parts)
     setFieldValue('labours', initialValues.labours)
     setFieldValue('depositAmount', initialValues.depositAmount)
@@ -1072,18 +1072,17 @@ const EditEstimate = () => {
                     />
                   </div>{" "}
                   <div className="w-full">
-                    <DropDownHalf
+                    <DropDownHalfParts
                       title="Mileage Value"
-                      placeholder="Unit"
                       placeholderInput={fields.mileageValue.label}
-                      name="mileage.count"
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      value={values.mileage.count}
                       type="number"
                       data={milesData}
-                      setUnit={setMileageUnit}
-                      unit={mileageUnit}
+                      valueUnit={values.mileage.unit}
+                      nameUnit={"mileage.unit"}
+                      onChangeUnit={formik.handleChange}
+                      name={'mileage.count'}
+                      value={values.mileage.count}
+                      onChange={formik.handleChange}
                     />
                   </div>
                 </div>

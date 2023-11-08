@@ -116,9 +116,12 @@ export default function useEstimate() {
         "success"
       )
       dispatch(getEstimatesAction());
-      handleReset();
     }
-  }, [estimateReducer.createEstimateStatus, estimateReducer.createEstimateSuccess, handleReset]);
+
+    return () => {
+      dispatch(clearCreateEstimateStatus())
+    }
+  }, [estimateReducer.createEstimateStatus]);
 
   useEffect(() => {
     if (estimateReducer.saveEstimateStatus === 'failed') {
@@ -212,7 +215,7 @@ export default function useEstimate() {
     }
   }, [dispatch, estimateReducer.sendDraftEstimateStatus, estimateReducer.sendDraftEstimateSuccess, handleReset]);
 
-  const handleCreateEstimate = (values: IEstimateValues, mileageUnit: string, options?: FormikHelpers<IEstimateValues>, ) => {
+  const handleCreateEstimate = (values: IEstimateValues, options?: FormikHelpers<IEstimateValues>, ) => {
     const depositAmount = values.depositAmount;
 
     if (depositAmount === 'null' || !depositAmount)
@@ -252,7 +255,7 @@ export default function useEstimate() {
       plateNumber: values.plateNumber,
       modelYear: values.modelYear,
       mileageValue: values.mileage.count.toString(),
-      mileageUnit: mileageUnit,
+      mileageUnit: values.mileage.unit,
       partsTotal: partTotal.toFixed(2),
       laboursTotal: labourTotal.toFixed(2),
       grandTotal: grandTotal.toFixed(2),

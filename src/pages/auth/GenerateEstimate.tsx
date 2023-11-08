@@ -104,7 +104,7 @@ const GenerateEstimate = () => {
     onSubmit: (values) => {
       save 
         ? handleSaveEstimate(values)
-        : handleCreateEstimate(values, mileageUnit)
+        : handleCreateEstimate(values)
     },
     validateOnBlur: true,
   });
@@ -678,7 +678,7 @@ const GenerateEstimate = () => {
     estimateReducer.createEstimateStatus,
     estimateReducer.sendDraftEstimateStatus,
   ]);
-
+ 
   const saveStatus = useMemo(() => {
     return (
       estimateReducer.updateEstimateStatus === "loading" ||
@@ -920,6 +920,7 @@ const GenerateEstimate = () => {
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
                       value={values.firstName}
+                      disabled={true}
                     />
                     {formik.touched.firstName && formik.errors.firstName && (
                       <div>{formik.errors.firstName}</div>
@@ -935,6 +936,7 @@ const GenerateEstimate = () => {
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
                       value={values.lastName}
+                      disabled={true}
                     />
                     {formik.touched.lastName && formik.errors.lastName && (
                       <div>{formik.errors.lastName}</div>
@@ -955,6 +957,7 @@ const GenerateEstimate = () => {
                       }}
                       onBlur={formik.handleBlur}
                       value={values.phone}
+                      disabled={true}
                     />
                     {formik.touched.phone && formik.errors.phone && (
                       <div>{formik.errors.phone}</div>
@@ -970,6 +973,7 @@ const GenerateEstimate = () => {
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
                       value={values.address}
+                      disabled={true}
                     />
                     {formik.touched.address && formik.errors.address && (
                       <div>{formik.errors.address}</div>
@@ -1050,6 +1054,7 @@ const GenerateEstimate = () => {
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
                       value={values.modelYear}
+                      disabled={true}
                     />
                   </div>
 
@@ -1062,6 +1067,7 @@ const GenerateEstimate = () => {
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
                       value={values.make}
+                      disabled={true}
                     />
                   </div>
 
@@ -1074,6 +1080,7 @@ const GenerateEstimate = () => {
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
                       value={values.model}
+                      disabled={true}
                     />
                   </div>
                 </div>
@@ -1088,21 +1095,21 @@ const GenerateEstimate = () => {
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
                       value={values.plateNumber}
+                      disabled={true}
                     />
                   </div>{" "}
                   <div className="w-full">
-                    <DropDownHalf
+                    <DropDownHalfParts
                       title="Mileage Value"
-                      placeholder="Unit"
                       placeholderInput={fields.mileageValue.label}
-                      name="mileage.count"
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      value={values.mileage.count}
                       type="number"
                       data={milesData}
-                      setUnit={setMileageUnit}
-                      unit={mileageUnit}
+                      valueUnit={values.mileage.unit}
+                      nameUnit={"mileage.unit"}
+                      onChangeUnit={formik.handleChange}
+                      name={'mileage.count'}
+                      value={values.mileage.count}
+                      onChange={formik.handleChange}
                     />
                   </div>
                 </div>
