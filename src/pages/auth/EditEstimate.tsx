@@ -1080,7 +1080,7 @@ const EditEstimate = () => {
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
                       value={values.mileage.count}
-                      type="text"
+                      type="number"
                       data={milesData}
                       setUnit={setMileageUnit}
                       unit={mileageUnit}
