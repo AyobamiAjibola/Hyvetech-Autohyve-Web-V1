@@ -31,6 +31,9 @@ import AddInvoicePayment from "./AddInvoicePayment";
 import { setInvoiceCode } from "../../store/reducers/expenseReducer";
 import Select from "react-select";
 import { customStyles } from "../../contsants/customStyles";
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
 interface IProps {
   openAddPayment: boolean,
@@ -114,7 +117,8 @@ const AddPaymentModal = ({
       quantityUnit: "",
       amountPaid: 0}],
       note: "",
-      type: ""
+      type: "",
+      date: new Date()
     },
     onSubmit: (values) => {
       handlePaymentRecord(values)
@@ -159,6 +163,9 @@ const AddPaymentModal = ({
   };
 
   const handlePaymentRecord = async (values: any) => {
+    if(values.date === "") {
+      return showMessage('Payment', 'Payment date is required', 'error')
+    }
     setLoading(true);
     try {
       const payload = {
@@ -166,7 +173,8 @@ const AddPaymentModal = ({
         customerId: value?.id,
         items: values.items,
         type: values.type,
-        note: values.note
+        note: values.note,
+        date: values.date
       };
 
       const response = await axiosClient.post(
@@ -374,6 +382,10 @@ const AddPaymentModal = ({
       dispatch(getPartnerAction(_partnerId));
     }
   }, [dispatch, _partnerId]);
+
+  useEffect(() => {
+    setFieldValue('date', '')
+  },[])
 
   return (
     <>
@@ -692,7 +704,62 @@ const AddPaymentModal = ({
                   </div>
 
                   <div className="flex gap-4 w-[100%] md:flex-row flex-col">
-                    <div className="flex w-[100%] md:w-[80%] relative mt-7 order-1 md:order-1 flex-col">
+                    <div className="flex w-[100%] md:w-[60%] relative mt-7 order-1 md:order-1 flex-col">
+                      <InputHeader text="Payment Date" />
+                      <LocalizationProvider dateAdapter={AdapterDateFns}>
+                        <DatePicker
+                          className={`bg-[#F5F5F5] border-[#F5F5F5] h-14 w-full 
+                          placeholder-[#A5A5A5] placeholderText h-[55px] rounded-[20px] 
+                          font-montserrat`}
+                          disableFuture
+                          minDate={new Date('2000/01/01')}
+                          openTo="day"
+                          views={['year', 'month', 'day']}
+                          value={new Date(values.date)}
+                          onChange={(value) => setFieldValue('date', value)}
+                          sx={{
+                              width: "100%",
+                              "& .MuiOutlinedInput-notchedOutline": {
+                              borderColor: "transparent", // Remove border color
+                              },
+                              "& label": {
+                              fontSize: "10px",
+                              fontFamily: "montserrat",
+                              color: "#A5A5A5",
+                              paddingTop: "5px",
+                              paddingLeft: "17px",
+                              },
+                              "& .MuiOutlinedInput-root": {
+                                fontFamily: 'montserrat',
+                                fontSize: '12px',
+                              "&:hover .MuiOutlinedInput-notchedOutline": {
+                                borderColor: "transparent", // Remove border color on hover
+                              },
+                              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                                  borderColor: "transparent", // Remove border color on focus
+                              },
+                              borderRadius: "20px",
+                              backgroundColor: "#F5F5F5",
+                  
+                              borderColor: "transparent",
+                              height: "53px",
+                              border: "none",
+                              },
+                          }}
+                          //@ts-ignore
+                          renderInput={(params: any) =>
+                            <TextField
+                              {...params}
+                              fullWidth
+                              label="Date"
+                              variant="outlined"
+                              // value={invoice.code.splice('_')[0]}
+                            />
+                          }
+                        />
+                      </LocalizationProvider>
+                    </div>
+                    <div className="flex w-[100%] md:w-[60%] relative mt-7 order-1 md:order-1 flex-col">
                       <InputHeader text={"Mode of payment"} />
                       <Select
                         options={paymentMode.map(option => ({ value: option, label: option }))}
@@ -710,18 +777,17 @@ const AddPaymentModal = ({
                         className="w-full"
                       />
                     </div>
-
-                  <div className="flex w-full relative mt-5 order-1 md:order-1">
-                    <div className="mt-2 w-[100%] md:w-[80%]">
-                      <CustomTextArea
-                        topTitle="Notes/Remarks"
-                        placeholder="Note"
-                        name="note"
-                        value={values.note}
-                        onChange={formik.handleChange}
-                      />
+                    <div className="flex w-full relative mt-5 order-1 md:order-1">
+                      <div className="mt-2 w-[100%] md:w-[100%]">
+                        <CustomTextArea
+                          topTitle="Notes/Remarks"
+                          placeholder="Note"
+                          name="note"
+                          value={values.note}
+                          onChange={formik.handleChange}
+                        />
+                      </div>
                     </div>
-                  </div>
                   </div>
                 </div>
               </form>

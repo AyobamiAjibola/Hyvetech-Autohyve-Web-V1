@@ -78,10 +78,10 @@ const SuccessfulPaymentModal = ({
                   Payment Successful
                 </h5>
                 {!isBulkPayment && <h5 className="text-center md:text-sm text-[9px] max-w-[95%]  text-[#494949] font-montserrat">
-                  Yay! Congratulations...
+                  Yay! Congratulations...&nbsp;
                   {Util.CurrencyDisplay(
                     Number(state.accountTransferInfo?.amount)
-                  )}
+                  )}&nbsp;
                   was successfully sent <br />
                   to{" "}
                   <strong>
@@ -91,8 +91,8 @@ const SuccessfulPaymentModal = ({
                   </strong>
                 </h5>}
                 {isBulkPayment && <h5 className="text-center md:text-sm text-[9px] max-w-[95%]  text-[#494949] font-montserrat">
-                  Yay! Congratulations...{" "}
-                  {Util.CurrencyDisplay(totalAmount)}{" "}
+                  Yay! Congratulations...&nbsp;
+                  {Util.CurrencyDisplay(totalAmount)}&nbsp;
                   was successfully sent to{" "}
                   <strong>
                     {state.bulkAccountTransferInfo.length}{" "}Account(s)

@@ -15,6 +15,7 @@ export interface IBeneficiaryValue {
   name: string;
   accountName: string | null;
   bankName: string | null;
+  bankCode: string | null;
   accountNumber: string | null;
 }
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CloseIcon from "../../assets/svgs/close-circle.svg";
 import AppBtn from "../AppBtn/AppBtn";
 import ConfirmPaymentModal from "../Dashboard/ConfirmPaymentModal";
@@ -9,7 +9,10 @@ import useAppDispatch from "../../hooks/useAppDispatch";
 import * as Yup from "yup";
 import Media from "react-media";
 import { Tabs } from "antd";
-import { saveAccountTransferInfo } from "../../store/reducers/autoHyveReducer";
+import { clearRequestNameEnquiryStatus, saveAccountTransferInfo } from "../../store/reducers/autoHyveReducer";
+import useAppSelector from "../../hooks/useAppSelector";
+import { setExpenseData } from "../../store/reducers/expenseReducer";
+import { showMessage } from "../../helpers/notification";
 
 const AccountTransferSchema = Yup.object({
   accountNumber: Yup.string().required("Account number is required"),
@@ -25,15 +28,21 @@ const AccountTransferSchema = Yup.object({
   email: Yup.string(),
 });
 
+interface IProps {
+  openSingleModal: boolean;
+  setOpenSingleModal: any;
+}
+
 const FundAccountModal = ({
   openSingleModal,
   setOpenSingleModal,
-  currentModal,
-}: any) => {
+}: IProps) => {
   const [confirmationmodal, setConfirmationmodal] = React.useState(false);
   const [selected, setSelected] = useState("New Beneficiary");
+  const expenseReducer = useAppSelector(state => state.expenseReducer);
+  const state = useAppSelector((state) => state.autoHyveReducer);
 
-  const [formState] = useState({
+  const [formState, setFormState] = useState({
     accountNumber: "",
     bank: {
       label: "",
@@ -67,6 +76,45 @@ const FundAccountModal = ({
     setOpenSingleModal(false);
     setConfirmationmodal(true);
   };
+
+  useEffect(() => {
+    if(expenseReducer.expenseData?.openModal) {
+      setOpenSingleModal(true)
+      setFormState({...formState, 
+        accountNumber: expenseReducer.expenseData?.accountNumber as string,
+        narration: expenseReducer.expenseData?.narration as string,
+        amount: expenseReducer.expenseData?.amount as any,
+        bank: expenseReducer.expenseData?.bank as any
+      });
+      
+    }
+  },[expenseReducer.expenseData?.openModal]);
+
+  const handleClose = () => {
+    setOpenSingleModal(false)
+    dispatch(setExpenseData({
+      id: -1,
+      accountName: '',
+      bank: {
+          bankName: '',
+          bankCode: ''
+      },
+      amount: 0,
+      narration: '',
+      openModal: false
+    }))
+  }
+
+  useEffect(() => {
+    if(state.requestNameEnquiryStatus === 'completed') {
+      setConfirmationmodal(false);
+      dispatch(clearRequestNameEnquiryStatus())
+    } else if(state.requestNameEnquiryStatus === 'failed') {
+      showMessage('', state.requestNameEnquiryError, 'error')
+      dispatch(clearRequestNameEnquiryStatus())
+    }
+
+  },[state.requestNameEnquiryStatus]);
  
   return (
     <>
@@ -82,7 +130,7 @@ const FundAccountModal = ({
           >
             <div className="body">
               <div className="flex justify-end w-full">
-                <button onClick={() => setOpenSingleModal(false)}>
+                <button onClick={handleClose}>
                   <img src={CloseIcon} alt="" />
                 </button>
               </div>
@@ -91,24 +139,6 @@ const FundAccountModal = ({
                   Transfer Funds
                 </h5>
               </div>
-
-              {currentModal && (
-                <>
-                  {/* <TabComponent /> */}
-                  {/* <div className="ml-12 mb-5 w-full flex items-center gap-5">
-                    <div>
-                      <span className="font-montserrat">Transfer 1</span>
-                    </div>
-                    <div>
-                      <span className="font-montserrat">Transfer 2</span>
-                    </div>
-
-                    <img src={add} alt="" className="w-[20px] h-[20px]" />
-                  </div>
-
-                  <div className="customLine"></div> */}
-                </>
-              )}
 
               <Media query="(max-width: 600px)">
                 {(matches) =>

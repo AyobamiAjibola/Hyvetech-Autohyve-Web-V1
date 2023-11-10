@@ -957,6 +957,7 @@ IUser
     saveAsBeneficiary?: boolean;
     bankName?: string;
     pin: string;
+    expenseId?: number;
   }
 
   export interface AccountTransferResponseDTO {

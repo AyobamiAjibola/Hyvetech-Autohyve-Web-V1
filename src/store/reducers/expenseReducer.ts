@@ -81,6 +81,17 @@ interface IExpenseState {
 
   invoiceCode: string;
   expenseCategoryId: string;
+  expenseData: {
+    id: number;
+    accountNumber: string;
+    bank: {
+      bankName: string;
+      bankCode: string
+    }
+    amount: number;
+    narration: string;
+    openModal: boolean
+  } | null;
 }
 
 const initialState: IExpenseState = {
@@ -147,6 +158,17 @@ const initialState: IExpenseState = {
 
   invoiceCode: '',
   expenseCategoryId: '',
+  expenseData: {
+    id: -1,
+    accountNumber: '',
+    bank: {
+      bankName: '',
+      bankCode: ''
+    },
+    amount: 0,
+    narration: '',
+    openModal: false
+  }
 };
 
 const expenseSlice = createSlice({
@@ -203,6 +225,9 @@ const expenseSlice = createSlice({
     setExpenseCategoryId(state: IExpenseState, action: PayloadAction<string>) {
       state.expenseCategoryId = action.payload;
     },
+    setExpenseData(state: IExpenseState, action: PayloadAction<any>) {
+      state.expenseData = action.payload;
+    }
   },
 
   extraReducers: builder => {
@@ -445,6 +470,7 @@ export const {
   clearCreateExpenseTypeStatus,
   setInvoiceCode,
   setExpenseCategoryId,
+  setExpenseData
 } = expenseSlice.actions;
 
 export default expenseSlice.reducer;

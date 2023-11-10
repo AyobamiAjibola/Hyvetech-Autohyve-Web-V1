@@ -31,6 +31,7 @@ export const customStyles = {
     borderRadius: 0,
     // kill the gap
     marginTop: 0,
+    fontFamily: 'montserrat'
   }),
   menuList: (base) => ({
     ...base,
@@ -43,6 +44,6 @@ export const customStyles = {
     border: "none", // Remove border
     background: "#f5f5f5",
     height: "53px",
-    borderRadius: "20px",
+    borderRadius: "20px"
   }),
 };

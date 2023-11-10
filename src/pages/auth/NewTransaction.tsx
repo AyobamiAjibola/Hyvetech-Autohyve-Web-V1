@@ -17,8 +17,6 @@ const NewTransaction = () => {
   const state = useAppSelector((state) => state.autoHyveReducer);
   const dispatch = useAppDispatch();
 
-  const [currentModal, setCurretntModal] = useState<any>(null);
-
   useEffect(() => {
     if (state.requestAccountTransferStatus === "completed" || state.performBulkAccountTransferRequestStatus === "completed") {
       showMessage("Transfer successful", "", "success");
@@ -45,7 +43,6 @@ const NewTransaction = () => {
         <div
           onClick={() => {
             setOpenSingleModal(true);
-            setCurretntModal(false);
           }}
           className="p-8 transact-card bg-gray-100"
         >
@@ -75,7 +72,6 @@ const NewTransaction = () => {
       <FundAccountModal
         openSingleModal={openSingleModal}
         setOpenSingleModal={setOpenSingleModal}
-        currentModal={currentModal}
       />
 
       <BulkAccountModal

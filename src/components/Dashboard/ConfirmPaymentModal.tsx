@@ -13,11 +13,18 @@ import { initiateAccountTranfer, initiateBulkAccountTransfer } from "../../store
 import { clearPerformBulkAccountEnquiryStatus } from "../../store/reducers/autoHyveReducer";
 import SuccessfulPaymentModal from "./SuccessfulPaymentModal";
 
+interface IProps {
+  confirmationmodal: boolean;
+  setConfirmationmodal: any;
+  isBulkTransfer?: boolean;
+  expenseId?: number;
+}
+
 const ConfirmPaymentModal = ({
   confirmationmodal,
   setConfirmationmodal,
-  isBulkTransfer
-}: any) => {
+  isBulkTransfer, expenseId
+}: IProps) => {
   const [successModal, setSuccessModal] = useState(false);
   const closeSuccessModal = () => setSuccessModal(!successModal);
 
@@ -30,9 +37,11 @@ const ConfirmPaymentModal = ({
       // showMessage("Transfer successful", "", "success");
       setSuccessModal(true);
       setConfirmationmodal(false);
+
     } else if (state.requestAccountTransferStatus === "failed") {
       setConfirmationmodal(false);
       showMessage(state.requestAccountTransferError, "", "error");
+
     } else if (state.performBulkAccountTransferRequestStatus === "failed") {
       setConfirmationmodal(false);
       // setIsBulkTransfer(false);
@@ -55,6 +64,7 @@ const ConfirmPaymentModal = ({
         saveAsBeneficiary: state.accountTransferInfo?.saveAsBeneficiary,
         bankName: state.accountTransferInfo?.bank.label as string,
         pin: values.pin,
+        expenseId: expenseId
       })
     );
   };

@@ -20,12 +20,14 @@ import { getAccountBalanceAction, getAccountTransactionsAction } from "../../sto
 import AppTabBtn from "../../components/AppTabBtn/AppTabBtn";
 import TransactionReceiptModal from "../../components/modals/TransactionReceiptModal";
 import NewPinModal from "../../components/modals/NewPinModal";
+import ExpensesModal from "../../components/AutoHyveModals/ExpensesModal";
 
 const Hyvepay = () => {
   const [accountDetails, showAccountDetails] = useState(false);
   const [openDate, setOpenDate] = useState(false);
   const [calenderEnd, setCalenderEnd] = useState("");
   const [openStart, setOpenStart] = useState(false);
+  const [expenses, setExpenses] = useState<boolean>(false);
 
   const state = useAppSelector((state) => state.userReducer);
 
@@ -187,7 +189,12 @@ const Hyvepay = () => {
 
             {state.user?.partner?.accountProvisionStatus === "APPROVED" && (
               <>
-                <AppTabBtn
+                {state.user.accountType !== 'individual' && (<AppBtn
+                  title="Expenses"
+                  className="text-[#000]"
+                  onClick={() => setExpenses(true)}
+                />)}
+                <AppBtn
                   title="Transfer"
                   className="text-[#000] btn-secondary"
                   onClick={() => navigation("/hyvepay/transfer")}
@@ -501,6 +508,11 @@ const Hyvepay = () => {
       <NewPinModal 
         setChangePin={setChangePin}
         changePin={changePin}
+      />
+
+      <ExpensesModal 
+        expenses={expenses}
+        setExpenses={setExpenses}
       />
     </>
   );

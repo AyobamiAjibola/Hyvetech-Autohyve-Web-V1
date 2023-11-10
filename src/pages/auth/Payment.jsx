@@ -154,7 +154,6 @@ const Payment = () => {
     const message = `${receiptData?.invoice?.estimate?.partner.name} has sent you a receipt.\nAmount Paid: NGN${formatNumberToIntl(receiptData?.amount)}\n\n` + fileUrl
 
     try {
-
       const shareData = {
         title: 'Receipt',
         text: `${message}`

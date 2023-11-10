@@ -31,8 +31,11 @@ import { Autocomplete, CircularProgress, TextField } from "@mui/material";
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { MyTextInput } from "../AppInput/AppInput";
+import { MySelect, MyTextInput } from "../AppInput/AppInput";
 import { Add } from "@mui/icons-material";
+import { getAllBankAction } from "../../store/actions/autoHyveActions";
+import { customStyles } from "../../contsants/customStyles";
+import Select from "react-select";
 
 const AddNewExpensesModal = ({ newExpenses, setNewExpenses }: any) => {
 
@@ -99,7 +102,10 @@ const AddNewExpensesModal = ({ newExpenses, setNewExpenses }: any) => {
   const [category, setCategory] = useState<IExpenseCategory | null>();
   const [type, setType] = useState<IExpenseType | null>();
   const [invoice, setInvoice] = useState<IInvoice | null>(null);
-  const [bank, setBank] = useState<IPayStackBank | null>();
+  const [bank, setBank] = useState({
+    bankName: '',
+    bankCode: ''
+  });
   const [name, setName] = useState('');
   const [accountName, setAccountName] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
@@ -110,6 +116,7 @@ const AddNewExpensesModal = ({ newExpenses, setNewExpenses }: any) => {
   const [showExpenseTypeForm, setShowExpenseTypeForm] = useState(false);
 
   const miscStore = useAppSelector(state => state.miscellaneousReducer);
+  const state = useAppSelector((state) => state.autoHyveReducer);
 
   useEffect(() => {
     if (store.createExpenseStatus === 'completed') {
@@ -178,7 +185,7 @@ const AddNewExpensesModal = ({ newExpenses, setNewExpenses }: any) => {
 
   useEffect(() => {
     if (store.createBeneficiaryStatus === 'completed') {
-      setBank(null);
+      setBank({...bank, bankName: '', bankCode: ''});
       setName('');
       setAccountName('');
       setAccountNumber('');
@@ -203,7 +210,8 @@ const AddNewExpensesModal = ({ newExpenses, setNewExpenses }: any) => {
     dispatch(
       createBeneficiaryAction({
         name,
-        bankName: bank?.name,
+        bankName: bank.bankName,
+        bankCode: bank.bankCode,
         accountName,
         accountNumber,
       }),
@@ -255,6 +263,10 @@ const AddNewExpensesModal = ({ newExpenses, setNewExpenses }: any) => {
     }
   },[expenseReducer.invoiceCode]);
 
+  useEffect(() => {
+    dispatch(getAllBankAction());
+  }, []);
+  console.log(bank, 'bankee')
   return (
     <>
       <Modal
@@ -724,59 +736,19 @@ const AddNewExpensesModal = ({ newExpenses, setNewExpenses }: any) => {
 
                   <div className=" w-full flex items-center gap-10 mt-10">
                     <div className="w-full">
-                      <InputHeader text="Bank Name" />
-                      <Autocomplete
-                        getOptionLabel={option => option.name}
-                        sx={{
-                          "& .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "transparent", // Remove border color
-                            fontSize: "14px"
-                          },
-                          "& label": {
-                            fontSize: "12px",
-                            fontFamily: "montserrat",
-                            color: "#A5A5A5",
-                            paddingTop: '4px'
-                          },
-                          "& input": {
-                            fontSize: "12px",
-                            fontFamily: "montserrat",
-                            marginRight: '-50px'
-                          },
-                          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "transparent", // Remove border color on focus
-                          },
-                          "&:hover .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "transparent", // Remove border color on hover
-                          },
+                      <InputHeader text={"Bank Name"} />
+                      <Select
+                        options={state.banks.map(option => ({ value: option.bankCode, label: option.bankName }))}
+                        onChange={(item) => {
+                          setBank({...bank, bankName: String(item?.label), bankCode: String(item?.value)});
                         }}
-                        renderInput={props => (
-                          <TextField
-                            className={`bg-[#F5F5F5] border-[#F5F5F5] h-14 w-full 
-                              placeholder-[#A5A5A5] placeholderText h-[55px] rounded-[20px] 
-                              font-montserrat`
-                            }
-                            {...props}
-                            label=""
-                            InputProps={{
-                              ...props.InputProps,
-                              endAdornment: (
-                                <React.Fragment>
-                                  {store.getExpensesStatus === 'loading' ? (
-                                    <CircularProgress color="inherit" size={20} />
-                                  ) : null}
-                                  {props.InputProps.endAdornment}
-                                </React.Fragment>
-                              ),
-                            }}
-                          />
-                        )}
-                        value={bank}
-                        onChange={(_: any, newValue) => {
-                          setBank(newValue);
+                        styles={customStyles}
+                        placeholder={"Bank Name"}
+                        name={"bank"}
+                        value={{
+                          value: bank.bankName,
+                          label: bank.bankName,
                         }}
-                        options={miscStore.banks}
-                        loading={miscStore.getBanksStatus === 'loading'}
                       />
                     </div>
 

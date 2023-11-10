@@ -15,8 +15,9 @@ const SingleTransferForm = () => {
     useFormikContext() as FormikContextType<any>;
   const dispatch = useAppDispatch();
   const state = useAppSelector((state) => state.autoHyveReducer);
+
   useEffect(() => {
-    if (values.accountNumber.length < 10 || values.bank?.value?.trim() === "")
+    if (values.accountNumber && values.accountNumber.length < 10 || values.bank?.value?.trim() === "")
       return;
     dispatch(clearAccountHolderDetail());
     dispatch(
@@ -118,7 +119,7 @@ const SingleTransferForm = () => {
               className="bg-gray-100 w-full p-4"
               style={{ borderRadius: 18, border: 0 }}
             />
-            <ErrorMessage name="narration" component="div" />
+            <ErrorMessage name="narration" component="div" className='font-montserrat text-xs text-[red]' />
 
           </div>
         </div>

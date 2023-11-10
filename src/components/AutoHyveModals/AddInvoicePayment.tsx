@@ -19,6 +19,7 @@ import { showMessage } from '../../helpers/notification';
 import { Util } from '../../helpers/Util';
 import { IInvoice } from '@app-models';
 import { setInvoiceCode } from '../../store/reducers/expenseReducer';
+import moment from 'moment';
 
 const API_ROOT = settings.api.rest;
 
@@ -43,7 +44,8 @@ function AddInvoicePayment({setOpenAddPayment, activeTab, invoiceId}: IProp)  {
           amount: 0,
           firstName: "",
           lastName: "",
-          date: new Date()
+          date: new Date(),
+          paymentDate: new Date()
         },
         onSubmit: (values) => {
           handlePaymentRecord(values)
@@ -58,37 +60,41 @@ function AddInvoicePayment({setOpenAddPayment, activeTab, invoiceId}: IProp)  {
 
       useEffect(() => {
         if(invoice) {
-            setFieldValue("firstName", invoice?.estimate?.customer?.firstName)
-            setFieldValue("lastName", invoice?.estimate?.customer?.lastName)
-            setFieldValue("date", invoice?.createdAt)
+          setFieldValue("firstName", invoice?.estimate?.customer?.firstName)
+          setFieldValue("lastName", invoice?.estimate?.customer?.lastName)
+          setFieldValue("date", invoice?.createdAt)
         }
       },[setFieldValue, invoice]);
 
-
     const handlePaymentRecord = async (values: any) => {
+      
+      if(values.paymentDate === "") {
+        return showMessage('Payment', 'Payment date is required', 'error')
+      }
       setIsloading(true);
       try {
-      const payload = {
+        const payload = {
           invoiceId: invoice?.id || 0,
           customerId: invoice?.estimate?.customer?.id,
           amount: values.amount,
           type: values.type,
-      };
+          paymentDate: values.paymentDate
+        };
 
-      const response = await axiosClient.post(
+        const response = await axiosClient.post(
           `${API_ROOT}/transactions/update-invoice-payment-manually`,
           payload
-      );
-      console.log(response.data);
-      // @ts-ignore
-      showMessage('Payment', 'Successful', 'success');
-      dispatch(getpaymentRecievedAction())
-      setOpenAddPayment(false);
-      dispatch(getSingleInvoice(invoiceId))
+        );
+        console.log(response.data);
+        // @ts-ignore
+        showMessage('Payment', 'Successful', 'success');
+        dispatch(getpaymentRecievedAction())
+        setOpenAddPayment(false);
+        dispatch(getSingleInvoice(invoiceId))
 
       } catch (e: any) {
           showMessage('Payment',
-              e.response?.data?.message || "Unable able to process please try again", 'error'
+            e.response?.data?.message || "Unable able to process please try again", 'error'
           );
       console.log(e);
       }
@@ -110,6 +116,11 @@ function AddInvoicePayment({setOpenAddPayment, activeTab, invoiceId}: IProp)  {
         setInvoice(invObj as IInvoice)
       }
     },[expenseReducer.invoiceCode]);
+
+    useEffect(() => {
+      setFieldValue("date", '')
+      setFieldValue("paymentDate", "")
+    },[])
 
     return (
       <>
@@ -180,127 +191,181 @@ function AddInvoicePayment({setOpenAddPayment, activeTab, invoiceId}: IProp)  {
                 </h5>
                 <div className="flex flex-col md:flex-row  mt-3 w-full gap-5">
                     <div className="w-full">
-                        <AppInput
-                            hasPLaceHolder={true}
-                            placeholderTop="First Name"
-                            placeholder="First Name"
-                            name={`firstName`}
-                            onBlur={formik.handleBlur}
-                            value={values.firstName}
-                        />
+                      <AppInput
+                        hasPLaceHolder={true}
+                        placeholderTop="First Name"
+                        placeholder="First Name"
+                        name={`firstName`}
+                        onBlur={formik.handleBlur}
+                        value={values.firstName}
+                      />
                     </div>
 
                     <div className="w-full">
-                        <AppInput
-                            hasPLaceHolder={true}
-                            placeholderTop="Last Name"
-                            placeholder="Last Name"
-                            name={`lastName`}
-                            onBlur={formik.handleBlur}
-                            value={values.lastName}
-                        />
+                      <AppInput
+                        hasPLaceHolder={true}
+                        placeholderTop="Last Name"
+                        placeholder="Last Name"
+                        name={`lastName`}
+                        onBlur={formik.handleBlur}
+                        value={values.lastName}
+                      />
                     </div>
                 </div>
 
                 <div className="flex md:flex-row flex-col gap-5 mt-8">
-                    <div className="flex-1">
-                        <InputHeader text="Date of Invoice" />
-                        <LocalizationProvider dateAdapter={AdapterDateFns}>
-                            <DatePicker
-                                className={`bg-[#F5F5F5] border-[#F5F5F5] h-14 w-full 
-                                placeholder-[#A5A5A5] placeholderText h-[55px] rounded-[20px] 
-                                font-montserrat`}
-                                disableFuture
-                                minDate={new Date('2000/01/01')}
-                                openTo="year"
-                                views={['year', 'month', 'day']}
-                                value={new Date(values.date)}
-                                // onChange={ handleDate }
-                                sx={{
-                                    width: "100%",
-                        
-                                    "& .MuiOutlinedInput-notchedOutline": {
-                                    borderColor: "transparent", // Remove border color
-                                    },
-                                    "& label": {
-                                    fontSize: "10px",
-                                    fontFamily: "montserrat",
-                                    color: "#A5A5A5",
-                                    paddingTop: "5px",
-                                    paddingLeft: "17px",
-                                    },
-                                    "& .MuiOutlinedInput-root": {
-                                    "&:hover .MuiOutlinedInput-notchedOutline": {
-                                        borderColor: "transparent", // Remove border color on hover
-                                    },
-                                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                                        borderColor: "transparent", // Remove border color on focus
-                                    },
-                                    borderRadius: "20px",
-                                    backgroundColor: "#F5F5F5",
-                        
-                                    borderColor: "transparent",
-                                    height: "53px",
-                                    border: "none",
-                                    },
-                                }}
-                                //@ts-ignore
-                                renderInput={(params: any) =>
-                                  <TextField
-                                    {...params}
-                                    fullWidth
-                                    label="Date"
-                                    variant="outlined"
-                                    // value={invoice.code.splice('_')[0]}
-                                  />
-                                }
-                            />
-                        </LocalizationProvider>
-                    </div>
-
-                    {/* <div className="flex-1">
-                        <AppInput
-                        hasPLaceHolder={true}
-                        placeholderTop="Receipt #"
-                        placeholder="DRC-64845206"
-                        className="bg-[#F5F5F5] border-[#F5F5F5] h-14"
-                        value={""}
-                        />
-                    </div> */}
-                    <div className="flex-1">
-                        <InputHeader text={"Mode of payment"} />
-                        <Select
-                            options={paymentMode.map(option => ({ value: option, label: option }))}
-                            onChange={(item) => {
-                            setFieldValue("type", String(item?.value));
-                            }}
-                            styles={customStyles}
-                            placeholder={"Mode of payment"}
-                            name={"type"}
-                            onBlur={formik.handleBlur}
-                            value={{
-                            value: values.type,
-                            label: values.type,
-                            }}
-                        />
-                    </div>
-                    <div className="flex-1">
-                        <AppInput
-                            type='number'
-                            hasPLaceHolder={true}
-                            placeholderTop="Amount Paid (₦)"
-                            placeholder={`Amount to Record Max: " + ${Util.formAmount(_dueAmt)}`}
-                            name={`amount`}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            value={values.amount}
-                            disabled={_dueAmt < 0}
-                        />
-
-                        {invoice && (<span
-                            className={`text-[10px] font-montserrat font-bold ${_dueAmt > 0 ? 'text-[green]' : 'text-[red]'}`}
-                        >{_dueAmt > 0 ? `Amount to Record Max: ${Util.formAmount(_dueAmt)}` : `Due balance is ${Util.formAmount(_dueAmt)}`}</span>)}
-                    </div>
+                  <div className="flex-1">
+                    <AppInput
+                      hasPLaceHolder={true}
+                      placeholderTop="Date of Invoice"
+                      placeholder="Date of Invoice"
+                      disabled
+                      // name={`lastName`}
+                      // onBlur={formik.handleBlur}
+                      value={values.date ? moment(values.date).format('MM/DD/YYYY') : ''}
+                    />
+                    {/* <InputHeader text="Date of Invoice" />
+                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                      <DatePicker
+                        className={`bg-[#F5F5F5] border-[#F5F5F5] h-14 w-full 
+                        placeholder-[#A5A5A5] placeholderText h-[55px] rounded-[20px] 
+                        font-montserrat`}
+                        disableFuture
+                        minDate={new Date('2000/01/01')}
+                        openTo="year"
+                        views={['year', 'month', 'day']}
+                        value={new Date(values.date)}
+                        // onChange={() => setFieldValue('date', ) }
+                        sx={{
+                            width: "100%",
+                            "& .MuiOutlinedInput-notchedOutline": {
+                            borderColor: "transparent", // Remove border color
+                            },
+                            "& label": {
+                            fontSize: "10px",
+                            fontFamily: "montserrat",
+                            color: "#A5A5A5",
+                            paddingTop: "5px",
+                            paddingLeft: "17px",
+                            },
+                            "& .MuiOutlinedInput-root": {
+                              fontFamily: 'montserrat',
+                              fontSize: '12px',
+                            "&:hover .MuiOutlinedInput-notchedOutline": {
+                                borderColor: "transparent", // Remove border color on hover
+                            },
+                            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                                borderColor: "transparent", // Remove border color on focus
+                            },
+                            borderRadius: "20px",
+                            backgroundColor: "#F5F5F5",
+                
+                            borderColor: "transparent",
+                            height: "53px",
+                            border: "none",
+                            },
+                        }}
+                        //@ts-ignore
+                        renderInput={(params: any) =>
+                          <TextField
+                            {...params}
+                            fullWidth
+                            label="Date"
+                            variant="outlined"
+                            // value={invoice.code.splice('_')[0]}
+                          />
+                        }
+                      />
+                    </LocalizationProvider> */}
+                  </div>
+                  <div className="flex-1">
+                    <InputHeader text="Payment Date" />
+                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                      <DatePicker
+                        className={`bg-[#F5F5F5] border-[#F5F5F5] h-14 w-full 
+                        placeholder-[#A5A5A5] placeholderText h-[55px] rounded-[20px] 
+                        font-montserrat`}
+                        disableFuture
+                        minDate={new Date('2000/01/01')}
+                        openTo="day"
+                        views={['year', 'month', 'day']}
+                        value={new Date(values.paymentDate)}
+                        onChange={(value) => setFieldValue('paymentDate', value)}
+                        sx={{
+                            width: "100%",
+                            "& .MuiOutlinedInput-notchedOutline": {
+                            borderColor: "transparent", // Remove border color
+                            },
+                            "& label": {
+                            fontSize: "10px",
+                            fontFamily: "montserrat",
+                            color: "#A5A5A5",
+                            paddingTop: "5px",
+                            paddingLeft: "17px",
+                            },
+                            "& .MuiOutlinedInput-root": {
+                              fontFamily: 'montserrat',
+                              fontSize: '12px',
+                            "&:hover .MuiOutlinedInput-notchedOutline": {
+                                borderColor: "transparent", // Remove border color on hover
+                            },
+                            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                                borderColor: "transparent", // Remove border color on focus
+                            },
+                            borderRadius: "20px",
+                            backgroundColor: "#F5F5F5",
+                
+                            borderColor: "transparent",
+                            height: "53px",
+                            border: "none",
+                            },
+                        }}
+                        //@ts-ignore
+                        renderInput={(params: any) =>
+                          <TextField
+                            {...params}
+                            fullWidth
+                            label="Date"
+                            variant="outlined"
+                            // value={invoice.code.splice('_')[0]}
+                          />
+                        }
+                      />
+                    </LocalizationProvider>
+                  </div>
+                  <div className="flex-1">
+                    <InputHeader text={"Mode of payment"} />
+                    <Select
+                      options={paymentMode.map(option => ({ value: option, label: option }))}
+                      onChange={(item) => {
+                        setFieldValue("type", String(item?.value));
+                      }}
+                      styles={customStyles}
+                      placeholder={"Mode of payment"}
+                      name={"type"}
+                      onBlur={formik.handleBlur}
+                      value={{
+                        value: values.type,
+                        label: values.type,
+                      }}
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <AppInput
+                      type='number'
+                      hasPLaceHolder={true}
+                      placeholderTop="Amount Paid (₦)"
+                      placeholder={`Amount to Record Max: " + ${Util.formAmount(_dueAmt)}`}
+                      name={`amount`}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      value={values.amount}
+                      disabled={_dueAmt < 0}
+                    />
+                    {invoice && (<span
+                      className={`text-[10px] font-montserrat font-bold ${_dueAmt > 0 ? 'text-[green]' : 'text-[red]'}`}
+                    >{_dueAmt > 0 ? `Amount to Record Max: ${Util.formAmount(_dueAmt)}` : `Due balance is ${Util.formAmount(_dueAmt)}`}</span>)}
+                  </div>
                 </div>
                 
             </div>

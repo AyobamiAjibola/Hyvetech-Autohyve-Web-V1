@@ -347,6 +347,11 @@ const autoHyvePay = createSlice({
       state.getVirtualAccountsSuccess = "";
       state.getVirtualAccountsStatus = "idle";
     },
+    clearRequestNameEnquiryStatus(state: IAutoHyveStatus) {
+      state.requestNameEnquiryError = "";
+      state.requestNameEnquirySuccess = "";
+      state.requestNameEnquiryStatus = "idle";
+    },
     clearGetBeneficiariesStatus(state: IAutoHyveStatus) {
       state.getBenenficiariesError = "";
       state.getBenenficiariesSuccess = "";
@@ -653,7 +658,8 @@ export const {
   clearTransactionFilteredAndStatus,
   clearMainTransactionLogsStatus,
   saveAccountTransferInfo,
-  saveBulkAccountTransferInfo
+  saveBulkAccountTransferInfo,
+  clearRequestNameEnquiryStatus
 } = autoHyvePay.actions;
 
 export default autoHyvePay.reducer;
