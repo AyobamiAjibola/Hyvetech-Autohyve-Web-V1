@@ -214,6 +214,12 @@ const Expenses = () => {
               className="w-[200px] text-[#000] btn-secondary hidden md:flex"
               onClick={() => setNewExpenses(true)}
             />
+            <AppTabBtn
+              icon={<AiOutlinePlus />}
+              title="Add New Expenses"
+              className="w-full text-[#000] btn-secondary md:hidden mt-4"
+              onClick={() => setNewExpenses(true)}
+            />
           </div>
         </div>
 

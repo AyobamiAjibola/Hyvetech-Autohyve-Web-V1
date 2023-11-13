@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
-import { Box, IconButton, Modal } from "@mui/material";
+import { Box, Modal } from "@mui/material";
 import ModalHeaderTitle from "../ModalHeaderTitle/ModalHeaderTitle";
 import CloseIcon from "../../assets/svgs/close-circle.svg";
 import SearchInput from "../SearchInput/SearchInput";
@@ -18,8 +18,6 @@ import { showMessage } from "../../helpers/notification";
 import { clearRequestNameEnquiryStatus, saveAccountTransferInfo } from "../../store/reducers/autoHyveReducer";
 import ClipLoader from "react-spinners/ClipLoader";
 import ConfirmPaymentModal from "../Dashboard/ConfirmPaymentModal";
-import { HiOutlineTrash } from "react-icons/hi";
-import DeleteExpenseModal from "../modals/DeleteExpenseModal";
 import { clearDeleteExpenseStatus } from "../../store/reducers/expenseReducer";
 
 interface IProps {
@@ -41,16 +39,11 @@ const ExpensesModal = ({expenses, setExpenses}: IProps) => {
     });
     const [expenseId, setExpenseId] = useState<number>(-1);
     const [loadingButton, setLoadingButton] = useState<number>(-1);
-    const [deletemodal, setDeletemodal] = useState(false);
+    const [loadingDelButton, setLoadingDelButton] = useState<number>(-1);
     
     const expenseReduder = useAppSelector(state => state.expenseReducer);
     const autoHyveReducer = useAppSelector(state => state.autoHyveReducer);
     const dispatch = useAppDispatch();
-
-    const closeDeleteModal = (event: any) => {
-        event.stopPropagation();
-        setDeletemodal(!deletemodal);
-    };
 
     const handleSearchChange = (e: any) => {
         const inputValue = e.target.value;
@@ -93,10 +86,6 @@ const ExpensesModal = ({expenses, setExpenses}: IProps) => {
         setCurrentPage(newPage);
     };
 
-    const handleExpenseDelete = (id: number) => {
-        dispatch(deleteExpenseAction({ id }));
-    };
-
     useEffect(() => {
         dispatch(getExpensesAction());
     }, []);
@@ -134,10 +123,10 @@ const ExpensesModal = ({expenses, setExpenses}: IProps) => {
         } else if (expenseReduder.deleteExpenseStatus === 'completed') {
           showMessage(
             'Expense',
-            'Expense deleted successfully',
+            'Expense delined successfully',
             'success'
           );
-          setDeletemodal(false)
+          setLoadingDelButton(-1)
           dispatch(getExpensesAction());
         }
     
@@ -262,21 +251,26 @@ const ExpensesModal = ({expenses, setExpenses}: IProps) => {
                                                     className="mr-1 flex relative"
                                                 />)}
                                             </span>
-                                            <IconButton
-                                                onClick={(e) => {
-                                                    setExpenseId(item.id)
-                                                    closeDeleteModal(e)
+                                            <span
+                                                className={`py-2 flex justify-center w-30 items-center bg-[white] 
+                                                w-[100px] gap-2 border border-solid border-1 border-[#CCCCCC]`}
+                                                style={{ borderRadius: 10 }}
+                                                onClick={() => {
+                                                    setLoadingDelButton(item.id);
+                                                    dispatch(deleteExpenseAction({id: item.id}));
                                                 }}
-                                                >
-                                                <HiOutlineTrash
-                                                    size={20}
-                                                    className="text-center cursor-pointer"
-                                                />
-                                            </IconButton>
-                                        </td>
-                                        {/* <td className="flex gap-3 items-center justify-center ">
+                                            >
+                                                Decline 
+                                                {loadingDelButton === item.id && (<ClipLoader
+                                                    loading={expenseReduder.deleteExpenseStatus === 'loading'}
+                                                    size={10}
+                                                    aria-label="Loading Spinner"
+                                                    data-testid="loader"
+                                                    className="mr-1 flex relative"
+                                                />)}
+                                            </span>
                                             
-                                        </td> */}
+                                        </td>
                                     </tr>
                                 </tbody>
                             );
@@ -294,18 +288,7 @@ const ExpensesModal = ({expenses, setExpenses}: IProps) => {
                         </div>
                     </div>
                 </Box>
-
             </Modal>
-
-            <DeleteExpenseModal
-                deletemodal={deletemodal}
-                setDeletemodal={setDeletemodal}
-                title={"Delete Record Expenses"}
-                closeDeleteModal={closeDeleteModal}
-                setExpenseId={setExpenseId}
-                expenseId={expenseId}
-                handleExpenseDelete={handleExpenseDelete}
-                />
         </div>
     )
 }
