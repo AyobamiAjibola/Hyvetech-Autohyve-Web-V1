@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
-import { Box, Modal } from "@mui/material";
+import { Box, IconButton, Modal } from "@mui/material";
 import ModalHeaderTitle from "../ModalHeaderTitle/ModalHeaderTitle";
 import CloseIcon from "../../assets/svgs/close-circle.svg";
 import SearchInput from "../SearchInput/SearchInput";
 import useAppDispatch from "../../hooks/useAppDispatch";
 import useAppSelector from "../../hooks/useAppSelector";
-import { getExpensesAction } from "../../store/actions/expenseAction";
+import { deleteExpenseAction, getExpensesAction } from "../../store/actions/expenseAction";
 import TableCountTitile from "../TableCountTitile/TableCountTitile";
 import moment from "moment";
 import { EXPENSE_STATUS } from "../../config/constants";
@@ -18,6 +18,9 @@ import { showMessage } from "../../helpers/notification";
 import { clearRequestNameEnquiryStatus, saveAccountTransferInfo } from "../../store/reducers/autoHyveReducer";
 import ClipLoader from "react-spinners/ClipLoader";
 import ConfirmPaymentModal from "../Dashboard/ConfirmPaymentModal";
+import { HiOutlineTrash } from "react-icons/hi";
+import DeleteExpenseModal from "../modals/DeleteExpenseModal";
+import { clearDeleteExpenseStatus } from "../../store/reducers/expenseReducer";
 
 interface IProps {
     setExpenses: any;
@@ -38,10 +41,16 @@ const ExpensesModal = ({expenses, setExpenses}: IProps) => {
     });
     const [expenseId, setExpenseId] = useState<number>(-1);
     const [loadingButton, setLoadingButton] = useState<number>(-1);
+    const [deletemodal, setDeletemodal] = useState(false);
     
     const expenseReduder = useAppSelector(state => state.expenseReducer);
     const autoHyveReducer = useAppSelector(state => state.autoHyveReducer);
     const dispatch = useAppDispatch();
+
+    const closeDeleteModal = (event: any) => {
+        event.stopPropagation();
+        setDeletemodal(!deletemodal);
+    };
 
     const handleSearchChange = (e: any) => {
         const inputValue = e.target.value;
@@ -84,6 +93,10 @@ const ExpensesModal = ({expenses, setExpenses}: IProps) => {
         setCurrentPage(newPage);
     };
 
+    const handleExpenseDelete = (id: number) => {
+        dispatch(deleteExpenseAction({ id }));
+    };
+
     useEffect(() => {
         dispatch(getExpensesAction());
     }, []);
@@ -111,7 +124,27 @@ const ExpensesModal = ({expenses, setExpenses}: IProps) => {
 
     },[autoHyveReducer.requestNameEnquiryStatus]);
 
-    console.log(expenseId, 'id')
+    useEffect(() => {
+        if (expenseReduder.deleteExpenseStatus === 'failed') {
+          showMessage(
+            'Expense',
+            expenseReduder.deleteExpenseError,
+            'error'
+          );
+        } else if (expenseReduder.deleteExpenseStatus === 'completed') {
+          showMessage(
+            'Expense',
+            'Expense deleted successfully',
+            'success'
+          );
+          setDeletemodal(false)
+          dispatch(getExpensesAction());
+        }
+    
+        return () => {
+          dispatch(clearDeleteExpenseStatus());
+        }
+    }, [expenseReduder.deleteExpenseStatus]);
 
     return (
         <div>
@@ -168,6 +201,7 @@ const ExpensesModal = ({expenses, setExpenses}: IProps) => {
                                 </th>
                                 <th className="font-montserrat  text-xs text-left">Status</th>
                                 <th className="font-montserrat  text-xs text-left">Action</th>
+                                {/* <th className="font-montserrat  text-xs text-left"/> */}
                             </thead>
 
                             {currentData.length > 0 &&
@@ -198,7 +232,7 @@ const ExpensesModal = ({expenses, setExpenses}: IProps) => {
                                                 {item.status == EXPENSE_STATUS.paid ? "PAID" : "UNPAID"}
                                             </span>
                                         </td>
-                                        <td className="font-montserrat text-xs">
+                                        <td className="font-montserrat text-xs flex flex-row gap-5">
                                             <span
                                                 className={`py-2 flex justify-center w-30 items-center bg-primary w-[100px] gap-2`}
                                                 style={{ borderRadius: 10 }}
@@ -228,7 +262,21 @@ const ExpensesModal = ({expenses, setExpenses}: IProps) => {
                                                     className="mr-1 flex relative"
                                                 />)}
                                             </span>
+                                            <IconButton
+                                                onClick={(e) => {
+                                                    setExpenseId(item.id)
+                                                    closeDeleteModal(e)
+                                                }}
+                                                >
+                                                <HiOutlineTrash
+                                                    size={20}
+                                                    className="text-center cursor-pointer"
+                                                />
+                                            </IconButton>
                                         </td>
+                                        {/* <td className="flex gap-3 items-center justify-center ">
+                                            
+                                        </td> */}
                                     </tr>
                                 </tbody>
                             );
@@ -249,7 +297,15 @@ const ExpensesModal = ({expenses, setExpenses}: IProps) => {
 
             </Modal>
 
-            
+            <DeleteExpenseModal
+                deletemodal={deletemodal}
+                setDeletemodal={setDeletemodal}
+                title={"Delete Record Expenses"}
+                closeDeleteModal={closeDeleteModal}
+                setExpenseId={setExpenseId}
+                expenseId={expenseId}
+                handleExpenseDelete={handleExpenseDelete}
+                />
         </div>
     )
 }

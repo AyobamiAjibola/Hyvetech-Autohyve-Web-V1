@@ -226,7 +226,7 @@ const GenerateEstimate = () => {
 
       setTimer(
         setTimeout(() => {
-          dispatch(getVehicleVINAction(vin));
+          dispatch(getVehicleVINAction(vin.toUpperCase()));
         }, 2000)
       );
 
@@ -513,10 +513,10 @@ const GenerateEstimate = () => {
 
   useEffect(() => {
     if(vehicleReducer.getVehicleVINStatus === 'completed') {
-      setFieldValue('make', vehicleReducer.vehicleVINDetails[2].value)
-      setFieldValue('plateNumber', vehicleReducer.vehicleVINDetails[10].value)
+      setFieldValue('make', vehicleReducer.vehicleVINDetails[2]?.value)
+      setFieldValue('plateNumber', vehicleReducer.vehicleVINDetails[10]?.value)
       setFieldValue('model', vehicleReducer.vehicleVINDetails[1].value === null ? null : vehicleReducer.vehicleVINDetails[1].value)
-      setFieldValue('modelYear', vehicleReducer.vehicleVINDetails[4].value)
+      setFieldValue('modelYear', vehicleReducer.vehicleVINDetails[4]?.value)
     }
   },[vehicleReducer.getVehicleVINStatus, setFieldValue])
 
@@ -865,50 +865,11 @@ const GenerateEstimate = () => {
                   options={showDrop ? options : []}
                   forcePopupIcon={false}
                 />
-                {/* <Box onClick={toggleFetch} className="w-[30%]">
-                  {fetch ? (
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        color: "#FBA91A",
-                      }}
-                    >
-                      <ToggleOn color="inherit" fontSize="large" />
-                      &nbsp;
-                      <span
-                        style={{
-                          fontSize: "14px",
-                          fontStyle: "italic",
-                          color: "#797979",
-                        }}
-                      >
-                        AutoHyve Users
-                      </span>
-                    </Box>
-                  ) : (
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        color: "#797979",
-                      }}
-                    >
-                      <ToggleOff color="inherit" fontSize="large" />
-                      &nbsp;
-                      <span style={{ fontSize: "14px", fontStyle: "italic" }}>
-                        Customers
-                      </span>
-                    </Box>
-                  )}
-                </Box> */}
               </div>
 
               <div className=" w-[100%] border-[1px] rounded-3xl  flex mt-8  px-3 md:px-5 flex-col py-5  border-[#CACACA]">
                 <h5 className="font-semibold font-montserrat">
-                  Customer Informationsss
+                  Customer Informations
                 </h5>
                 <div className="flex flex-col md:flex-row  mt-3 w-full gap-5">
                   <div className="w-full">
@@ -1054,7 +1015,6 @@ const GenerateEstimate = () => {
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
                       value={values.modelYear}
-                      disabled={true}
                     />
                   </div>
 
@@ -1067,7 +1027,6 @@ const GenerateEstimate = () => {
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
                       value={values.make}
-                      disabled={true}
                     />
                   </div>
 
@@ -1080,7 +1039,6 @@ const GenerateEstimate = () => {
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
                       value={values.model}
-                      disabled={true}
                     />
                   </div>
                 </div>
@@ -1095,7 +1053,6 @@ const GenerateEstimate = () => {
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
                       value={values.plateNumber}
-                      disabled={true}
                     />
                   </div>{" "}
                   <div className="w-full">

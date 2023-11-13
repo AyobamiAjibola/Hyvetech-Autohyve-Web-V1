@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import OptionIcon from "../../assets/svgs/option.svg";
 import DeleteModal from "../modals/DeleteModal";
 
-const SingleVhicle = ({ make, year, plateNumber, vehicleName }) => {
+const SingleVhicle = ({ model, year, plateNumber, vehicleName }) => {
   const [option, setOption] = useState(false);
   const [dModal, setdModal] = useState(false);
   const refOne = useRef(null);
@@ -52,7 +52,7 @@ const SingleVhicle = ({ make, year, plateNumber, vehicleName }) => {
         {vehicleName}
       </h5>
 
-      <p className="text-sm font-montserrat text-[10px]">Make: {make}</p>
+      <p className="text-sm font-montserrat text-[10px]">Model: {model}</p>
       <p className="text-sm font-montserrat text-[10px]"> Year: {year}</p>
       <p className="text-sm font-montserrat text-[10px]">
         Plate Number: {plateNumber}

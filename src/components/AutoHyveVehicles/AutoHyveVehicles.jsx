@@ -66,7 +66,7 @@ const AutoHyveVehicles = () => {
             <div key={index}>
             <SingleVhicle
               vehicleName={vehicle.make}
-              make={vehicle.make}
+              model={vehicle.model}
               year={vehicle.modelYear}
               plateNumber={vehicle.plateNumber}
             />

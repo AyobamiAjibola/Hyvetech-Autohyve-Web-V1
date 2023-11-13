@@ -325,32 +325,6 @@ const Expenses = () => {
             />)}
           </div>
         </div>
-        {/* <div className="flex justify-between flex-col md:flex-row md:gap-0 gap-5 w-[99%] mt-10">
-          <AppTabBtn
-            icon={<AiOutlinePlus />}
-            title="Add New Expenses"
-            className="w-full text-[#000] btn-secondary flex md:hidden order-2"
-            onClick={() => setNewExpenses(true)}
-          />
-
-          <TableActionButton
-            icon={DownloadIcon}
-            title="Export Items"
-            className="order-2"
-          />
-
-          <div className="flex items-center mb-8 md:mb-0 order-1 gap-3">
-            <div className="border-[1px] rounded-[5px] p-3 border-[#D9D9D9] cursor-pointer">
-              <HiChevronLeft color="#D9D9D9" />
-            </div>
-            <div className="border-[1px] rounded-[5px] px-5 py-2 border-[#D9D9D9]">
-              1
-            </div>
-            <div className="border-[1px] rounded-[5px] p-3 border-[#D9D9D9] cursor-pointer">
-              <HiChevronRight color="#D9D9D9" />
-            </div>
-          </div>
-        </div> */}
 
         <AddNewExpensesModal
           newExpenses={newExpenses}
