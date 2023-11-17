@@ -30,8 +30,8 @@ const SavedBulkBeneficiaryTransferForm = ({
       const data = state.beneficiaries.find(
         (item) => item.accountNumber === inputValues[activeTab].beneficiary.value
       );
-      
-      if (data) {
+
+      if (data && data.accountName !== '' && data.accountNumber !== '') {
         dispatch(
           performNameEnquiryAction({
             beneficiaryAccountNumber: data.accountNumber,

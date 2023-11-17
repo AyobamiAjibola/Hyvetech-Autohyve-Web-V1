@@ -1,24 +1,35 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import OptionIcon from "../../assets/svgs/option.svg";
-import DeleteModal from "../modals/DeleteModal.js";
 import AddNewBeneficiaryModal from "../modals/AddNewBeneficiaryModal";
+import useAppDispatch from "../../hooks/useAppDispatch";
+import useAppSelector from "../../hooks/useAppSelector";
+import { deleteBeneficiaryAction } from "../../store/actions/expenseAction";
+// import { showMessage } from "../../helpers/notification";
+import { clearDeleteBeneficiaryStatus } from "../../store/reducers/expenseReducer";
+import { getBeneficiariesAction } from "../../store/actions/autoHyveActions";
 
-const TransactCard = ({ name, accountNumber, bankName, phone }: any) => {
+const TransactCard = ({ name, accountNumber, bankName, phone, beneficiaryId }: any) => {
   const [option, setOption] = useState(false);
-  const [dModal, setdModal] = useState(false);
   const [beneficiary, setBeneficiary] = useState(false);
 
-  const closeDeleteModal = () => setdModal(!dModal);
+  const dispatch = useAppDispatch();
+  const expenseReducer = useAppSelector(state => state.expenseReducer);
+
+  useEffect(() => {
+    if(expenseReducer.deleteBeneficiaryStatus === 'completed') {
+      setOption(false);
+      // showMessage('', expenseReducer.deleteBeneficiarySuccess, 'success')
+      dispatch(getBeneficiariesAction());
+      dispatch(clearDeleteBeneficiaryStatus())
+    } else if(expenseReducer.deleteBeneficiaryStatus === 'failed'){
+      setOption(false);
+      // showMessage('', expenseReducer.deleteBeneficiaryError, 'error')
+      dispatch(clearDeleteBeneficiaryStatus())
+    }
+  },[expenseReducer.deleteBeneficiaryStatus]);
 
   return (
     <>
-      <DeleteModal
-        title={"Delete Beneficiary"}
-        // description={'Are you sure you want to carry out this action? If you proceed, you will not be able to undo this action'}
-        deletemodal={dModal}
-        closeDeleteModal={closeDeleteModal}
-      />
-
       <AddNewBeneficiaryModal
         newBeneficiary={beneficiary}
         setnewBeneficiary={setBeneficiary}
@@ -47,8 +58,7 @@ const TransactCard = ({ name, accountNumber, bankName, phone }: any) => {
                 <li>
                   <button
                     onClick={() => {
-                      setdModal(!dModal);
-                      setOption(false);
+                      dispatch(deleteBeneficiaryAction(beneficiaryId))
                     }}
                   >
                     Delete

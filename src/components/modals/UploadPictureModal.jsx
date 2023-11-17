@@ -29,6 +29,7 @@ export default function UploadPictureModal({ setOpenProfile, openProfile, data }
   const dispatch = useAppDispatch();
 
   const handleSubmit = (value) => {
+    console.log(value.profileImageUrl, 'uri')
     dispatch(updateUserAction({
       ...data,
       profileImageUrl: value.profileImageUrl,

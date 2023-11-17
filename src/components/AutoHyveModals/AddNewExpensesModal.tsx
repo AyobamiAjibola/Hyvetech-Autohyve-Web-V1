@@ -8,10 +8,8 @@ import InputHeader from "../InputHeader/InputHeader";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import ModalHeaderTitle from "../ModalHeaderTitle/ModalHeaderTitle";
-import AppTabBtn from "../AppTabBtn/AppTabBtn";
-import { AiOutlinePlus } from "react-icons/ai";
 import useAppSelector from "../../hooks/useAppSelector";
-import { IBeneficiary, IExpenseCategory, IExpenseType, IInvoice, IPayStackBank } from "@app-models";
+import { IBeneficiary, IExpenseCategory, IExpenseType, IInvoice } from "@app-models";
 import useAppDispatch from "../../hooks/useAppDispatch";
 import { clearCreateBeneficiaryStatus, clearCreateExpenseCategoryStatus, clearCreateExpenseTypeStatus, setInvoiceCode } from "../../store/reducers/expenseReducer";
 import { showMessage } from "../../helpers/notification";
@@ -36,12 +34,16 @@ import { Add } from "@mui/icons-material";
 import { getAllBankAction } from "../../store/actions/autoHyveActions";
 import { customStyles } from "../../contsants/customStyles";
 import Select from "react-select";
+import { useNavigate } from "react-router-dom";
+import plus from '../../assets/svgs/plus.svg';
+import SavedBeneficiaries from "../../pages/auth/SavedBeneficiaries";
 
 const AddNewExpensesModal = ({ newExpenses, setNewExpenses }: any) => {
 
   const [openNewBeneficiary, setOpenNewBeneficiary] = useState(false);
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.up("sm"));
+  const navigate = useNavigate()
 
   const style = {
     position: "absolute",
@@ -91,6 +93,22 @@ const AddNewExpensesModal = ({ newExpenses, setNewExpenses }: any) => {
     py: 5,
   };
 
+  const style4 = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: isSmallScreen ? 900 : "95%",
+    height: 650,
+    overflow: "auto",
+    bgcolor: "background.paper",
+    border: "transparent",
+    borderRadius: 5,
+    boxShadow: 24,
+    padding: isSmallScreen ? "30px" : "30px",
+    py: 5,
+  };
+
   const store = useAppSelector(state => state.expenseReducer);
   const invoiceStore = useAppSelector(state => state.invoiceReducer);
   const dispatch = useAppDispatch();
@@ -114,6 +132,7 @@ const AddNewExpensesModal = ({ newExpenses, setNewExpenses }: any) => {
 
   const [showCategoryForm, setShowCategoryForm] = useState(false);
   const [showExpenseTypeForm, setShowExpenseTypeForm] = useState(false);
+  const [viewBeneficiary, setViewBeneficiary] = useState<boolean>(false);
 
   const miscStore = useAppSelector(state => state.miscellaneousReducer);
   const state = useAppSelector((state) => state.autoHyveReducer);
@@ -266,7 +285,7 @@ const AddNewExpensesModal = ({ newExpenses, setNewExpenses }: any) => {
   useEffect(() => {
     dispatch(getAllBankAction());
   }, []);
-  console.log(bank, 'bankee')
+
   return (
     <>
       <Modal
@@ -427,13 +446,20 @@ const AddNewExpensesModal = ({ newExpenses, setNewExpenses }: any) => {
                         />
                       </LocalizationProvider>
                     </div>
-                    <div className="flex h-[100%] w-[100%] md:w-[30%] mt-5 gap-3">
-                      <AppTabBtn
-                        icon={<AiOutlinePlus />}
+                    <div className="flex flex-col h-[100%] w-[100%] md:w-[30%] mt-5 gap-3">
+                      <AppBtn
+                        image={plus}
+                        showIcon={true}
                         type="button"
                         title="Add New Beneficiary"
-                        className=" text-[#000] btn-secondary flex-1"
                         onClick={() => setOpenNewBeneficiary(true)}
+                        className='btn-secondary'
+                      />
+                      <AppBtn
+                        type="button"
+                        title="View Saved Beneficiary"
+                        onClick={() => setViewBeneficiary(true)}
+                        // onClick={() => navigate('/saved-beneficiaries')}
                       />
                     </div>
                   </div>
@@ -882,6 +908,31 @@ const AddNewExpensesModal = ({ newExpenses, setNewExpenses }: any) => {
               </Form>
             )}
           </Formik>
+        </Box>
+      </Modal>
+
+      <Modal
+        open={viewBeneficiary}
+        // onClose={handleClose2}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style4}>
+          <div className="modal-header pt-0 bg-white ">
+            <div className="flex justify-between w-full">
+              <ModalHeaderTitle title="Beneficiaries" />
+
+              <button onClick={() => setViewBeneficiary(!viewBeneficiary)}
+                type='button'
+              >
+                <img src={CloseIcon} alt="" />
+              </button>
+            </div>
+
+            <div className=" w-full flex items-center gap-10 mt-10">
+              <SavedBeneficiaries/>
+            </div>
+          </div>
         </Box>
       </Modal>
     </>

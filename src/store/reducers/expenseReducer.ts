@@ -7,6 +7,7 @@ import {
   createExpenseAction,
   createExpenseCategoryAction,
   createExpenseTypeAction,
+  deleteBeneficiaryAction,
   deleteExpenseAction,
   getBeneficiariesAction,
   getExpenseCategories,
@@ -29,6 +30,10 @@ interface IExpenseState {
   deleteExpenseError: string;
   deleteExpenseStatus: IThunkAPIStatus;
   deleteExpenseSuccess: string;
+
+  deleteBeneficiaryError: string;
+  deleteBeneficiaryStatus: IThunkAPIStatus;
+  deleteBeneficiarySuccess: string;
 
   updateExpenseError: string;
   updateExpenseStatus: IThunkAPIStatus;
@@ -106,6 +111,10 @@ const initialState: IExpenseState = {
   deleteExpenseError: '',
   deleteExpenseStatus: 'idle',
   deleteExpenseSuccess: '',
+
+  deleteBeneficiaryError: '',
+  deleteBeneficiaryStatus: 'idle',
+  deleteBeneficiarySuccess: '',
 
   updateExpenseError: '',
   updateExpenseStatus: 'idle',
@@ -201,6 +210,11 @@ const expenseSlice = createSlice({
       state.deleteExpenseStatus = 'idle';
       state.deleteExpenseSuccess = '';
       state.deleteExpenseError = '';
+    },
+    clearDeleteBeneficiaryStatus(state: IExpenseState) {
+      state.deleteBeneficiaryStatus = 'idle';
+      state.deleteBeneficiarySuccess = '';
+      state.deleteBeneficiaryError = '';
     },
     clearUpdateExpenseStatus(state: IExpenseState) {
       state.updateExpenseStatus = 'idle';
@@ -332,6 +346,26 @@ const expenseSlice = createSlice({
         } else {
           state.deleteExpenseError = action.error.message as string;
           state.deleteExpenseError = action.error.message as string;
+        }
+      });
+
+    builder
+      .addCase(deleteBeneficiaryAction.pending, state => {
+        state.deleteBeneficiaryStatus = 'loading';
+      })
+      .addCase(deleteBeneficiaryAction.fulfilled, (state, action) => {
+        state.deleteBeneficiaryStatus = 'completed';
+        state.deleteBeneficiarySuccess = action.payload.message;
+      })
+      .addCase(deleteBeneficiaryAction.rejected, (state, action) => {
+        state.deleteBeneficiaryStatus = 'failed';
+
+        if (action.payload) {
+          state.deleteBeneficiaryError = action.payload.message;
+          state.deleteBeneficiaryError = action.payload.message;
+        } else {
+          state.deleteBeneficiaryError = action.error.message as string;
+          state.deleteBeneficiaryError = action.error.message as string;
         }
       });
 
@@ -470,7 +504,8 @@ export const {
   clearCreateExpenseTypeStatus,
   setInvoiceCode,
   setExpenseCategoryId,
-  setExpenseData
+  setExpenseData,
+  clearDeleteBeneficiaryStatus
 } = expenseSlice.actions;
 
 export default expenseSlice.reducer;

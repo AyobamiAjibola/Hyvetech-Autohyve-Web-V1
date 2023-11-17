@@ -109,7 +109,6 @@ const EditEstimate = () => {
     validationSchema: schema,
     initialValues: initialValues,
     onSubmit: (values) => {
-      console.log(values, 'values')
       save ? handleUpdateEstimate(values) : handleSendDraftEstimate(values)
     },
     validateOnBlur: true,
@@ -1057,11 +1056,13 @@ const EditEstimate = () => {
                       value={values.plateNumber}
                     /> */}
                     <div
-                      onClick={() => setOpenReminder(true)}
-                      className="flex items-center gap-4 font-montserrat cursor-pointer text-[#FAA21B]"
+                      className="flex items-center text-[#FAA21B]"
                     >
-                      <span>View Reminder</span>
-                      <FaCalendarAlt />
+                      <span
+                        className="cursor-pointer flex flex-row items-center gap-2 font-montserrat"
+                        onClick={() => setOpenReminder(true)}
+                      >View Reminder
+                      <FaCalendarAlt /> </span>
                     </div>
                   </div>
                   {/* <div className="w-full">

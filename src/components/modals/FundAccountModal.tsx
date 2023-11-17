@@ -115,7 +115,7 @@ const FundAccountModal = ({
     }
 
   },[state.requestNameEnquiryStatus]);
- 
+
   return (
     <>
       {openSingleModal && (

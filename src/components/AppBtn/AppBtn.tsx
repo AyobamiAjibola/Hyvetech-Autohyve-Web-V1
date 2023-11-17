@@ -43,9 +43,9 @@ const AppBtn: FC<IProps> = ({
           className="mr-5 flex relative top-1"
         />
       )}
-      {showIcon && <img src={image} alt="" className="w-[25px] h-[25px]" />}
+      {showIcon && <img src={image} alt="" className={`w-[25px] h-[25px]`} />}
 
-      <span className="text-sm inline-block  font-montserrat">{title}</span>
+      <span className="text-sm inline-block font-montserrat">{title}</span>
     </button>
   );
 };

@@ -22,6 +22,7 @@ const CREATE_EXPENSE_CATEGORY = 'expense:CREATE_EXPENSE_CATEGORY';
 const DELETE_EXPENSE = 'expense:DELETE_EXPENSE';
 const UPDATE_EXPENSE_CATEGORY = 'expense:UPDATE_EXPENSE_CATEGORY';
 const UPDATE_EXPENSE_DETAILS = 'expense:UPDATE_EXPENSE_DETAILS';
+const DELETE_BENEFICIARY = 'expense:DELETE_BENEFICIARY';
 
 const API_ROOT = settings.api.rest;
 
@@ -112,6 +113,15 @@ export const deleteExpenseAction = asyncThunkWrapper<ApiResponseSuccess<IExpense
   DELETE_EXPENSE,
   async data => {
     const response = await axiosClient.delete(`${API_ROOT}/expense/${data.id}`);
+    return response.data;
+  },
+);
+
+export const deleteBeneficiaryAction = asyncThunkWrapper<ApiResponseSuccess<any>, { id: number }>(
+  DELETE_BENEFICIARY,
+  async data => {
+
+    const response = await axiosClient.delete(`${API_ROOT}/beneficiary/${data}`);
     return response.data;
   },
 );

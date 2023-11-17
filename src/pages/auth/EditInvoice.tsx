@@ -51,7 +51,6 @@ const EditInvoice = () => {
   // const [activeId, setactiveId] = useState<number>(0);
   // const [value, setValue] = useState<IDriversFilterData | null>(null);
   // const [inputValue, setInputValue] = useState("");
-  const [mileageUnit, setMileageUnit] = useState<string>("");
   // const [noOptionsText, setNoOptionsText] = useState<any>(
   //   "Click Enter to Initialize Search"
   // );
@@ -91,7 +90,6 @@ const EditInvoice = () => {
     validationSchema: schema,
     initialValues: initialValues,
     onSubmit: (values) => {
-      console.log(values, 'values')
       save ? handleSaveInvoice(values) : handleSendInvoice(values)
     },
     validateOnBlur: true,
@@ -501,7 +499,6 @@ const EditInvoice = () => {
     setFieldValue('modelYear', initialValues.modelYear)
     setFieldValue('plateNumber', initialValues.plateNumber)
     setFieldValue('mileage', initialValues.mileage)
-    setMileageUnit(initialValues.mileage.unit)
     setFieldValue('parts', initialValues.parts)
     setFieldValue('labours', initialValues.labours)
     setFieldValue('depositAmount', initialValues.depositAmount)
@@ -1046,20 +1043,17 @@ const EditInvoice = () => {
                     />
                   </div>{" "}
                   <div className="w-full">
-                    <DropDownHalf
+                    <DropDownHalfParts
                       title="Mileage Value"
-                      placeholder="Unit"
                       placeholderInput={fields.mileageValue.label}
-                      name="mileage.count"
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      value={values.mileage.count}
                       type="number"
                       data={milesData}
-                      setUnit={setMileageUnit}
-                      unit={mileageUnit}
-                      unitDisable={true}
-                      disabled={true}
+                      valueUnit={values.mileage.unit}
+                      nameUnit={"mileage.unit"}
+                      onChangeUnit={formik.handleChange}
+                      name={'mileage.count'}
+                      value={values.mileage.count}
+                      onChange={formik.handleChange}
                     />
                   </div>
                 </div>
@@ -1076,11 +1070,13 @@ const EditInvoice = () => {
                       value={values.plateNumber}
                     /> */}
                     <div
-                      onClick={() => setOpenReminder(true)}
-                      className="flex items-center gap-4 font-montserrat cursor-pointer text-[#FAA21B]"
+                      className="flex items-center text-[#FAA21B]"
                     >
-                      <span>View Reminder</span>
-                      <FaCalendarAlt />
+                      <span
+                        className="cursor-pointer flex flex-row items-center gap-2 font-montserrat"
+                        onClick={() => setOpenReminder(true)}
+                      >View Reminder
+                      <FaCalendarAlt /> </span>
                     </div>
                   </div>
                   {/* <div className="w-full">

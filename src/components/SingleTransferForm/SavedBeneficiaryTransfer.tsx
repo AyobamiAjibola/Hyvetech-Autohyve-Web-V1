@@ -24,7 +24,7 @@ const SavedBeneficiaryTransferForm = () => {
         (item) => item.accountNumber === values.beneficiary.value
       );
 
-      if (data) {
+      if (data && data.accountName !== '' && data.accountNumber !== '') {
         dispatch(
           performNameEnquiryAction({
             beneficiaryAccountNumber: data.accountNumber,

@@ -122,6 +122,10 @@ const router = createBrowserRouter([
         element: <PrivateRoute><SavedBeneficiaries/></PrivateRoute>,
       },
       {
+        path: "/saved-beneficiaries",
+        element: <PrivateRoute><SavedBeneficiaries/></PrivateRoute>,
+      },
+      {
         path: "/settings",
         element: <PrivateRoute><Settings/></PrivateRoute>,
       },

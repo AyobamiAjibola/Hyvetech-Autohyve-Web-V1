@@ -388,7 +388,12 @@ export default function useInvoice() {
     const data = getUpdateData(invoiceId, values, partTotal, labourTotal, grandTotal, refundable, dueBalance);
 
     setSave(false);
-    void dispatch(saveInvoiceAction({ ...data, discount, discountType, taxPart: values.taxPart }));
+    void dispatch(saveInvoiceAction({ 
+      ...data, discount, discountType, taxPart: values.taxPart,
+      vin: values.vin,
+      mileageUnit: values.mileage.unit,
+      mileageValue: values.mileage.count.toString()
+    }));
   };
 
   const handleSendInvoice = (values: IEstimateValues) => {
@@ -400,7 +405,13 @@ export default function useInvoice() {
 
     const data = getUpdateData(invoiceId, values, partTotal, labourTotal, grandTotal, refundable, dueBalance);
 
-    void dispatch(sendInvoiceAction({ ...data, discount, discountType, taxPart: values.taxPart }));
+    void dispatch(sendInvoiceAction({ 
+      ...data, discount, discountType, 
+      taxPart: values.taxPart,
+      vin: values.vin,
+      mileageUnit: values.mileage.unit,
+      mileageValue: values.mileage.count.toString()
+    }));
   };
 
   const handleCloseEdit = () => {

@@ -86,7 +86,7 @@ const Dashboard = () => {
     },
     {
       name: "Total Expense",
-      price: Util.formAmount(techDashboardReducer?.mExpenses, false) || 0,
+      price: Util.formAmount(techDashboardReducer?.mExpense, false) || 0,
       qty: "",
       color: "#FFEDED"
     },
