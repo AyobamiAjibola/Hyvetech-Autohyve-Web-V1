@@ -47,6 +47,7 @@ const EstimateDetailsModal = ({
   const [generating, setGenerating] = useState<any>(false);
   const [downloadEstimateModal, setDownloadEstimateModal] = useState<boolean>(false);
   const [preference, setPreference] = useState('');
+  const [pdfExist, setPdfExist] = useState<boolean>(false);
 
   const invoiceReducer = useAppSelector(state => state.invoiceReducer);
   const partnerReducer = useAppSelector(state => state.partnerReducer);
@@ -149,7 +150,7 @@ const EstimateDetailsModal = ({
     } catch (e: any) {
       console.log(e);
     }
-
+    setPdfExist(true)
     setTimeout(() => {
       setDownloading(false);
       window.open(`${settings.api.baseURL}/uploads/pdf/${rName}`);
@@ -167,73 +168,79 @@ const EstimateDetailsModal = ({
     }
   };
 
-    //share pdf logic --- start
-    const handleShareLink = async () => {
-      const fileUrl = `${settings.api.baseURL}/uploads/pdf/${estimate?.code}.pdf`;
-      const message =
-        `${estimate?.partner.name} has sent you an estimate.\nAmount Due: NGN${
-          estimate?.grandTotal && Util.formAmount(estimate?.grandTotal)
-        }\n\n` + fileUrl;
-  
-      try {
-        const shareData = {
-          title: 'Estimate',
-          text: `${message}`,
-          // url: fileUrl
-        };
-  
-        await navigator.share(shareData);
-  
-        console.log('File shared successfully');
-      } catch (error) {
-        console.error('Error sharing file:', error);
-      }
+  //share pdf logic --- start
+  const handleShareLink = async () => {
+    const fileUrl = `${settings.api.baseURL}/uploads/pdf/${estimate?.code}.pdf`;
+    const message =
+      `${estimate?.partner.name} has sent you an estimate.\nAmount Due: NGN${
+        estimate?.grandTotal && Util.formAmount(estimate?.grandTotal)
+      }\n\n` + fileUrl;
+
+    try {
+      const shareData = {
+        title: 'Estimate',
+        text: `${message}`,
+        // url: fileUrl
+      };
+
+      await navigator.share(shareData);
+      
+      console.log('File shared successfully');
+    } catch (error) {
+      console.error('Error sharing file:', error);
+    }
+  };
+
+  const handleShareLinkNoMessage = async () => {
+    const fileUrl = `${settings.api.baseURL}/uploads/pdf/${estimate?.code}.pdf`;
+    // const message = `${estimate?.partner.name} has sent you an estimate.\n Amount Due: NGN${estimate?.grandTotal && formatNumberToIntl(estimate?.grandTotal)}\n\n` + fileUrl
+
+    try {
+      const shareData = {
+        title: 'Estimate',
+        // text: `${message}`
+        url: fileUrl,
+      };
+
+      await navigator.share(shareData);
+      console.log('File shared successfully');
+    } catch (error) {
+      console.error('Error sharing file:', error);
+    }
+  };
+
+  const handleSharePdf = async () => {
+    const rName = estimate?.code + '.pdf';
+    // @ts-ignore
+    const payload = {
+      type: 'ESTIMATE',
+      id: estimate?.id || -1,
+      rName,
     };
-  
-    const handleShareLinkNoMessage = async () => {
-      const fileUrl = `${settings.api.baseURL}/uploads/pdf/${estimate?.code}.pdf`;
-      // const message = `${estimate?.partner.name} has sent you an estimate.\n Amount Due: NGN${estimate?.grandTotal && formatNumberToIntl(estimate?.grandTotal)}\n\n` + fileUrl
-  
-      try {
-        const shareData = {
-          title: 'Estimate',
-          // text: `${message}`
-          url: fileUrl,
-        };
-  
-        await navigator.share(shareData);
-  
-        console.log('File shared successfully');
-      } catch (error) {
-        console.error('Error sharing file:', error);
-      }
-    };
-  
-    const handleSharePdf = async () => {
-      const fileUrl = `${settings.api.baseURL}/uploads/pdf/${estimate?.code}.pdf`;
-      const message = `${estimate?.partner.name} has sent you an estimate.`;
-  
-      try {
-        const response = await axiosClient.get(fileUrl, { responseType: 'blob' });
-        const blob = response.data;
-        const file = new File([blob], `${message} - ${estimate?.code.split('_')[0]}_estimate.pdf`, {
-          type: 'application/pdf',
-        });
-  
-        const shareData = {
-          title: 'Estimate',
-          text: `${message}`,
-          // url: fileUrl
-          files: [file],
-        };
-  
-        await navigator.share(shareData);
-  
-        console.log('File shared successfully');
-      } catch (error) {
-        console.error('Error sharing file:', error);
-      }
-    };
+
+    const fileUrl = `${settings.api.baseURL}/uploads/pdf/${estimate?.code}.pdf`;
+    const message = `${estimate?.partner.name} has sent you an estimate.`;
+
+    try {
+      const response = await axiosClient.get(fileUrl, { responseType: 'blob' });
+      const blob = response.data;
+      const file = new File([blob], `${message} - ${estimate?.code.split('_')[0]}_estimate.pdf`, {
+        type: 'application/pdf',
+      });
+
+      const shareData = {
+        title: 'Estimate',
+        text: `${message}`,
+        // url: fileUrl
+        files: [file],
+      };
+
+      await navigator.share(shareData);
+      console.log('File shared successfully');
+    } catch (error) {
+      console.error('Error sharing file:', error);
+    }
+  };
 
   const handleChange = (event: any) => {
     const value = event.target.value as string;
@@ -295,6 +302,22 @@ const EstimateDetailsModal = ({
   useEffect(() => {
     getPartnerAccount();
   }, [estimate?.partner]);
+
+  useEffect(() => {
+
+    const checkFileExist = async () => {
+      const fileUrl = `${settings.api.baseURL}/uploads/pdf/${estimate?.code}.pdf`;
+      const response = await axiosClient.get(fileUrl, { responseType: 'blob' });
+      if(response.statusText === 'OK') {
+        setPdfExist(true)
+      } else {
+        setPdfExist(false)
+      }
+    }
+
+    checkFileExist()
+    
+  },[estimate]);
 
   return (
     <>
@@ -653,11 +676,11 @@ const EstimateDetailsModal = ({
                 {downloading ? 'Downloading...' : 'Download Pdf'}
               </span>
             </div>
-            <div className="border-[1px] cursor-pointer mt-5 py-4 flex items-center gap-3 border-[#CACACA] px-10  rounded-[20px]"
+            <div className="border-[1px] cursor-pointer mt-5 py-4 flex items-center gap-3 border-[#CACACA] px-10 rounded-[20px]"
               onClick={() => {
                 document.documentElement.clientWidth <= 912 
-                  ? handleShareLink() 
-                  : handleShareLinkNoMessage();
+                  ? pdfExist ? handleShareLink() : showMessage('PDF Link', 'Please download pdf before sharing.', 'info')
+                  : pdfExist ? handleShareLinkNoMessage() : showMessage('PDF Link', 'Please download pdf before sharing.', 'info')
               }}
             >
               <img
@@ -669,13 +692,14 @@ const EstimateDetailsModal = ({
                 Share Unique Link
               </span>
             </div>
-            <div className="border-[1px] mt-5 py-4 cursor-pointer flex items-center gap-3 border-[#CACACA] px-10  rounded-[20px]"
+            <div className={`border-[1px] mt-5 py-4 cursor-pointer
+              flex items-center gap-3 border-[#CACACA] px-10 rounded-[20px]`}
               onClick={() => {
-                handleSharePdf()
+                pdfExist ? handleSharePdf() : showMessage('PDF', 'Please download pdf before sharing.', 'info')
               }}
             >
               <img src={mdi_share} alt="" className="w-[24px] h-[24px]" />
-              <span className="text-[11px] font-montserrat font-semibold">
+              <span className={`text-[11px] font-montserrat font-semibold }`}>
                 Share PDF
               </span>
             </div>

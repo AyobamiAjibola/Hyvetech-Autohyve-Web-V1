@@ -6,21 +6,8 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   plugins: [
     react(),
-    // VitePWA({
-    //   manifest: {
-    //     name: "HyvePay",
-    //     short_name: "HyvePay",
-    //     description:
-    //       "Payments platform for automotive industry, sponsored by HyveTech",
-    //     icons: [
-    //       {
-    //         src: "/hyvePay.png",
-    //         sizes: "512x512",
-    //         type: "image/png",
-    //         purpose: "any maskable",
-    //       },
-    //     ],
-    //   },
-    // }),
   ],
+  build: {
+    chunkSizeWarningLimit: 2000, // Set your desired chunk size limit in kilobytes
+  }
 });
