@@ -218,21 +218,21 @@ export default function useEstimate() {
 
     const containsLettersOrSpecialCharacters = /[a-zA-Z!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(values.depositAmount);
     if (containsLettersOrSpecialCharacters)
-      showMessage(
+      return showMessage(
         'Estimate',
         'Deposit must be a number.',
         'error'
       );
 
     if (values.depositAmount.length > 1 && values.depositAmount.startsWith('0'))
-      showMessage(
+      return showMessage(
         'Estimate',
         'Deposit amount should not start with leading 0.',
         'error'
       )
 
     if (Math.sign(+depositAmount) === -1)
-      showMessage(
+      return showMessage(
         'Estimate',
         'Deposit amount must be a positive number greater than 0',
         'error'
@@ -242,7 +242,7 @@ export default function useEstimate() {
     const _grandTotal = Math.round(grandTotal);
 
     if (_depositAmount > _grandTotal)
-      showMessage(
+      return showMessage(
         'Estimate',
         `Deposit must be less than or equal to Grand Total ${Math.round(grandTotal)}`,
         'error'
@@ -288,21 +288,21 @@ export default function useEstimate() {
 
     const containsLettersOrSpecialCharacters = /[a-zA-Z!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(values.depositAmount);
     if (containsLettersOrSpecialCharacters)
-      showMessage(
+      return showMessage(
         'Estimate',
         'Deposit must be a number.',
         'error'
       );
 
     if (values.depositAmount.length > 1 && values.depositAmount.startsWith('0'))
-      showMessage(
+      return showMessage(
         'Estimate',
         'Deposit amount should not start with leading 0.',
         'error'
       )
 
     if (Math.sign(+depositAmount) === -1)
-      showMessage(
+      return showMessage(
         'Estimate',
         'Deposit amount must be a positive number greater than 0',
         'error'
@@ -351,21 +351,21 @@ export default function useEstimate() {
 
     const containsLettersOrSpecialCharacters = /[a-zA-Z!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(values.depositAmount);
     if (containsLettersOrSpecialCharacters)
-      showMessage(
+      return showMessage(
         'Estimate',
         'Deposit must be a number.',
         'error'
       );
 
     if (values.depositAmount.length > 1 && values.depositAmount.startsWith('0'))
-      showMessage(
+      return showMessage(
         'Estimate',
         'Deposit amount should not start with leading 0.',
         'error'
       )
 
     if (Math.sign(+depositAmount) === -1)
-      showMessage(
+      return showMessage(
         'Estimate',
         'Deposit amount must be a positive number greater than 0',
         'error'
@@ -410,21 +410,21 @@ export default function useEstimate() {
 
     const containsLettersOrSpecialCharacters = /[a-zA-Z!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(values.depositAmount);
     if (containsLettersOrSpecialCharacters)
-      showMessage(
+      return showMessage(
         'Estimate',
         'Deposit must be a number.',
         'error'
       );
 
     if (values.depositAmount.length > 1 && values.depositAmount.startsWith('0'))
-      showMessage(
+      return showMessage(
         'Estimate',
         'Deposit amount should not start with leading 0.',
         'error'
       )
 
     if (Math.sign(+depositAmount) === -1)
-      showMessage(
+      return showMessage(
         'Estimate',
         'Deposit amount must be a positive number greater than 0',
         'error'

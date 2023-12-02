@@ -1606,7 +1606,7 @@ const GenerateEstimate = () => {
                   spinner={sendStatus}
                   disabled={initialValues.status === ESTIMATE_STATUS.invoiced}
                 />
-                <AppBtn 
+                <AppBtn
                   title="SAVE" 
                   className={`font-semibold 
                     ${initialValues.status === ESTIMATE_STATUS.sent || 
