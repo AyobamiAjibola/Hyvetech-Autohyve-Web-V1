@@ -1513,8 +1513,7 @@ const GenerateEstimate = () => {
                         name={fields.depositAmount.name}
                         value={values.depositAmount}
                         onChange={formik.handleChange}
-                        min="0"
-                        type="number"
+                        type="string"
                       />
                     </div>
                   </div>

@@ -24,7 +24,6 @@ import {
   clearSendDraftEstimateStatus,
   clearUpdateEstimateStatus,
 } from '../store/reducers/estimateReducer';
-import { FormikHelpers } from 'formik';
 import { getCustomerAction } from '../store/actions/customerActions';
 import { showMessage } from '../helpers/notification';
 
@@ -87,6 +86,7 @@ export default function useEstimate() {
         estimateReducer.getEstimatesError,
         "error"
       )
+      handleReset();
     }
   }, [estimateReducer.getEstimatesError, estimateReducer.getEstimatesStatus]);
 
@@ -104,9 +104,9 @@ export default function useEstimate() {
         estimateReducer.createEstimateError,
         "error"
       )
-      handleReset();
+      dispatch(clearCreateEstimateStatus());
     }
-  }, [estimateReducer.createEstimateError, estimateReducer.createEstimateStatus, handleReset]);
+  }, [estimateReducer.createEstimateStatus]);
 
   useEffect(() => {
     if (estimateReducer.createEstimateStatus === 'completed') {
@@ -115,12 +115,10 @@ export default function useEstimate() {
         estimateReducer.createEstimateSuccess,
         "success"
       )
-      dispatch(getEstimatesAction());
-    }
-
-    return () => {
+      dispatch(getEstimatesAction())
       dispatch(clearCreateEstimateStatus())
     }
+
   }, [estimateReducer.createEstimateStatus]);
 
   useEffect(() => {
@@ -130,9 +128,9 @@ export default function useEstimate() {
         estimateReducer.saveEstimateError,
         "error"
       )
-      handleReset();
+      dispatch(clearSaveEstimateStatus())
     }
-  }, [estimateReducer.saveEstimateError, estimateReducer.saveEstimateStatus, handleReset]);
+  }, [estimateReducer.saveEstimateStatus]);
 
   useEffect(() => {
     if (estimateReducer.saveEstimateStatus === 'completed') {
@@ -141,10 +139,10 @@ export default function useEstimate() {
         estimateReducer.saveEstimateSuccess,
         "success"
       )
-      handleReset();
-      dispatch(getEstimatesAction());
+      dispatch(getEstimatesAction())
+      dispatch(clearSaveEstimateStatus());
     }
-  }, [dispatch, estimateReducer.saveEstimateStatus, estimateReducer.saveEstimateSuccess, handleReset]);
+  }, [estimateReducer.saveEstimateStatus]);
 
   useEffect(() => {
     if (estimateReducer.updateEstimateStatus === 'failed') {
@@ -153,9 +151,9 @@ export default function useEstimate() {
         estimateReducer.updateEstimateError,
         "error"
       )
-      handleReset();
+      dispatch(clearUpdateEstimateStatus())
     }
-  }, [estimateReducer.updateEstimateError, estimateReducer.updateEstimateStatus, handleReset]);
+  }, [estimateReducer.updateEstimateStatus]);
 
   useEffect(() => {
     if (estimateReducer.updateEstimateStatus === 'completed') {
@@ -164,10 +162,10 @@ export default function useEstimate() {
         estimateReducer.updateEstimateSuccess,
         "success"
       )
-      handleReset();
-      dispatch(getEstimatesAction());
+      dispatch(getEstimatesAction())
+      dispatch(clearUpdateEstimateStatus());
     }
-  }, [dispatch, estimateReducer.updateEstimateStatus, estimateReducer.updateEstimateSuccess, handleReset]);
+  }, [ estimateReducer.updateEstimateStatus]);
 
   useEffect(() => {
     if (estimateReducer.deleteEstimateStatus === 'failed') {
@@ -176,9 +174,9 @@ export default function useEstimate() {
         estimateReducer.deleteEstimateError,
         "error"
       )
-      handleReset();
+      dispatch(clearDeleteEstimateStatus())
     }
-  }, [estimateReducer.deleteEstimateError, estimateReducer.deleteEstimateStatus, handleReset]);
+  }, [estimateReducer.deleteEstimateStatus]);
 
   useEffect(() => {
     if (estimateReducer.deleteEstimateStatus === 'completed') {
@@ -187,10 +185,10 @@ export default function useEstimate() {
         estimateReducer.deleteEstimateSuccess,
         "success"
       )
-      handleReset();
-      dispatch(getEstimatesAction());
+      dispatch(getEstimatesAction())
+      dispatch(clearDeleteEstimateStatus())
     }
-  }, [dispatch, estimateReducer.deleteEstimateStatus, estimateReducer.deleteEstimateSuccess, handleReset]);
+  }, [estimateReducer.deleteEstimateStatus]);
 
   useEffect(() => {
     if (estimateReducer.sendDraftEstimateStatus === 'failed') {
@@ -199,9 +197,9 @@ export default function useEstimate() {
         estimateReducer.sendDraftEstimateError,
         "error"
       )
-      handleReset();
+      dispatch(clearSendDraftEstimateStatus())
     }
-  }, [estimateReducer.sendDraftEstimateError, estimateReducer.sendDraftEstimateStatus, handleReset]);
+  }, [estimateReducer.sendDraftEstimateStatus]);
 
   useEffect(() => {
     if (estimateReducer.sendDraftEstimateStatus === 'completed') {
@@ -210,27 +208,44 @@ export default function useEstimate() {
         estimateReducer.sendDraftEstimateSuccess,
         "success"
       )
-      handleReset();
-      dispatch(getEstimatesAction());
+      dispatch(getEstimatesAction())
+      dispatch(clearSendDraftEstimateStatus())
     }
-  }, [dispatch, estimateReducer.sendDraftEstimateStatus, estimateReducer.sendDraftEstimateSuccess, handleReset]);
+  }, [estimateReducer.sendDraftEstimateStatus]);
 
-  const handleCreateEstimate = (values: IEstimateValues, options?: FormikHelpers<IEstimateValues>, ) => {
+  const handleCreateEstimate = (values: IEstimateValues ) => {
     const depositAmount = values.depositAmount;
 
-    if (depositAmount === 'null' || !depositAmount)
-      return options?.setFieldError('depositAmount', `Deposit amount must not be empty.`);
+    const containsLettersOrSpecialCharacters = /[a-zA-Z!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(values.depositAmount);
+    if (containsLettersOrSpecialCharacters)
+      showMessage(
+        'Estimate',
+        'Deposit must be a number.',
+        'error'
+      );
+
+    if (values.depositAmount.length > 1 && values.depositAmount.startsWith('0'))
+      showMessage(
+        'Estimate',
+        'Deposit amount should not start with leading 0.',
+        'error'
+      )
 
     if (Math.sign(+depositAmount) === -1)
-      return options?.setFieldError('depositAmount', `Deposit amount must be a positive number greater than 0`);
+      showMessage(
+        'Estimate',
+        'Deposit amount must be a positive number greater than 0',
+        'error'
+      )
 
     const _depositAmount = Math.round(parseInt(depositAmount));
     const _grandTotal = Math.round(grandTotal);
 
     if (_depositAmount > _grandTotal)
-      return options?.setFieldError(
-        'depositAmount',
-        `Deposit  must be less than or equal to Grand Total ${Math.round(grandTotal)}`,
+      showMessage(
+        'Estimate',
+        `Deposit must be less than or equal to Grand Total ${Math.round(grandTotal)}`,
+        'error'
       );
 
     const data = {
@@ -246,7 +261,7 @@ export default function useEstimate() {
       email: values.email,
       state: values.state,
       phone: values.phone,
-      depositAmount: values.depositAmount,
+      depositAmount: values.depositAmount === '' ? '0' : values.depositAmount,
       jobDurationValue: values.jobDuration.count,
       jobDurationUnit: values.jobDuration.interval,
       vin: values.vin.toUpperCase(),
@@ -268,12 +283,31 @@ export default function useEstimate() {
     dispatch(createEstimateAction(data));
   };
 
-  const handleSaveEstimate = (values: IEstimateValues, options?: FormikHelpers<IEstimateValues>) => {
+  const handleSaveEstimate = (values: IEstimateValues) => {
     const depositAmount = values.depositAmount;
 
-    if (Math.sign(+depositAmount) === -1)
-      return options?.setFieldError('depositAmount', `Deposit amount must be a positive number greater than 0`);
+    const containsLettersOrSpecialCharacters = /[a-zA-Z!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(values.depositAmount);
+    if (containsLettersOrSpecialCharacters)
+      showMessage(
+        'Estimate',
+        'Deposit must be a number.',
+        'error'
+      );
 
+    if (values.depositAmount.length > 1 && values.depositAmount.startsWith('0'))
+      showMessage(
+        'Estimate',
+        'Deposit amount should not start with leading 0.',
+        'error'
+      )
+
+    if (Math.sign(+depositAmount) === -1)
+      showMessage(
+        'Estimate',
+        'Deposit amount must be a positive number greater than 0',
+        'error'
+      )
+    
     const data = {
       id: partnerId,
       parts: values.parts,
@@ -312,12 +346,30 @@ export default function useEstimate() {
     dispatch(saveEstimateAction(data));
   };
 
-  const handleUpdateEstimate = (values: IEstimateValues, options?: FormikHelpers<IEstimateValues>) => {
+  const handleUpdateEstimate = (values: IEstimateValues) => {
     const depositAmount = values.depositAmount;
 
-    if (Math.sign(+depositAmount) === -1)
-      return options?.setFieldError('depositAmount', `Deposit amount must be a positive number greater than 0`);
+    const containsLettersOrSpecialCharacters = /[a-zA-Z!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(values.depositAmount);
+    if (containsLettersOrSpecialCharacters)
+      showMessage(
+        'Estimate',
+        'Deposit must be a number.',
+        'error'
+      );
 
+    if (values.depositAmount.length > 1 && values.depositAmount.startsWith('0'))
+      showMessage(
+        'Estimate',
+        'Deposit amount should not start with leading 0.',
+        'error'
+      )
+
+    if (Math.sign(+depositAmount) === -1)
+      showMessage(
+        'Estimate',
+        'Deposit amount must be a positive number greater than 0',
+        'error'
+      )
     const data = {
       id: estimateId,
       parts: values.parts,
@@ -353,29 +405,30 @@ export default function useEstimate() {
     void dispatch(updateEstimateAction(data));
   };
 
-  const handleSendDraftEstimate = (values: IEstimateValues, options?: FormikHelpers<IEstimateValues>) => {
+  const handleSendDraftEstimate = (values: IEstimateValues) => {
     const depositAmount = values.depositAmount;
 
-    if (depositAmount === 'null' || !depositAmount)
-      return options?.setFieldError('depositAmount', `Deposit amount must not be empty.`);
+    const containsLettersOrSpecialCharacters = /[a-zA-Z!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(values.depositAmount);
+    if (containsLettersOrSpecialCharacters)
+      showMessage(
+        'Estimate',
+        'Deposit must be a number.',
+        'error'
+      );
+
+    if (values.depositAmount.length > 1 && values.depositAmount.startsWith('0'))
+      showMessage(
+        'Estimate',
+        'Deposit amount should not start with leading 0.',
+        'error'
+      )
 
     if (Math.sign(+depositAmount) === -1)
-      return options?.setFieldError('depositAmount', `Deposit amount must be a positive number greater than 0`);
-
-    const _depositAmount = Math.round(parseInt(depositAmount));
-    const _grandTotal = Math.round(grandTotal);
-
-    if (_depositAmount > _grandTotal)
-      return options?.setFieldError(
-        'depositAmount',
-        `Deposit  must be less than or equal to Grand Total ${Math.round(grandTotal)}`,
-      );
-
-    if (_depositAmount > _grandTotal)
-      return options?.setFieldError(
-        'depositAmount',
-        `Deposit  must be less than or equal to Grand Total ${Math.round(grandTotal)}`,
-      );
+      showMessage(
+        'Estimate',
+        'Deposit amount must be a positive number greater than 0',
+        'error'
+      )
 
     const data = {
       id: estimateId,
