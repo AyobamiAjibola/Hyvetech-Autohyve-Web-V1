@@ -26,7 +26,7 @@ const AppBtn: FC<IProps> = ({
   return (
     <button
       className={
-        `btn text-[#000] bg-[#FAA21B] flex items-center justify-center px-6 py-3
+        `btn text-[#000] bg-[#FAA21B] flex items-center justify-center px-6 py-3 gap-2
       ` + className
       }
       onClick={onClick}
@@ -34,18 +34,17 @@ const AppBtn: FC<IProps> = ({
       disabled={spinner || disabled}
       style={{ cursor: "pointer" }}
     >
+      <span className="text-sm inline-block font-montserrat">{title}</span>
       {spinner && (
         <ClipLoader
           loading={loading}
           size={20}
           aria-label="Loading Spinner"
           data-testid="loader"
-          className="mr-5 flex relative top-1"
+          className="mr-5 flex relative"
         />
       )}
       {showIcon && <img src={image} alt="" className={`w-[25px] h-[25px]`} />}
-
-      <span className="text-sm inline-block font-montserrat">{title}</span>
     </button>
   );
 };

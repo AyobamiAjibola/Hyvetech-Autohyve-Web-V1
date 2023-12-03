@@ -23,6 +23,8 @@ import {
   clearSaveEstimateStatus,
   clearSendDraftEstimateStatus,
   clearUpdateEstimateStatus,
+  setEstimateSavingLoading,
+  setEstimateSendingLoading,
 } from '../store/reducers/estimateReducer';
 import { getCustomerAction } from '../store/actions/customerActions';
 import { showMessage } from '../helpers/notification';
@@ -105,6 +107,7 @@ export default function useEstimate() {
         "error"
       )
       dispatch(clearCreateEstimateStatus());
+      dispatch(setEstimateSendingLoading(false))
     }
   }, [estimateReducer.createEstimateStatus]);
 
@@ -117,6 +120,7 @@ export default function useEstimate() {
       )
       dispatch(getEstimatesAction())
       dispatch(clearCreateEstimateStatus())
+      dispatch(setEstimateSendingLoading(false))
     }
 
   }, [estimateReducer.createEstimateStatus]);
@@ -129,6 +133,7 @@ export default function useEstimate() {
         "error"
       )
       dispatch(clearSaveEstimateStatus())
+      dispatch(setEstimateSavingLoading(false))
     }
   }, [estimateReducer.saveEstimateStatus]);
 
@@ -141,6 +146,7 @@ export default function useEstimate() {
       )
       dispatch(getEstimatesAction())
       dispatch(clearSaveEstimateStatus());
+      dispatch(setEstimateSavingLoading(false))
     }
   }, [estimateReducer.saveEstimateStatus]);
 
@@ -152,6 +158,7 @@ export default function useEstimate() {
         "error"
       )
       dispatch(clearUpdateEstimateStatus())
+      dispatch(setEstimateSavingLoading(false))
     }
   }, [estimateReducer.updateEstimateStatus]);
 
@@ -164,6 +171,7 @@ export default function useEstimate() {
       )
       dispatch(getEstimatesAction())
       dispatch(clearUpdateEstimateStatus());
+      dispatch(setEstimateSavingLoading(false))
     }
   }, [ estimateReducer.updateEstimateStatus]);
 
@@ -198,6 +206,7 @@ export default function useEstimate() {
         "error"
       )
       dispatch(clearSendDraftEstimateStatus())
+      dispatch(setEstimateSendingLoading(false))
     }
   }, [estimateReducer.sendDraftEstimateStatus]);
 
@@ -210,10 +219,13 @@ export default function useEstimate() {
       )
       dispatch(getEstimatesAction())
       dispatch(clearSendDraftEstimateStatus())
+      dispatch(setEstimateSendingLoading(false))
     }
   }, [estimateReducer.sendDraftEstimateStatus]);
 
   const handleCreateEstimate = (values: IEstimateValues ) => {
+    console.log('am i here')
+    dispatch(setEstimateSendingLoading(true))
     const depositAmount = values.depositAmount;
 
     const containsLettersOrSpecialCharacters = /[a-zA-Z!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(values.depositAmount);
@@ -284,6 +296,7 @@ export default function useEstimate() {
   };
 
   const handleSaveEstimate = (values: IEstimateValues) => {
+    dispatch(setEstimateSavingLoading(true))
     const depositAmount = values.depositAmount;
 
     const containsLettersOrSpecialCharacters = /[a-zA-Z!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(values.depositAmount);
@@ -347,6 +360,7 @@ export default function useEstimate() {
   };
 
   const handleUpdateEstimate = (values: IEstimateValues) => {
+    dispatch(setEstimateSavingLoading(true))
     const depositAmount = values.depositAmount;
 
     const containsLettersOrSpecialCharacters = /[a-zA-Z!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(values.depositAmount);
@@ -406,6 +420,7 @@ export default function useEstimate() {
   };
 
   const handleSendDraftEstimate = (values: IEstimateValues) => {
+    dispatch(setEstimateSendingLoading(true))
     const depositAmount = values.depositAmount;
 
     const containsLettersOrSpecialCharacters = /[a-zA-Z!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(values.depositAmount);

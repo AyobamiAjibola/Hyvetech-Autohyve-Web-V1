@@ -662,6 +662,12 @@ const EditEstimate = () => {
     setFieldValue('labours', newService);
   };
 
+  const handleEnterKeyPress = (e: any) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+    }
+  };
+
   useEffect(() => {
     setGrandTotal(subTotal - calculateDiscount(subTotal));
   }, [subTotal]);
@@ -704,21 +710,25 @@ const EditEstimate = () => {
   const sendStatus = useMemo(() => {
     return (
       estimateReducer.sendDraftEstimateStatus === "loading" ||
-      estimateReducer.createEstimateStatus === "loading"
+      estimateReducer.createEstimateStatus === "loading" ||
+      estimateReducer.estimateSendingLoading
     );
   }, [
     estimateReducer.createEstimateStatus,
     estimateReducer.sendDraftEstimateStatus,
+    estimateReducer.estimateSendingLoading
   ]);
 
   const saveStatus = useMemo(() => {
     return (
       estimateReducer.updateEstimateStatus === "loading" ||
-      estimateReducer.saveEstimateStatus === "loading"
+      estimateReducer.saveEstimateStatus === "loading" ||
+      estimateReducer.estimateSavingLoading 
     );
   }, [
     estimateReducer.saveEstimateStatus,
     estimateReducer.updateEstimateStatus,
+    estimateReducer.estimateSavingLoading
   ]);
 
   return (
@@ -736,6 +746,7 @@ const EditEstimate = () => {
                   inputValue={inputValue}
                   value={value}
                   openOnFocus={false}
+                  onKeyDown={handleEnterKeyPress}
                   loading={
                     partnerReducer.getDriversFilterDataStatus === "loading"
                   }
@@ -1486,8 +1497,7 @@ const EditEstimate = () => {
                         name={fields.depositAmount.name}
                         value={values.depositAmount}
                         onChange={formik.handleChange}
-                        min="0"
-                        type="number"
+                        type="string"
                       />
                     </div>
                   </div>

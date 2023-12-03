@@ -37,6 +37,8 @@ interface IEstimateState {
 
   estimate: IEstimate | null;
   estimates: IEstimate[];
+  estimateSavingLoading: boolean;
+  estimateSendingLoading: boolean
 }
 
 const initialState: IEstimateState = {
@@ -66,6 +68,8 @@ const initialState: IEstimateState = {
 
   estimates: [],
   estimate: null,
+  estimateSavingLoading: false,
+  estimateSendingLoading: false
 };
 
 const estimateSlice = createSlice({
@@ -106,6 +110,12 @@ const estimateSlice = createSlice({
       state.getEstimatesSuccess = '';
       state.getEstimatesError = '';
     },
+    setEstimateSavingLoading(state: IEstimateState, action) {
+      state.estimateSavingLoading = action.payload
+    },
+    setEstimateSendingLoading(state: IEstimateState, action) {
+      state.estimateSendingLoading = action.payload
+    }
   },
 
   extraReducers: builder => {
@@ -220,6 +230,8 @@ export const {
   clearSendDraftEstimateStatus,
   clearUpdateEstimateStatus,
   clearDeleteEstimateStatus,
+  setEstimateSavingLoading,
+  setEstimateSendingLoading
 } = estimateSlice.actions;
 
 export default estimateSlice.reducer;

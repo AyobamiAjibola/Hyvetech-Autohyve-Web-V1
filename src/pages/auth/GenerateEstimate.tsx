@@ -672,21 +672,25 @@ const GenerateEstimate = () => {
   const sendStatus = useMemo(() => {
     return (
       estimateReducer.sendDraftEstimateStatus === "loading" ||
-      estimateReducer.createEstimateStatus === "loading"
+      estimateReducer.createEstimateStatus === "loading" ||
+      estimateReducer.estimateSendingLoading
     );
   }, [
     estimateReducer.createEstimateStatus,
     estimateReducer.sendDraftEstimateStatus,
+    estimateReducer.estimateSendingLoading
   ]);
- 
+
   const saveStatus = useMemo(() => {
     return (
       estimateReducer.updateEstimateStatus === "loading" ||
-      estimateReducer.saveEstimateStatus === "loading"
+      estimateReducer.saveEstimateStatus === "loading" ||
+      estimateReducer.estimateSavingLoading 
     );
   }, [
     estimateReducer.saveEstimateStatus,
     estimateReducer.updateEstimateStatus,
+    estimateReducer.estimateSavingLoading 
   ]);
 
   useEffect(() => {
@@ -720,6 +724,12 @@ const GenerateEstimate = () => {
 
   const handlePopstate = () => {
     sessionStorage.removeItem('key');
+  };
+
+  const handleEnterKeyPress = (e: any) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+    }
   };
 
   useEffect(() => {
@@ -864,6 +874,7 @@ const GenerateEstimate = () => {
                   )}
                   options={showDrop ? options : []}
                   forcePopupIcon={false}
+                  onKeyDown={handleEnterKeyPress}
                 />
               </div>
 
