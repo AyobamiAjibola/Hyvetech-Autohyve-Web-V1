@@ -125,7 +125,7 @@ const FundAccountModal = ({
           onClick={toggleModal}
         >
           <div
-            className="bg-white p-2 relative w-[90%] md:w-[50%] xs:w-[30%] overflow-y-auto pb-5 xs:pb-2 xs:h-[80%] rounded-md"
+            className="bg-white p-2 relative w-[90%] md:w-[50%] xs:w-[30%] overflow-y-auto pb-5 xs:pb-2 rounded-md h-[90%]"
             style={{ maxWidth: 600 }}
           >
             <div className="body">
@@ -160,6 +160,10 @@ const FundAccountModal = ({
                         ]}
                         activeKey={selected}
                         onChange={(key) => setSelected(key)}
+                        tabBarStyle={{
+                          fontFamily: 'montserrat',
+                          alignSelf: 'center'
+                        }}
                       />
                     </div>
                   ) : (
@@ -184,7 +188,7 @@ const FundAccountModal = ({
               <div className="flex justify-center "></div>
 
               {/* view */}
-              <div className="form-modal">
+              <div className={`form-modal`}>
                 {selected === "New Beneficiary" ? (
                   <Formik
                     enableReinitialize
