@@ -61,8 +61,7 @@ const Invoices = () => {
     "Record expenses",
     "Download PDF",
     "Share",
-    "Add Reminder",
-    "Edit Invoice",
+    "Add Reminder"
   ];
 
   // Function to handle changes in the search input
