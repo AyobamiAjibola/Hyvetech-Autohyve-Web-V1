@@ -57,23 +57,22 @@ const ResetHyveCloudPasswordModal = ({
 
   useEffect(() => {
     if(state.sendPasswordResetTokenStatus === "completed") {
+      setEmail('')
       setOpenOtp(true);
       setOpenResetPassword(false);
       !pin && setOpenHyveLogin(false);
-      showMessage(
-        "Reset password",
-        state.sendPasswordResetTokenSuccess,
-        "success"
-      )
+      // showMessage(
+      //   "Reset password",
+      //   state.sendPasswordResetTokenSuccess,
+      //   "success"
+      // )
+      // dispatch(clearSendPasswordResetTokenStatus())
     } else if(state.sendPasswordResetTokenStatus === "failed") {
       showMessage(
         "Reset password",
         state.sendPasswordResetTokenError,
         "error"
       )
-    }
-
-    return () => {
       dispatch(clearSendPasswordResetTokenStatus())
     }
   },[state.sendPasswordResetTokenStatus]);
@@ -110,6 +109,7 @@ const ResetHyveCloudPasswordModal = ({
                 className="h-14"
                 hasPLaceHolder={true}
                 onChange={(e: any) => {
+                  sessionStorage.setItem('emailReset', e.target.value)
                   setEmail(e.target.value)
                 }}
                 value={email}
@@ -125,7 +125,7 @@ const ResetHyveCloudPasswordModal = ({
           </div>
         </Box>
       </Modal>
-      <OtpModal openOtp={openOtp} setOpenOtp={setOpenOtp} email={email} pin={false}/>
+      <OtpModal openOtp={openOtp} setOpenOtp={setOpenOtp} pin={false}/>
     </>
   );
 };

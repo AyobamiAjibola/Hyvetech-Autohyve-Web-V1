@@ -7,6 +7,7 @@ import {
   garageSignUpAction, 
   preSignUpAction, 
   resetPasswordWithTokenAction, 
+  resetTokenAction, 
   sendPasswordResetTokenAction, 
   signInAction, signOutAction, 
   veryfyTokenAction 
@@ -41,6 +42,10 @@ interface IAuthenticationState {
   resetPasswordWithTokenSuccess: string;
   resetPasswordWithTokenError?: string;
 
+  resetTokenStatus: IThunkAPIStatus;
+  resetTokenSuccess: string;
+  resetTokenError?: string;
+
   preSignUpStatus: IThunkAPIStatus;
   preSignUpSuccess: string;
   preSignUpError?: string;
@@ -73,6 +78,10 @@ const initialState: IAuthenticationState = {
   resetPasswordWithTokenError: '',
   resetPasswordWithTokenSuccess: '',
   resetPasswordWithTokenStatus: 'idle',
+
+  resetTokenError: '',
+  resetTokenSuccess: '',
+  resetTokenStatus: 'idle',
 
   garageSignUpStatus: 'idle',
   garageSignUpSuccess: '',
@@ -122,6 +131,11 @@ const authenticationSlice = createSlice({
       state.resetPasswordWithTokenStatus = 'idle';
       state.resetPasswordWithTokenSuccess = '';
       state.resetPasswordWithTokenError = '';
+    },
+    clearResetTokenStatus(state: IAuthenticationState) {
+      state.resetTokenStatus = 'idle';
+      state.resetTokenSuccess = '';
+      state.resetTokenError = '';
     },
     clearPreSignUpStatus(state: IAuthenticationState) {
       state.preSignUpStatus = 'idle';
@@ -246,6 +260,22 @@ const authenticationSlice = createSlice({
       });
 
     builder
+      .addCase(resetTokenAction.pending, state => {
+        state.resetTokenStatus = 'loading';
+      })
+      .addCase(resetTokenAction.fulfilled, (state, action) => {
+        state.resetTokenStatus = 'completed';
+        state.resetTokenSuccess = action.payload.message;
+      })
+      .addCase(resetTokenAction.rejected, (state, action) => {
+        state.resetTokenStatus = 'failed';
+
+        if (action.payload) {
+          state.resetTokenError = action.payload.message;
+        } else state.resetTokenError = action.error.message as string;
+      });
+
+    builder
       .addCase(preSignUpAction.pending, state => {
         state.preSignUpStatus = 'loading';
       })
@@ -285,6 +315,7 @@ export const {
   clearGarageSignUpStatus,
   clearChangePasswordStatus,
   clearResetPasswordWithTokenStatus,
+  clearResetTokenStatus,
   clearSendPasswordResetTokenStatus,
   clearPreSignUpStatus,
   clearVerifyTokenStatus

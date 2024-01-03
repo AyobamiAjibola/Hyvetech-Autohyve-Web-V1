@@ -476,13 +476,13 @@ const InvoiceDetailsModal = ({
     if (value === "Add Reminder") {
       generateReminder()
     }
-    if (value === "Edit Invoice") {
-      navigate("/edit-invoice");
-      Object.entries(data).forEach(([key, value]) => {
-        //@ts-ignore
-        sessionStorage.setItem(key, value);
-      });
-    }
+    // if (value === "Edit Invoice") {
+    //   navigate("/edit-invoice");
+    //   Object.entries(data).forEach(([key, value]) => {
+    //     //@ts-ignore
+    //     sessionStorage.setItem(key, value);
+    //   });
+    // }
   };
 
   useEffect(() => {
@@ -698,14 +698,14 @@ const InvoiceDetailsModal = ({
                 >
                   Add Reminder
                 </MenuItem>
-                <MenuItem
+                {/* <MenuItem
                   className={classes.select}
                   value={'Edit Invoice'}
                   sx={{fontSize: "14px",
                   fontFamily: "montserrat"}}
                 >
                   Edit Invoice
-                </MenuItem>
+                </MenuItem> */}
               </Select>
             </FormControl>
           </div>

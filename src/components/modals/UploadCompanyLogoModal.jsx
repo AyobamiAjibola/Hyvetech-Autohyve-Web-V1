@@ -99,6 +99,7 @@ export default function UploadCompanyLogoModal({ setOpenProfile, openProfile, da
                       id="logo"
                       accept="image/*"
                       onChange={(event) => {
+                        console.log(event.currentTarget.files[0], 'uri')
                         const previewURL = URL.createObjectURL(event.target.files[0]);
                         setImagePreview(previewURL);
                         setFieldValue("logo", event.currentTarget.files[0])

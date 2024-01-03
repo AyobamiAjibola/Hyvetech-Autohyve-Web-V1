@@ -14,7 +14,7 @@ import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { clearSendPasswordResetTokenStatus } from "../../store/reducers/authenticationReducer";
 
-export default function NewPassword({ setNewPasswordModal, newPasswordModal, otp }) {
+export default function NewPassword({ setNewPasswordModal, newPasswordModal, otp, email }) {
 
   const state = useAppSelector(state => state.authenticationReducer)
   const dispatch = useAppDispatch();
@@ -56,14 +56,13 @@ export default function NewPassword({ setNewPasswordModal, newPasswordModal, otp
   }, [newPasswordModal]);
 
   const handleSubmit = (values) => {
-    if(otp.length === 4) {
       dispatch(
         resetPasswordWithTokenAction({
+          email: email ? email : sessionStorage.getItem('emailReset'),
           password: values.newPassword,
-          token: otp
+          confirmPassword: values.confirmPassword
         })
       );
-    }
   };
 
   useEffect(() => {

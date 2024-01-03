@@ -10,6 +10,7 @@ const SIGN_OUT = 'authentication:SIGN_OUT';
 const CHANGE_PASSWORD = 'authentication:CHANGE_PASSWORD';
 const SEND_PASS_RESET_TOKEN = 'authentication:SEND_PASS_RESET_TOKEN';
 const RESET_PASS_WITH_TOKEN = 'authentication:RESET_PASS_WITH_TOKEN';
+const RESET_TOKEN = 'authentication:RESET_TOKEN';
 const PRE_SIGN_UP = 'authentication:PRE_SIGN_UP';
 const VERIFY_TOKEN = 'authentication:VERIFY_TOKEN';
 const API_ROOT = settings.api.rest;
@@ -54,7 +55,15 @@ export const sendPasswordResetTokenAction = asyncThunkWrapper<ApiResponseSuccess
 export const resetPasswordWithTokenAction = asyncThunkWrapper<ApiResponseSuccess<string>, any>(
   RESET_PASS_WITH_TOKEN,
   async args => {
-  const response = await axiosClient.post(`${API_ROOT}/reset-password-with-token`, args);
+  const response = await axiosClient.put(`${API_ROOT}/reset-password-with-token`, args);
+
+  return response.data;
+});
+
+export const resetTokenAction = asyncThunkWrapper<ApiResponseSuccess<string>, any>(
+  RESET_TOKEN,
+  async args => {
+  const response = await axiosClient.put(`${API_ROOT}/reset-token`, args);
 
   return response.data;
 });

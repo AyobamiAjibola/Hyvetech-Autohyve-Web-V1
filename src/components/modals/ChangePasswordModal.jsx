@@ -64,11 +64,6 @@ export default function ChangePasswordModal({ setOpenModal, openModal, email }) 
     if(state.sendPasswordResetTokenStatus === 'completed') {
       setOpenOtp(true);
       setOpenModal(false);
-      showMessage(
-        "Password Reset",
-        state.sendPasswordResetTokenSuccess,
-        "success"
-      );
     }
   },[state.sendPasswordResetTokenStatus]);
 
@@ -196,11 +191,7 @@ export default function ChangePasswordModal({ setOpenModal, openModal, email }) 
                         className="text-[#000] border-[1px] bg-white border-[#D9D9D9] mt-1 font-medium"
                         type="button"
                         spinner={state.sendPasswordResetTokenStatus === 'loading'}
-                        onClick={() => {
-                          handleResetPassword()
-                          // setOpenOtp(true);
-                          // setOpenModal(false);
-                        }}
+                        onClick={handleResetPassword}
                       />
 
                       <AppBtn

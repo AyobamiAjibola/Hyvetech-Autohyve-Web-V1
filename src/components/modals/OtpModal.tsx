@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./modal.css";
 import CloseIcon from "../../assets/svgs/close-circle.svg";
 import AppBtn from "../AppBtn/AppBtn";
@@ -8,40 +8,27 @@ import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { sendPasswordResetTokenAction } from "../../store/actions/authenicationActions";
+import { resetTokenAction, sendPasswordResetTokenAction } from "../../store/actions/authenicationActions";
 import useAppDispatch from "../../hooks/useAppDispatch";
 import useAppSelector from "../../hooks/useAppSelector";
 import NewPinResetModal from "./NewPinResetModal";
-
-// const style = {
-//   position: 'absolute',
-//   top: '50%',
-//   left: '50%',
-//   transform: 'translate(-50%, -50%)',
-//   width: 400,
-//   bgcolor: 'background.paper',
-//   border: '2px solid #000',
-//   boxShadow: 24,
-//   p: 4,
-// };
+import { showMessage } from "../../helpers/notification";
+import { clearResetTokenStatus, clearSendPasswordResetTokenStatus } from "../../store/reducers/authenticationReducer";
 
 interface IProps {
   openOtp: any;
   setOpenOtp: any;
   openReset?: any;
   setOpenReset?: any;
-  // headerTitle: string;
-  subHeader?: string
-  email: any;
+  subHeader?: string;
   pin?: boolean;
+  email?: string;
 }
 
 export default function OtpModal({
   openOtp,
   setOpenOtp,
-  // openReset,
-  subHeader = "We sent you an OTP, check your email address and provide the code",
-  email, pin
+  subHeader = "We sent you an OTP, check your email address and provide the code", email
 }: IProps) {
   const [otp, setOtp] = useState("");
   const [newPasswordModal, setNewPasswordModal] = useState(false);
@@ -68,29 +55,54 @@ export default function OtpModal({
 
   const handleResetPassword = () => {
     dispatch(sendPasswordResetTokenAction({
-      email
+      email: email ? email : sessionStorage.getItem('emailReset')
     }))
   };
 
-  // useEffect(() => {
-  //   if(state.sendPasswordResetTokenStatus === "completed") {
-  //     showMessage(
-  //       "Reset password",
-  //       state.sendPasswordResetTokenSuccess,
-  //       "success"
-  //     )
-  //   } else if(state.sendPasswordResetTokenStatus === "failed") {
-  //     showMessage(
-  //       "Reset password",
-  //       state.sendPasswordResetTokenError,
-  //       "error"
-  //     )
-  //   }
+  const handleOtp = () => {
+    if(otp.length === 4) {
+      dispatch(
+        resetTokenAction({
+          email: email ? email : sessionStorage.getItem('emailReset'),
+          token: otp
+        })
+      );
+    }
+  };
 
-  //   return () => {
-  //     dispatch(clearSendPasswordResetTokenStatus())
-  //   }
-  // },[state.sendPasswordResetTokenStatus]);
+  useEffect(() => {
+    if(state.sendPasswordResetTokenStatus === "completed") {
+      showMessage(
+        "Reset password",
+        state.sendPasswordResetTokenSuccess,
+        "success"
+      )
+      dispatch(clearSendPasswordResetTokenStatus())
+    } else if(state.sendPasswordResetTokenStatus === "failed") {
+      showMessage(
+        "Reset password",
+        state.sendPasswordResetTokenError,
+        "error"
+      )
+      dispatch(clearSendPasswordResetTokenStatus())
+    }
+  },[state.sendPasswordResetTokenStatus]);
+
+  useEffect(() => {
+    if(state.resetTokenStatus === 'completed') {
+      setOpenOtp(false);
+      setNewPasswordModal(true)
+      setOtp('')
+      dispatch(clearResetTokenStatus())
+    } else if (state.resetTokenStatus === 'failed') {
+      showMessage(
+        "Password reset",
+        state.resetTokenError,
+        "error"
+      )
+      dispatch(clearResetTokenStatus())
+    }
+  },[state.resetTokenStatus]);
 
   return (
     <>
@@ -141,13 +153,9 @@ export default function OtpModal({
 
             <AppBtn
               title="CONFIRM"
-              onClick={() => {
-                !otp && setNewPasswordModal(!newPasswordModal);
-                setOpenOtp(!openOtp);
-                pin ? setChangePin(!changePin) : setNewPasswordModal(!newPasswordModal);
-              }}
+              onClick={handleOtp}
               className="text-[#000] font-medium bg-[#FAA21B] mt-1"
-              spinner={state.sendPasswordResetTokenStatus === 'loading'}
+              spinner={state.sendPasswordResetTokenStatus === 'loading' || state.resetTokenStatus === 'loading'}
             />
           </div>
         </Box>
@@ -157,6 +165,7 @@ export default function OtpModal({
         newPasswordModal={newPasswordModal}
         setNewPasswordModal={setNewPasswordModal}
         otp={otp}
+        email={email}
       />
 
       <NewPinResetModal
