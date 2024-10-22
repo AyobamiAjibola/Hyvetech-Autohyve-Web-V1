@@ -135,6 +135,7 @@ const Payment = ({data}: IProps) => {
                                 title="Activate Account"
                                 className="btn-primary text-[#000] mt-8"
                                 onClick={() => setShowAccountModal(true)}
+                                disabled
                             />
                         </div>
                       </>)

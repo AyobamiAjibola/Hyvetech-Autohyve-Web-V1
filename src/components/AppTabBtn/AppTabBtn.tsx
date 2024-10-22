@@ -31,7 +31,8 @@ interface IProps {
   title: string;
   className: any;
   icon?: any;
-  type?: any
+  type?: any;
+  disabled?: boolean;
 }
 
 const AppTabBtn = ({ 
@@ -39,7 +40,8 @@ const AppTabBtn = ({
   title, 
   className, 
   icon, 
-  type = 'button'
+  type = 'button',
+  disabled = false
 }: IProps) => {
   return (
     <button
@@ -49,6 +51,7 @@ const AppTabBtn = ({
     ` + className
       }
       onClick={onClick}
+      disabled={disabled}
     >
       {icon}
       <span className="font-montserrat font-medium text-sm"> {title}</span>
