@@ -184,6 +184,7 @@ const Hyvepay = () => {
                                   ? setShowIndividualAccountModal(true)
                                   : setShowAccountModal(true)
                           }}
+                  disabled={true}
                 />
               )}
 
